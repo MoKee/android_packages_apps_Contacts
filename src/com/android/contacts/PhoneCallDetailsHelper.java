@@ -110,7 +110,8 @@ public class PhoneCallDetailsHelper {
             nameText = displayNumber;
             if (TextUtils.isEmpty(details.geocode)
                     || mPhoneNumberHelper.isVoicemailNumber(details.number)) {
-                numberText = mResources.getString(R.string.call_log_empty_gecode);
+		numberText = "";
+                //numberText = mResources.getString(R.string.call_log_empty_gecode);
             } else {
                 numberText = details.geocode;
             }
@@ -123,7 +124,7 @@ public class PhoneCallDetailsHelper {
 
         views.nameView.setText(nameText);
         views.numberView.setText(numberText);
-        views.labelView.setText(labelText);
+        views.labelView.setText(TextUtils.isEmpty(details.geocode) ? labelText : labelText + " " + details.geocode);
         views.labelView.setVisibility(TextUtils.isEmpty(labelText) ? View.GONE : View.VISIBLE);
     }
 
