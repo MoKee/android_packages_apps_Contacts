@@ -85,13 +85,14 @@ public class CallStatsDetailHelper {
             out = byDuration
                     ? details.getRequestedDuration(Calls.OUTGOING_TYPE) * ratio / full
                     : details.getRequestedCount(Calls.OUTGOING_TYPE) * ratio / full;
-            if (!byDuration) {
-                missed = details.getRequestedCount(Calls.MISSED_TYPE) * ratio / full;
-            }
         } else if (type == Calls.INCOMING_TYPE) {
             in = ratio;
         } else if (type == Calls.OUTGOING_TYPE) {
             out = ratio;
+        }
+
+        if (!byDuration) {
+            missed = details.getRequestedCount(Calls.MISSED_TYPE) * ratio / full;
         } else if (type == Calls.MISSED_TYPE) {
             missed = ratio;
         }
@@ -147,7 +148,7 @@ public class CallStatsDetailHelper {
         }
 
         boolean dispHours = hours > 0;
-        boolean dispMinutes = minutes > 0 || (!includeSeconds && hours == 0);
+        boolean dispMinutes = minutes > 0 || !includeSeconds;
         boolean dispSeconds = includeSeconds && (seconds > 0 || (hours == 0 && minutes == 0));
 
         final String hourString = dispHours ?

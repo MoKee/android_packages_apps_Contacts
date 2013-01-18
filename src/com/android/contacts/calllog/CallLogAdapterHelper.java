@@ -212,7 +212,7 @@ public class CallLogAdapterHelper implements ViewTreeObserver.OnPreDrawListener 
      */
     private final LinkedList<ContactInfoRequest> mRequests;
 
-    private View mOnPreDrawObservedView = null;
+    private ViewTreeObserver mViewTreeObserver = null;
 
     private Handler mHandler = new Handler() {
         @Override
@@ -266,9 +266,9 @@ public class CallLogAdapterHelper implements ViewTreeObserver.OnPreDrawListener 
 
     public void registerOnPreDrawListener(View v) {
         // Listen for the first draw
-        if (mOnPreDrawObservedView == null) {
-            mOnPreDrawObservedView = v;
-            v.getViewTreeObserver().addOnPreDrawListener(this);
+        if (mViewTreeObserver == null) {
+            mViewTreeObserver = v.getViewTreeObserver();
+            mViewTreeObserver.addOnPreDrawListener(this);
         }
     }
 
@@ -276,10 +276,10 @@ public class CallLogAdapterHelper implements ViewTreeObserver.OnPreDrawListener 
      * Stop receiving onPreDraw() notifications.
      */
     private void unregisterPreDrawListener() {
-        if (mOnPreDrawObservedView != null) {
-            mOnPreDrawObservedView.getViewTreeObserver().removeOnPreDrawListener(this);
-            mOnPreDrawObservedView = null;
+        if (mViewTreeObserver != null && mViewTreeObserver.isAlive()) {
+            mViewTreeObserver.removeOnPreDrawListener(this);
         }
+        mViewTreeObserver = null;
     }
 
     public void invalidateCache() {
