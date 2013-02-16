@@ -53,8 +53,8 @@
     <string name="menu_splitAggregate" msgid="8368636463748691868">"Opdel"</string>
     <string name="menu_editGroup" msgid="5062005185370983720">"Rediger"</string>
     <string name="menu_deleteGroup" msgid="3486380004411482874">"Slet"</string>
-    <string name="menu_new_contact_action_bar" msgid="8887818026717394343">"Ny"</string>
-    <string name="menu_new_group_action_bar" msgid="5055346725617932394">"Ny"</string>
+    <string name="menu_new_contact_action_bar" msgid="7263362129442119188">"Tilføj kontaktperson"</string>
+    <string name="menu_new_group_action_bar" msgid="3520232877587377175">"Tilføj gruppe"</string>
     <string name="splitConfirmation_title" msgid="633640935430370530">"Opdel kontaktperson?"</string>
     <string name="splitConfirmation" msgid="740190210499587175">"Denne kontaktperson opdeles i flere kontaktpersoner."</string>
     <string name="menu_joinAggregate" msgid="5027981918265667970">"Føj til"</string>
@@ -137,6 +137,7 @@
     <string name="contactsAllLabel" msgid="6479708629170672169">"Alle kontaktpersoner"</string>
     <string name="contactsGroupsLabel" msgid="2841971472518003524">"Grupper"</string>
     <string name="contactsFavoritesLabel" msgid="8417039765586853670">"Favorit"</string>
+    <string name="dialerAllContactsLabel" msgid="1025920923112988336">"Foretrukne og alle kontakter"</string>
     <string name="dialerIconLabel" msgid="6500826552823403796">"Telefon"</string>
     <string name="recentCallsIconLabel" msgid="1419116422359067949">"Opk.liste"</string>
     <string name="menu_sendTextMessage" msgid="6937343460284499306">"Send sms"</string>
@@ -568,6 +569,7 @@
     <string name="dialog_voicemail_airplane_mode_message" msgid="530922773669546093">"Hvis du vil ringe til telefonsvareren, skal du først slå Flytilstand fra."</string>
     <string name="menu_export_database" msgid="2659719297530170820">"Eksportér databasefiler"</string>
     <string name="action_menu_overflow_description" msgid="2303272250613084574">"Flere valgmuligheder"</string>
+    <string name="expand_collapse_name_fields_description" msgid="8682630859539604311">"Udvid eller skjul navnefelter"</string>
 
     <!-- CYANOGENMOD ADDITIONS -->
     <string name="t9_loading">Indlæser\u2026</string>
@@ -584,6 +586,58 @@
     <string name="dialer_ui_title">Indstillinger for opkaldsprogram</string>
     <string name="dialer_ui_orientation_title">Slå sensor-orientering til</string>
     <string name="dialer_ui_orientation_summary">Rotér opkaldsprogram baseret på sensor</string>
+
+    <!-- Call stats -->
+    <string name="callStatsDetailTitle">Detaljer for opkaldsstatistik</string>
+    <string name="call_stats">Opkaldsstatistik</string>
+    <string name="call_stats_refresh">Genopfrisk</string>
+    <string name="activity_title_call_stats">Opkaldsstatistik</string>
+    <string name="call_stats_nav_all">Alle</string>
+    <string name="call_stats_nav_incoming">Indgående</string>
+    <string name="call_stats_nav_outgoing">Udgående</string>
+    <string name="call_stats_nav_missed">Ubesvaret</string>
+    <string name="call_stats_incoming">Indgående: <xliff:g id="percent">%d</xliff:g>%%</string>
+    <string name="call_stats_outgoing">Udgående: <xliff:g id="percent">%d</xliff:g>%%</string>
+    <string name="call_stats_missed">Ubesvaret</string>
+    <string name="call_stats_missed_percent">Ubesvaret: <xliff:g id="percent">%d</xliff:g>%%</string>
+    <string name="call_stats_header_total">I alt: <xliff:g id="call_count">%s</xliff:g>, <xliff:g id="duration">%s</xliff:g></string>
+    <string name="call_stats_header_total_callsonly">I alt: <xliff:g id="call_count">%s</xliff:g></string>
+    <string name="call_stats_filter_from">Startdato</string>
+    <string name="call_stats_filter_to">Slutdato</string>
+    <string name="call_stats_filter_picker_title">Tidsinterval</string>
+
+    <string name="date_quick_selection">Hurtigvalg</string>
+    <string name="date_qs_currentmonth">Denne måned</string>
+    <string name="date_qs_currentquarter">Dette kvartal</string>
+    <string name="date_qs_currentyear">Dette år</string>
+    <string name="date_qs_lastweek">Sidste uge</string>
+    <string name="date_qs_lastmonth">Sidste måned</string>
+    <string name="date_qs_lastquarter">Sidste kvartal</string>
+    <string name="date_qs_lastyear">Sidste år</string>
+
+    <string name="call_stats_date_filter">Justér tidsinterval</string>
+    <string name="call_stats_reset_filter">Nulstil tidsinterval</string>
+    <string name="call_stats_sort_by_duration">Sortér på opkaldslængde</string>
+    <string name="call_stats_sort_by_count">Sortér på antal opkald</string>
+
+    <plurals name="hour">
+        <item quantity="one">1 time</item>
+        <item quantity="other">%d timer</item>
+    </plurals>
+    <plurals name="minute">
+        <item quantity="one">1 minut</item>
+        <item quantity="other">%d minutter</item>
+    </plurals>
+    <plurals name="second">
+        <item quantity="one">1 sekund</item>
+        <item quantity="other">%d sekunder</item>
+    </plurals>
+
+    <plurals name="call">
+        <item quantity="one">1 opkald</item>
+        <item quantity="other">%d opkald</item>
+    </plurals>
+
     <!-- CYANOGENMOD ADDITIONS END -->
 
 </resources>
