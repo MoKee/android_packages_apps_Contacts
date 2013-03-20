@@ -25,6 +25,7 @@ import android.app.DialogFragment;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
@@ -88,9 +89,13 @@ import com.android.contacts.activities.DialtactsActivity;
 import com.android.contacts.dialpad.T9SearchCache.ContactItem;
 import com.android.contacts.dialpad.T9SearchCache.T9Adapter;
 import com.android.contacts.dialpad.T9SearchCache.T9SearchResult;
+import com.android.contacts.preference.IPCallPreferenceActivity;
 import com.android.contacts.util.Constants;
 import com.android.contacts.util.PhoneNumberFormatter;
 import com.android.contacts.util.StopWatch;
+import com.android.i18n.phonenumbers.NumberParseException;
+import com.android.i18n.phonenumbers.PhoneNumberUtil;
+import com.android.i18n.phonenumbers.Phonenumber.PhoneNumber;
 import com.android.internal.telephony.ITelephony;
 import com.android.phone.CallLogAsync;
 import com.android.phone.HapticFeedback;
@@ -699,6 +704,7 @@ public class DialpadFragment extends Fragment
         final MenuItem callSettingsMenuItem = menu.findItem(R.id.menu_call_settings_dialpad);
         final MenuItem addToContactMenuItem = menu.findItem(R.id.menu_add_contacts);
         final MenuItem twoSecPauseMenuItem = menu.findItem(R.id.menu_2s_pause);
+        final MenuItem IPCallMenuItem = menu.findItem(R.id.menu_ipcall);
         final MenuItem waitMenuItem = menu.findItem(R.id.menu_add_wait);
 
         // Check if all the menu items are inflated correctly. As a shortcut, we assume all menu
@@ -722,6 +728,7 @@ public class DialpadFragment extends Fragment
         if (dialpadChooserVisible() || isDigitsEmpty()) {
             addToContactMenuItem.setVisible(false);
             twoSecPauseMenuItem.setVisible(false);
+            IPCallMenuItem.setVisible(false);
             waitMenuItem.setVisible(false);
         } else {
             final CharSequence digits = mDigits.getText();
@@ -730,6 +737,8 @@ public class DialpadFragment extends Fragment
             addToContactMenuItem.setIntent(getAddToContactIntent(digits));
             addToContactMenuItem.setVisible(true);
 
+            IPCallMenuItem.setVisible(digits.length() >= 3 ? true : false);
+            
             // Check out whether to show Pause & Wait option menu items
             int selectionStart;
             int selectionEnd;
@@ -1207,6 +1216,33 @@ public class DialpadFragment extends Fragment
         mClearDigitsOnStop = true;
         getActivity().finish();
     }
+    
+    public static class IPCallDialogFragment extends DialogFragment {
+
+        public static void show(DialpadFragment parent) {
+            if (!parent.isAdded()) return;
+
+            final IPCallDialogFragment dialog = new IPCallDialogFragment();
+            dialog.setTargetFragment(parent, 0);
+            dialog.show(parent.getFragmentManager(), "IPCallDialogFragment");
+        }
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle(R.string.dialer_ipcall_title);
+            builder.setMessage(R.string.dialer_ipcall_msg);
+            builder.setPositiveButton(android.R.string.ok,
+                    new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            	final DialpadFragment target = (DialpadFragment) getTargetFragment();
+                            	target.dialButtonPressed();
+                            }
+                    }).setNegativeButton(android.R.string.cancel, null);
+            return builder.create();
+        }
+    }
 
     public static class ErrorDialogFragment extends DialogFragment {
         private int mTitleResId;
@@ -1305,6 +1341,52 @@ public class DialpadFragment extends Fragment
                 getActivity().finish();
             }
         }
+    }
+
+    public void dialIPCallButtonPressed() {
+    	Context context = DialpadFragment.this.getActivity().getBaseContext();
+            final String number = mDigits.getText().toString();
+
+            // "persist.radio.otaspdial" is a temporary hack needed for one carrier's automated
+            // test equipment.
+            // TODO: clean it up.
+            if (number != null
+                    && !TextUtils.isEmpty(mProhibitedPhoneNumberRegexp)
+                    && number.matches(mProhibitedPhoneNumberRegexp)
+                    && (SystemProperties.getInt("persist.radio.otaspdial", 0) != 1)) {
+                Log.i(TAG, "The phone number is prohibited explicitly by a rule.");
+                if (getActivity() != null) {
+                    DialogFragment dialogFragment = ErrorDialogFragment.newInstance(
+                            R.string.dialog_phone_call_prohibited_message);
+                    dialogFragment.show(getFragmentManager(), "phone_prohibited_dialog");
+                }
+
+                // Clear the digits just in case.
+                mDigits.getText().clear();
+            } else {
+            	PhoneNumber pNumber;
+                String nNumber= number;
+                String ipNumber = "";
+			try {
+				pNumber = PhoneNumberUtil.getInstance().parse(number, IPCallPreferenceActivity.getCurrentCountryCode(context));
+	            		nNumber = String.valueOf(pNumber.getNationalNumber());
+				String ip_call_prefix = IPCallPreferenceActivity.getIPCallPrefix(context);
+				if(nNumber.indexOf(ip_call_prefix) == 0 && ip_call_prefix.length() != 0)
+				{
+					nNumber = nNumber.replaceFirst(ip_call_prefix, "");
+				}
+				ipNumber = ip_call_prefix + nNumber;
+			} catch (NumberParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+                final Intent intent = ContactsUtils.getCallIntent(ipNumber,
+                        (getActivity() instanceof DialtactsActivity ?
+                                ((DialtactsActivity)getActivity()).getCallOrigin() : null));
+                startActivity(intent);
+                mClearDigitsOnStop = true;
+                getActivity().finish();
+            }
     }
 
     private void handleDialButtonClickWithEmptyDigits() {
@@ -1707,6 +1789,17 @@ public class DialpadFragment extends Fragment
                 return true;
             case R.id.menu_add_wait:
                 updateDialString(";");
+                return true;
+            case R.id.menu_ipcall:
+            	Context context = DialpadFragment.this.getActivity().getBaseContext();
+            	if(TextUtils.isEmpty(IPCallPreferenceActivity.getIPCallPrefix(context)))
+            	{
+                    IPCallDialogFragment.show(this);
+            	}
+            	else
+            	{
+                    dialIPCallButtonPressed();
+            	}
                 return true;
             default:
                 return false;

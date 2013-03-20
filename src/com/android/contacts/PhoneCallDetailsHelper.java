@@ -110,7 +110,7 @@ public class PhoneCallDetailsHelper {
             nameText = displayNumber;
             if (TextUtils.isEmpty(details.geocode)
                     || mPhoneNumberHelper.isVoicemailNumber(details.number)) {
-		numberText = "";
+                numberText = "";
                 //numberText = mResources.getString(R.string.call_log_empty_gecode);
             } else {
                 numberText = details.geocode;
