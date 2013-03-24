@@ -16,8 +16,10 @@
 
 package com.android.contacts;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Typeface;
+import android.mokee.location.PhoneLocation;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.telephony.PhoneNumberUtils;
 import android.text.SpannableString;
@@ -111,7 +113,6 @@ public class PhoneCallDetailsHelper {
             if (TextUtils.isEmpty(details.geocode)
                     || mPhoneNumberHelper.isVoicemailNumber(details.number)) {
                 numberText = "";
-                //numberText = mResources.getString(R.string.call_log_empty_gecode);
             } else {
                 numberText = details.geocode;
             }
@@ -122,10 +123,22 @@ public class PhoneCallDetailsHelper {
             labelText = numberFormattedLabel;
         }
 
+        Context mContext = views.labelView.getContext();   
+        if(mContext.getResources().getConfiguration().locale.getCountry().equals("CN")||mContext.getResources().getConfiguration().locale.getCountry().equals("TW")) {
+        	CharSequence PhoneLocationStr = PhoneLocation.getCityFromPhone(String.valueOf(details.number), mContext);
+        	views.locationView.setText(PhoneLocationStr);
+            views.locationView.setVisibility(TextUtils.isEmpty(PhoneLocationStr) ? View.INVISIBLE : View.VISIBLE);
+        } else {
+        	views.locationView.setText(details.geocode);
+            views.locationView.setVisibility(TextUtils.isEmpty(details.geocode) ? View.INVISIBLE : View.VISIBLE);
+        }
+        
+
         views.nameView.setText(nameText);
         views.numberView.setText(numberText);
-        views.labelView.setText(TextUtils.isEmpty(details.geocode) ? labelText : labelText + " " + details.geocode);
+        views.labelView.setText(labelText);
         views.labelView.setVisibility(TextUtils.isEmpty(labelText) ? View.GONE : View.VISIBLE);
+        views.numberView.setVisibility(numberText == details.geocode ? View.GONE : View.VISIBLE);
     }
 
     /** Sets the text of the header view for the details page of a phone call. */
