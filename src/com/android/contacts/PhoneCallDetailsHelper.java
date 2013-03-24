@@ -127,10 +127,10 @@ public class PhoneCallDetailsHelper {
         if(mContext.getResources().getConfiguration().locale.getCountry().equals("CN")||mContext.getResources().getConfiguration().locale.getCountry().equals("TW")) {
         	CharSequence PhoneLocationStr = PhoneLocation.getCityFromPhone(String.valueOf(details.number), mContext);
         	views.locationView.setText(PhoneLocationStr);
-            views.locationView.setVisibility(TextUtils.isEmpty(PhoneLocationStr) ? View.INVISIBLE : View.VISIBLE);
+        	views.locationView.setVisibility(TextUtils.isEmpty(PhoneLocationStr) ? View.INVISIBLE : View.VISIBLE);
         } else {
         	views.locationView.setText(details.geocode);
-            views.locationView.setVisibility(TextUtils.isEmpty(details.geocode) ? View.INVISIBLE : View.VISIBLE);
+        	views.locationView.setVisibility(TextUtils.isEmpty(details.geocode) ? View.INVISIBLE : View.VISIBLE);
         }
         
 
@@ -138,7 +138,7 @@ public class PhoneCallDetailsHelper {
         views.numberView.setText(numberText);
         views.labelView.setText(labelText);
         views.labelView.setVisibility(TextUtils.isEmpty(labelText) ? View.GONE : View.VISIBLE);
-        views.numberView.setVisibility(numberText == details.geocode ? View.GONE : View.VISIBLE);
+        views.numberView.setVisibility(numberText == details.geocode || TextUtils.isEmpty(numberText) ? View.GONE : View.VISIBLE);
     }
 
     /** Sets the text of the header view for the details page of a phone call. */
