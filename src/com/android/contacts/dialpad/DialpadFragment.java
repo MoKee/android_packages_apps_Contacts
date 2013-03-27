@@ -302,7 +302,7 @@ public class DialpadFragment extends Fragment
 			    SensorProximity = currentProx;
 			    initProx = false;
 			} else {
-			    if( SensorProximity > 0 && currentProx == 0){
+			    if( SensorProximity > 0 && currentProx <= 3){
 			        proxChanged = true;
 			    }
 			}
@@ -310,7 +310,7 @@ public class DialpadFragment extends Fragment
 			break;
 	        }
 
-	    if (rightOrientation(SensorOrientationY) && SensorProximity == 0 && proxChanged ) {
+	    if (rightOrientation(SensorOrientationY) && SensorProximity <= 3 && proxChanged ) {
 	        if (isDigitsEmpty() == false) {
 	            // unregister Listener to don't let the onSesorChanged run the
 	            // whole time
