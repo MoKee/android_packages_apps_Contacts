@@ -1894,6 +1894,8 @@ connection to the voicemail server is lost. [CHAR LIMIT=64] -->
          [CHAR LIMIT=NONE] -->
     <string name="expand_collapse_name_fields_description">Expand or collapse name fields</string>
 
+    <!-- CYANOGENMOD ADDITIONS START -->
+
     <string name="call_stats_nav_all">All</string>
     <string name="call_stats_nav_incoming">Incoming</string>
     <string name="call_stats_nav_outgoing">Outgoing</string>
@@ -1958,11 +1960,16 @@ connection to the voicemail server is lost. [CHAR LIMIT=64] -->
         <item quantity="other">%d calls</item>
     </plurals>
 
-    <!-- MoKee Add Start -->
+    <string name="menu_add_to_blacklist">Add to blacklist</string>
+    <string name="toast_added_to_blacklist">%s added to blacklist.</string>
+
+    <!-- CYANOGENMOD ADDITIONS END -->
+    
+    <!-- MOKEE ADDITIONS START -->
     <!-- IP Call -->
     <string name="dialer_ip_call_prefix_title">IP Prefix</string>
     <string name="dialer_ip_call_prefix_summary">Tap to set IP Prefix</string>
     <string name="dialer_ipcall_title">IPCall</string>
     <string name="dialer_ipcall_msg">IP prefix has not been set. Do you want to make the call without IP prefix</string>
-    <!-- MoKee Add End -->
+    <!-- MOKEE ADDITIONS END -->
 </resources>
