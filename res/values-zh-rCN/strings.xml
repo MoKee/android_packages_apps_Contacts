@@ -637,11 +637,14 @@
         <item quantity="other">%d 个通话</item>
     </plurals>
 
-    <!-- MoKee Add Start -->
+    <string name="menu_add_to_blacklist">加入黑名单</string>
+    <string name="toast_added_to_blacklist">%s 已加入到黑名单</string>
+
+    <!-- MOKEE ADDITIONS START -->
     <!-- IP Call -->
     <string name="dialer_ip_call_prefix_title">IP拨号前缀</string>
     <string name="dialer_ip_call_prefix_summary">点击设置IP拨号前缀</string>
     <string name="dialer_ipcall_title">IP拨号</string>
     <string name="dialer_ipcall_msg">尚未设置IP拨号前缀。您想直接拨打此号码吗？</string>
-    <!-- MoKee Add End -->
+    <!-- MOKEE ADDITIONS END -->
 </resources>
