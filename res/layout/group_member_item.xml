@@ -18,32 +18,60 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:orientation="vertical"
+    >
+	
+	<LinearLayout
+		xmlns:android="http://schemas.android.com/apk/res/android"
+		android:layout_width="match_parent"
+		android:layout_height="@dimen/contacts_view_person_data_height"
+    	android:paddingLeft="@dimen/account_container_left_padding"
+    	android:paddingBottom="@dimen/account_container_left_padding"
+    	android:paddingTop="@dimen/account_container_left_padding"
+    	android:orientation="horizontal"
+    	>
+		    <!--  
+	        android:layout_marginLeft="5dip"
+	        android:layout_marginRight="10dip"
+	        style="?android:attr/quickContactBadgeStyleWindowMedium" 
+		-->
+	    <QuickContactBadge
+	        android:id="@+id/badge"
+	        android:layout_gravity="center_vertical"
+	        android:layout_marginRight="@dimen/account_container_left_padding"
+	        android:layout_width="@dimen/contacts_view_photo_height"
+	        android:layout_height="@dimen/contacts_view_photo_height"
+	        android:scaleType="fitXY"
+	        />
+		
+		<!--  
+	        android:paddingRight="3dip"
+	        android:paddingLeft="@dimen/group_member_item_left_padding" 
+	        android:layout_weight="1"
+		-->
+	    <TextView
+	        android:id="@+id/name"
+	        android:layout_height="wrap_content"
+	        android:layout_width="0dp"
+	        android:layout_weight="1"
+	        android:layout_gravity="center_vertical"
+	        android:gravity="center_vertical"
+	        android:singleLine="true"
+	        android:ellipsize="end"
+	        android:textAppearance="?android:attr/textAppearanceMedium"
+	        android:focusable="true"
+	        />
+	
+	    <include
+	        android:id="@+id/delete_button_container"
+	        layout="@layout/edit_delete_button"
+	        android:gravity="center_vertical" />
+	</LinearLayout>
 
-    <TextView
-        android:id="@+id/name"
-        android:layout_height="wrap_content"
-        android:layout_width="0dip"
-        android:layout_weight="1"
-        android:layout_gravity="center_vertical"
-        android:gravity="center_vertical"
-        android:paddingRight="3dip"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:focusable="true"
-        android:paddingLeft="@dimen/group_member_item_left_padding" />
-
-    <QuickContactBadge
-        android:id="@+id/badge"
-        android:layout_marginLeft="5dip"
-        android:layout_marginRight="10dip"
-        android:layout_gravity="center_vertical"
-        android:layout_width="50dip"
-        android:layout_height="50dip"
-        style="?android:attr/quickContactBadgeStyleWindowMedium" />
-
-    <include
-        android:id="@+id/delete_button_container"
-        layout="@layout/edit_delete_button"
-        android:gravity="center_vertical" />
-
+	<View 
+	    android:id="@+id/group_member_item_dividing_id"
+		android:layout_width="match_parent"
+		android:layout_height="@dimen/contacts_dividing_line_height"
+		android:background="@drawable/contacts_dividing_line"/>
+		
 </LinearLayout>

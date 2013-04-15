@@ -23,23 +23,32 @@
     <RelativeLayout
         android:id="@+id/contact_tile_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent" 
+        android:background="@drawable/group_item_view_bg"
+        >
 
         <com.android.contacts.widget.LayoutSuppressingImageView
             android:id="@+id/contact_tile_image"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scaleType="centerCrop" />
+            android:scaleType="centerCrop" 
+        	android:layout_marginRight="@dimen/account_container_left_padding"
+        	android:layout_marginLeft="@dimen/account_container_left_padding"
+            />
 
+        <!--  
+            android:background="@color/contact_tile_shadow_box_color"
+        -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="@dimen/contact_tile_shadowbox_height"
             android:orientation="vertical"
-            android:background="@color/contact_tile_shadow_box_color"
+            android:background="@drawable/group_item_bottom_view_bg"
             android:layout_alignParentBottom="true"
             android:gravity="center_vertical"
-            android:paddingRight="8dip"
-            android:paddingLeft="8dip">
+        	android:paddingRight="@dimen/account_container_left_padding"
+        	android:paddingLeft="@dimen/account_container_left_padding"
+            >
 
             <TextView
                 android:id="@+id/contact_tile_name"

@@ -16,6 +16,15 @@
 
 package com.android.contacts;
 
+import com.android.contacts.model.AccountTypeManager;
+import com.android.contacts.model.AccountWithDataSet;
+import com.android.contacts.model.EntityDelta;
+import com.android.contacts.model.EntityDeltaList;
+import com.android.contacts.model.EntityModifier;
+import com.android.contacts.util.CallerInfoCacheUtils;
+import com.google.android.collect.Lists;
+import com.google.android.collect.Sets;
+
 import android.app.Activity;
 import android.app.IntentService;
 import android.content.ContentProviderOperation;
@@ -45,15 +54,6 @@ import android.provider.ContactsContract.RawContacts;
 import android.provider.ContactsContract.RawContactsEntity;
 import android.util.Log;
 import android.widget.Toast;
-
-import com.android.contacts.model.AccountTypeManager;
-import com.android.contacts.model.RawContactModifier;
-import com.android.contacts.model.RawContactDelta;
-import com.android.contacts.model.RawContactDeltaList;
-import com.android.contacts.model.account.AccountWithDataSet;
-import com.android.contacts.util.CallerInfoCacheUtils;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -289,7 +289,7 @@ public class ContactSaveService extends IntentService {
      * @param rawContactId identifies a writable raw-contact whose photo is to be updated.
      * @param updatedPhotoPath denotes a temporary file containing the contact's new photo.
      */
-    public static Intent createSaveContactIntent(Context context, RawContactDeltaList state,
+    public static Intent createSaveContactIntent(Context context, EntityDeltaList state,
             String saveModeExtraKey, int saveMode, boolean isProfile,
             Class<? extends Activity> callbackActivity, String callbackAction, long rawContactId,
             String updatedPhotoPath) {
@@ -306,7 +306,7 @@ public class ContactSaveService extends IntentService {
      * Contact Editor.
      * @param updatedPhotos maps each raw-contact's ID to the file-path of the new photo.
      */
-    public static Intent createSaveContactIntent(Context context, RawContactDeltaList state,
+    public static Intent createSaveContactIntent(Context context, EntityDeltaList state,
             String saveModeExtraKey, int saveMode, boolean isProfile,
             Class<? extends Activity> callbackActivity, String callbackAction,
             Bundle updatedPhotos) {
@@ -332,13 +332,13 @@ public class ContactSaveService extends IntentService {
     }
 
     private void saveContact(Intent intent) {
-        RawContactDeltaList state = intent.getParcelableExtra(EXTRA_CONTACT_STATE);
+        EntityDeltaList state = intent.getParcelableExtra(EXTRA_CONTACT_STATE);
         boolean isProfile = intent.getBooleanExtra(EXTRA_SAVE_IS_PROFILE, false);
         Bundle updatedPhotos = intent.getParcelableExtra(EXTRA_UPDATED_PHOTOS);
 
         // Trim any empty fields, and RawContacts, before persisting
         final AccountTypeManager accountTypes = AccountTypeManager.getInstance(this);
-        RawContactModifier.trimEmpty(state, accountTypes);
+        EntityModifier.trimEmpty(state, accountTypes);
 
         Uri lookupUri = null;
 
@@ -427,16 +427,16 @@ public class ContactSaveService extends IntentService {
                     throw new IllegalStateException("Version consistency failed for a new contact");
                 }
 
-                final RawContactDeltaList newState = RawContactDeltaList.fromQuery(
+                final EntityDeltaList newState = EntityDeltaList.fromQuery(
                         isProfile
                                 ? RawContactsEntity.PROFILE_CONTENT_URI
                                 : RawContactsEntity.CONTENT_URI,
                         resolver, sb.toString(), null, null);
-                state = RawContactDeltaList.mergeAfter(newState, state);
+                state = EntityDeltaList.mergeAfter(newState, state);
 
                 // Update the new state to use profile URIs if appropriate.
                 if (isProfile) {
-                    for (RawContactDelta delta : state) {
+                    for (EntityDelta delta : state) {
                         delta.setProfileQueryUri();
                     }
                 }
@@ -518,7 +518,7 @@ public class ContactSaveService extends IntentService {
     /**
      * Find the ID of an existing or newly-inserted raw-contact.  If none exists, return -1.
      */
-    private long getRawContactId(RawContactDeltaList state,
+    private long getRawContactId(EntityDeltaList state,
             final ArrayList<ContentProviderOperation> diff,
             final ContentProviderResult[] results) {
         long existingRawContactId = state.findRawContactId();
@@ -562,10 +562,12 @@ public class ContactSaveService extends IntentService {
     public static Intent createNewGroupIntent(Context context, AccountWithDataSet account,
             String label, long[] rawContactsToAdd, Class<? extends Activity> callbackActivity,
             String callbackAction) {
+        log("createNewGroup : accountType = "+account.type+" , accountName = "+account.name+" , dataSet = "+account.dataSet);
         Intent serviceIntent = new Intent(context, ContactSaveService.class);
         serviceIntent.setAction(ContactSaveService.ACTION_CREATE_GROUP);
-        serviceIntent.putExtra(ContactSaveService.EXTRA_ACCOUNT_TYPE, account.type);
-        serviceIntent.putExtra(ContactSaveService.EXTRA_ACCOUNT_NAME, account.name);
+        /*Wang: Judge whether account is localed and return different extra value*/ 
+        serviceIntent.putExtra(ContactSaveService.EXTRA_ACCOUNT_TYPE, account.type.equals("local")?  "" : account.type);
+        serviceIntent.putExtra(ContactSaveService.EXTRA_ACCOUNT_NAME, account.name.equals("local") ?  "" : account.name);
         serviceIntent.putExtra(ContactSaveService.EXTRA_DATA_SET, account.dataSet);
         serviceIntent.putExtra(ContactSaveService.EXTRA_GROUP_LABEL, label);
         serviceIntent.putExtra(ContactSaveService.EXTRA_RAW_CONTACTS_TO_ADD, rawContactsToAdd);
@@ -956,8 +958,9 @@ public class ContactSaveService extends IntentService {
             Log.e(TAG, "Invalid arguments for deleteContact request");
             return;
         }
-
         getContentResolver().delete(contactUri, null, null);
+        //Wang:2013-1-6
+         if(mDeletedListener != null) mDeletedListener.onDeleted();
     }
 
     /**
@@ -1139,5 +1142,21 @@ public class ContactSaveService extends IntentService {
                 return;
             }
         }
+    }
+    
+    //Wang:
+    public interface OnDeletedListener{
+    	public void onDeleted();
+    }
+    private static OnDeletedListener mDeletedListener;
+    public static void setOnDeletedListener(OnDeletedListener listener){
+    	if(mDeletedListener != listener)mDeletedListener = listener;
+    }
+    public static void removeDeletedListener(){
+    	mDeletedListener = null;
+    }
+    private static final boolean debug = false;
+    private static final void log(String msg){
+        if(debug) Log.i("shenduSave", msg);
     }
 }

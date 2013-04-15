@@ -18,6 +18,8 @@
     <item
         android:id="@+id/menu_edit"
         android:title="@string/menu_editContact"
+        android:showAsAction="ifRoom"
+        android:icon="@drawable/ic_menu_edit_contact_holo_light"
         android:alphabeticShortcut="e" />
 
     <item
@@ -27,18 +29,22 @@
 
     <item
         android:id="@+id/menu_delete"
-        android:title="@string/menu_deleteContact" />
+        android:title="@string/menu_deleteContact" 
+        />
 
     <item
         android:id="@+id/menu_set_ringtone"
-        android:title="@string/menu_set_ring_tone" />
+        android:title="@string/menu_set_ring_tone" 
+        />
 
     <item
         android:id="@+id/menu_send_to_voicemail"
         android:checkable="true"
-        android:title="@string/menu_redirect_calls_to_vm" />
+        android:title="@string/menu_redirect_calls_to_vm" 
+        />
 
     <item
         android:id="@+id/menu_create_contact_shortcut"
-        android:title="@string/menu_create_contact_shortcut" />
+        android:title="@string/menu_create_contact_shortcut" 
+        />
 </menu>

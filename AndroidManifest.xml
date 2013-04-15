@@ -56,6 +56,7 @@
         android:name="com.android.contacts.ContactsApplication"
         android:label="@string/contactsList"
         android:icon="@mipmap/ic_launcher_contacts"
+        android:screenOrientation="portrait"
         android:taskAffinity="android.task.contacts"
         android:hardwareAccelerated="true"
     >
@@ -121,7 +122,7 @@
             android:launchMode="singleTask"
             android:clearTaskOnLaunch="true"
             android:icon="@mipmap/ic_launcher_phone"
-            android:screenOrientation="nosensor"
+            android:screenOrientation="portrait"
             android:enabled="@*android:bool/config_voice_capable"
             android:taskAffinity="android.task.contacts.phone"
             android:windowSoftInputMode="stateAlwaysHidden|adjustNothing">
@@ -183,10 +184,11 @@
         <!-- The main Contacts activity with the contact list, favorites, and groups. -->
         <activity android:name=".activities.PeopleActivity"
             android:label="@string/people"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
             android:theme="@style/PeopleTheme"
             android:uiOptions="splitActionBarWhenNarrow"
             android:clearTaskOnLaunch="true"
-            android:launchMode="singleTop"
         >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -343,6 +345,7 @@
         <activity android:name=".activities.JoinContactActivity"
             android:theme="@style/JoinContactActivityTheme"
             android:clearTaskOnLaunch="true"
+            android:screenOrientation="portrait"
         >
             <intent-filter>
                 <action android:name="com.android.contacts.action.JOIN_CONTACT" />
@@ -355,19 +358,6 @@
             android:name=".preference.ContactsPreferenceActivity"
             android:label="@string/activity_title_settings"
             android:theme="@style/ContactsPreferencesTheme" />
-
-        <!-- Used to set options -->
-        <activity
-            android:name=".preference.IPCallPreferenceActivity"
-            android:label="@string/dialer_ipcall_title"
-            android:icon="@mipmap/ic_launcher_phone"
-            android:theme="@style/@android:style/Theme.Holo.DialogWhenLarge">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
 
         <!-- Used to set options -->
         <activity
@@ -386,6 +376,7 @@
         <activity
             android:name=".list.AccountFilterActivity"
             android:label="@string/activity_title_contacts_filter"
+            android:screenOrientation="portrait"
             android:theme="@style/ContactListFilterTheme" />
 
         <!-- Used to select display and sync groups -->
@@ -396,6 +387,7 @@
 
         <activity
             android:name=".activities.ShowOrCreateActivity"
+            android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Translucent.NoTitleBar">
 
             <intent-filter>
@@ -412,17 +404,23 @@
             android:theme="@style/PeopleTheme"
             android:uiOptions="splitActionBarWhenNarrow"
             android:launchMode="singleTop"
+            android:screenOrientation="portrait"
             android:clearTaskOnLaunch="true"/>
 
         <!-- Views the details of a single group -->
+         <!-- Wang:modify theme -->
         <activity android:name=".activities.GroupDetailActivity"
             android:label=""
-            android:theme="@style/DetailActivityTheme"/>
+            android:screenOrientation="portrait"
+            android:uiOptions="splitActionBarWhenNarrow"
+            android:theme="@style/ShenduActivityTheme"/>
 
         <!-- Create a new or edit an existing group -->
+        <!-- Wang:portrait set -->
         <activity
             android:name=".activities.GroupEditorActivity"
             android:theme="@style/EditorActivityTheme"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
 
         <!-- Used to show QuickContact window over a translucent activity, which is a
@@ -490,7 +488,7 @@
         <activity android:name="CallDetailActivity"
             android:label="@string/callDetailTitle"
             android:theme="@style/CallDetailActivityTheme"
-            android:screenOrientation="portrait"
+            android:screenOrientation="nosensor"
             android:icon="@mipmap/ic_launcher_phone"
             android:taskAffinity="android.task.contacts.phone"
         >
@@ -502,9 +500,12 @@
         </activity>
 
         <!-- Views the details of a single contact -->
+        <!-- Wang: -->
         <activity android:name=".activities.ContactDetailActivity"
             android:label="@string/viewContactTitle"
-            android:theme="@style/DetailActivityTheme"
+            android:theme="@style/ShenduActivityTheme"
+            android:screenOrientation="portrait"
+            android:uiOptions="splitActionBarWhenNarrow"
             android:parentActivityName=".activities.PeopleActivity">
 
             <intent-filter android:label="@string/viewContactDesription">
@@ -535,6 +536,7 @@
         <activity
             android:name=".activities.ContactEditorActivity"
             android:theme="@style/EditorActivityTheme"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize">
 
             <intent-filter android:label="@string/editContactDescription">
@@ -573,6 +575,7 @@
         <!-- Attaches a photo to a contact. Started from external applications -->
         <activity android:name=".activities.AttachPhotoActivity"
             android:label="@string/attach_photo_dialog_title"
+            android:screenOrientation="portrait"
             android:taskAffinity="">
             <intent-filter>
                 <action android:name="android.intent.action.ATTACH_DATA" />
@@ -677,31 +680,6 @@
             </intent-filter>
         </activity>
 
-        <!-- "Call Statistics" UI, used only on voice-capable phone devices. -->
-        <activity android:name=".callstats.CallStatsActivity"
-                android:taskAffinity="android.task.contacts.phone"
-                android:icon="@mipmap/ic_launcher_phone"
-                android:label="@string/activity_title_call_stats"
-                android:configChanges="orientation|screenSize|keyboardHidden"
-                android:theme="@style/CallStatsActivityTheme">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-
-        <activity android:name=".callstats.CallStatsDetailActivity"
-            android:label="@string/callStatsDetailTitle"
-            android:theme="@style/CallDetailActivityTheme"
-            android:screenOrientation="portrait"
-            android:icon="@mipmap/ic_launcher_phone"
-            android:taskAffinity="android.task.contacts.phone" >
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-
         <service
             android:name=".calllog.CallLogNotificationsService"
             android:exported="false"
@@ -717,6 +695,21 @@
                 <data android:mimeType="vnd.android.cursor.item/contact" />
             </intent-filter>
         </service>
+        
         <meta-data android:name="android.nfc.disable_beam_default" android:value="true" />
+
+        <!-- Shendu -->
+        <activity
+            android:name=".activities.ShenDuContactSelectionActivity"
+            android:clearTaskOnLaunch="true"
+            android:label="@string/contactsList"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:theme="@style/ShenduContactSelectionStyle"
+            android:uiOptions="splitActionBarWhenNarrow" >
+            <intent-filter>
+                <action android:name="shendu.intent.action.PICK_ACTION" />
+            </intent-filter>
+        </activity>
     </application>
 </manifest>

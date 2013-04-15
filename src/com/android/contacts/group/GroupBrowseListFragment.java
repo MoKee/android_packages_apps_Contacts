@@ -16,6 +16,12 @@
 
 package com.android.contacts.group;
 
+import com.android.contacts.ContactsUtils;
+import com.android.contacts.GroupListLoader;
+import com.android.contacts.R;
+import com.android.contacts.group.GroupBrowseListAdapter.GroupListItemViewCache;
+import com.android.contacts.widget.AutoScrollListView;
+
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.LoaderManager;
@@ -27,8 +33,11 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.provider.ContactsContract;
 import android.provider.Settings;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -41,12 +50,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import com.android.contacts.ContactsUtils;
-import com.android.contacts.GroupListLoader;
-import com.android.contacts.R;
-import com.android.contacts.group.GroupBrowseListAdapter.GroupListItemViewCache;
-import com.android.contacts.widget.AutoScrollListView;
 
 /**
  * Fragment to display the list of groups.
@@ -209,15 +212,31 @@ public class GroupBrowseListFragment extends Fragment
         public void onLoaderReset(Loader<Cursor> loader) {
         }
     };
-
+    
+    /**
+     * Judgment of whether there is a local group or not. there may some problem with the function. 
+     * @author Wang
+     * @param
+     * @return true when local account has group member.
+     * @date 2012-8-22
+     * */
+    private boolean isLocalGroupExist(){
+        return !ContactsUtils.areGroupWritableAccountsAvailable(mContext) && mAdapter != null && mAdapter.getCount() > 0; 
+    }
+    
     private void bindGroupList() {
+        log(">>>bindGroupList<<<");
+        log("mGroupListCursor =>"+mGroupListCursor);
+        if(mGroupListCursor != null) log("mGroupListCursor.count=>"+mGroupListCursor.getCount());
         mEmptyView.setText(R.string.noGroups);
-        setAddAccountsVisibility(!ContactsUtils.areGroupWritableAccountsAvailable(mContext));
+//        setAddAccountsVisibility(!ContactsUtils.areGroupWritableAccountsAvailable(mContext));
         if (mGroupListCursor == null) {
             return;
         }
         mAdapter.setCursor(mGroupListCursor);
-
+        //Wang:
+        setAddAccountsVisibility(!ContactsUtils.areGroupWritableAccountsAvailable(mContext));
+        
         if (mSelectionToScreenRequested) {
             mSelectionToScreenRequested = false;
             requestSelectionToScreen();
@@ -305,8 +324,18 @@ public class GroupBrowseListFragment extends Fragment
     }
 
     public void setAddAccountsVisibility(boolean visible) {
+        /*Wang: always GONE*/
+        visible = false;
         if (mAddAccountsView != null) {
             mAddAccountsView.setVisibility(visible ? View.VISIBLE : View.GONE);
+        }
+    }
+    
+    private static final boolean debug  = false;
+    private static void log(String msg){
+        if(debug){
+            msg = "Browser -> " + msg;
+            Log.i("shenduGroup", msg);
         }
     }
 }

@@ -16,6 +16,8 @@
  */
 package com.android.contacts.list;
 
+import com.android.contacts.R;
+
 import android.content.Context;
 import android.content.res.Resources;
 import android.database.DataSetObserver;
@@ -24,8 +26,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.FrameLayout;
 import android.widget.SectionIndexer;
-
-import com.android.contacts.R;
 
 /**
  * An adapter that combines items from {@link ContactTileAdapter} and

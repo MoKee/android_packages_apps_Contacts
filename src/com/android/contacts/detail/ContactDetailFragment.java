@@ -16,32 +16,82 @@
 
 package com.android.contacts.detail;
 
+import com.android.contacts.Collapser;
+import com.android.contacts.Collapser.Collapsible;
+import com.android.contacts.ContactLoader;
+import com.android.contacts.ContactPresenceIconUtil;
+import com.android.contacts.ContactSaveService;
+import com.android.contacts.ContactsUtils;
+import com.android.contacts.GroupMetaData;
+import com.android.contacts.R;
+import com.android.contacts.TypePrecedence;
+import com.android.contacts.activities.ContactDetailActivity.FragmentKeyListener;
+import com.android.contacts.detail.ContactDetailPhotoSetter;
+import com.android.contacts.editor.SelectAccountDialogFragment;
+import com.android.contacts.model.AccountType;
+import com.android.contacts.model.AccountType.EditType;
+import com.android.contacts.model.AccountTypeManager;
+import com.android.contacts.model.AccountWithDataSet;
+import com.android.contacts.model.DataKind;
+import com.android.contacts.model.EntityDelta;
+import com.android.contacts.model.EntityDelta.ValuesDelta;
+import com.android.contacts.model.EntityDeltaList;
+import com.android.contacts.model.EntityModifier;
+import com.android.contacts.util.AccountsListAdapter.AccountListFilter;
+import com.android.contacts.util.ClipboardUtils;
+import com.android.contacts.util.Constants;
+import com.android.contacts.util.DataStatus;
+import com.android.contacts.util.DateUtils;
+import com.android.contacts.util.NameAvatarUtils;
+import com.android.contacts.util.PhoneCapabilityTester;
+import com.android.contacts.util.StructuredPostalUtils;
+import com.android.internal.telephony.ITelephony;
+import com.google.common.annotations.VisibleForTesting;
+
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.SearchManager;
+import android.app.AlertDialog.Builder;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Entity;
+import android.content.Entity.NamedContentValues;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
+import android.media.RingtoneManager;
 import android.net.ParseException;
 import android.net.Uri;
 import android.net.WebAddress;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Parcelable;
 import android.os.RemoteException;
 import android.os.ServiceManager;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Email;
+import android.provider.ContactsContract.CommonDataKinds.Event;
 import android.provider.ContactsContract.CommonDataKinds.GroupMembership;
 import android.provider.ContactsContract.CommonDataKinds.Im;
+import android.provider.ContactsContract.CommonDataKinds.Nickname;
+import android.provider.ContactsContract.CommonDataKinds.Note;
+import android.provider.ContactsContract.CommonDataKinds.Organization;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
+import android.provider.ContactsContract.CommonDataKinds.Relation;
+import android.provider.ContactsContract.CommonDataKinds.SipAddress;
+import android.provider.ContactsContract.CommonDataKinds.StructuredName;
+import android.provider.ContactsContract.CommonDataKinds.StructuredPostal;
+import android.provider.ContactsContract.CommonDataKinds.Website;
 import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.Directory;
 import android.provider.ContactsContract.DisplayNameSources;
+import android.provider.ContactsContract.RawContacts;
 import android.provider.ContactsContract.StatusUpdates;
+import android.telephony.PhoneNumberUtils;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -67,52 +117,7 @@ import android.widget.ListAdapter;
 import android.widget.ListPopupWindow;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import com.android.contacts.Collapser;
-import com.android.contacts.Collapser.Collapsible;
-import com.android.contacts.ContactPresenceIconUtil;
-import com.android.contacts.ContactSaveService;
-import com.android.contacts.ContactsUtils;
-import com.android.contacts.GroupMetaData;
-import com.android.contacts.R;
-import com.android.contacts.TypePrecedence;
-import com.android.contacts.activities.ContactDetailActivity.FragmentKeyListener;
-import com.android.contacts.editor.SelectAccountDialogFragment;
-import com.android.contacts.model.AccountTypeManager;
-import com.android.contacts.model.Contact;
-import com.android.contacts.model.RawContact;
-import com.android.contacts.model.RawContactDelta;
-import com.android.contacts.model.RawContactDelta.ValuesDelta;
-import com.android.contacts.model.RawContactDeltaList;
-import com.android.contacts.model.RawContactModifier;
-import com.android.contacts.model.account.AccountType;
-import com.android.contacts.model.account.AccountType.EditType;
-import com.android.contacts.model.account.AccountWithDataSet;
-import com.android.contacts.model.dataitem.DataItem;
-import com.android.contacts.model.dataitem.DataKind;
-import com.android.contacts.model.dataitem.EmailDataItem;
-import com.android.contacts.model.dataitem.EventDataItem;
-import com.android.contacts.model.dataitem.GroupMembershipDataItem;
-import com.android.contacts.model.dataitem.ImDataItem;
-import com.android.contacts.model.dataitem.NicknameDataItem;
-import com.android.contacts.model.dataitem.NoteDataItem;
-import com.android.contacts.model.dataitem.OrganizationDataItem;
-import com.android.contacts.model.dataitem.PhoneDataItem;
-import com.android.contacts.model.dataitem.RelationDataItem;
-import com.android.contacts.model.dataitem.SipAddressDataItem;
-import com.android.contacts.model.dataitem.StructuredNameDataItem;
-import com.android.contacts.model.dataitem.StructuredPostalDataItem;
-import com.android.contacts.model.dataitem.WebsiteDataItem;
-import com.android.contacts.util.AccountsListAdapter.AccountListFilter;
-import com.android.contacts.util.ClipboardUtils;
-import com.android.contacts.util.Constants;
-import com.android.contacts.util.DataStatus;
-import com.android.contacts.util.DateUtils;
-import com.android.contacts.util.PhoneCapabilityTester;
-import com.android.contacts.util.StructuredPostalUtils;
-import com.android.internal.telephony.ITelephony;
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Iterables;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -140,7 +145,7 @@ public class ContactDetailFragment extends Fragment implements FragmentKeyListen
     private Uri mLookupUri;
     private Listener mListener;
 
-    private Contact mContactData;
+    private ContactLoader.Result mContactData;
     private ViewGroup mStaticPhotoContainer;
     private View mPhotoTouchOverlay;
     private ListView mListView;
@@ -190,8 +195,9 @@ public class ContactDetailFragment extends Fragment implements FragmentKeyListen
     private Parcelable mListState;
 
     /**
-     * Lists of specific types of entries to be shown in contact details.
+     * A list of distinct contact IDs included in the current contact.
      */
+    private ArrayList<Long> mRawContactIds = new ArrayList<Long>();
     private ArrayList<DetailViewEntry> mPhoneEntries = new ArrayList<DetailViewEntry>();
     private ArrayList<DetailViewEntry> mSmsEntries = new ArrayList<DetailViewEntry>();
     private ArrayList<DetailViewEntry> mEmailEntries = new ArrayList<DetailViewEntry>();
@@ -213,6 +219,11 @@ public class ContactDetailFragment extends Fragment implements FragmentKeyListen
     private boolean mIsUniqueEmail;
 
     private ListPopupWindow mPopup;
+    
+    /*Wang: Ringtone 2012-11-20*/
+    private String mCustomRingtone;
+    private static final int REQUEST_CODE_PICK_RINGTONE = 1;
+    private static TextView mRingtoneName;
 
     /**
      * This is to forward touch events to the list view to enable users to scroll the list view
@@ -337,7 +348,7 @@ public class ContactDetailFragment extends Fragment implements FragmentKeyListen
         return mListener;
     }
 
-    protected Contact getContactData() {
+    protected ContactLoader.Result getContactData() {
         return mContactData;
     }
 
@@ -364,7 +375,7 @@ public class ContactDetailFragment extends Fragment implements FragmentKeyListen
         setData(null, null);
     }
 
-    public void setData(Uri lookupUri, Contact result) {
+    public void setData(Uri lookupUri, ContactLoader.Result result) {
         mLookupUri = lookupUri;
         mContactData = result;
         bindData();
@@ -458,7 +469,6 @@ public class ContactDetailFragment extends Fragment implements FragmentKeyListen
         Collapser.collapseList(mEmailEntries);
         Collapser.collapseList(mPostalEntries);
         Collapser.collapseList(mImEntries);
-        Collapser.collapseList(mEventEntries);
 
         mIsUniqueNumber = mPhoneEntries.size() == 1;
         mIsUniqueEmail = mEmailEntries.size() == 1;
@@ -533,7 +543,11 @@ public class ContactDetailFragment extends Fragment implements FragmentKeyListen
         // Clear out the old entries
         mAllEntries.clear();
 
+        mRawContactIds.clear();
+
         mPrimaryPhoneUri = null;
+
+        final AccountTypeManager accountTypes = AccountTypeManager.getInstance(mContext);
 
         // Build up method entries
         if (mContactData == null) {
@@ -541,39 +555,55 @@ public class ContactDetailFragment extends Fragment implements FragmentKeyListen
         }
 
         ArrayList<String> groups = new ArrayList<String>();
-        for (RawContact rawContact: mContactData.getRawContacts()) {
-            final long rawContactId = rawContact.getId();
-            for (DataItem dataItem : rawContact.getDataItems()) {
-                dataItem.setRawContactId(rawContactId);
+        for (Entity entity: mContactData.getEntities()) {
+            final ContentValues entValues = entity.getEntityValues();
+            final String accountType = entValues.getAsString(RawContacts.ACCOUNT_TYPE);
+            final String dataSet = entValues.getAsString(RawContacts.DATA_SET);
+            final long rawContactId = entValues.getAsLong(RawContacts._ID);
 
-                if (dataItem.getMimeType() == null) continue;
+            if (!mRawContactIds.contains(rawContactId)) {
+                mRawContactIds.add(rawContactId);
+            }
 
-                if (dataItem instanceof GroupMembershipDataItem) {
-                    GroupMembershipDataItem groupMembership =
-                            (GroupMembershipDataItem) dataItem;
-                    Long groupId = groupMembership.getGroupRowId();
+            AccountType type = accountTypes.getAccountType(accountType, dataSet);
+
+            for (NamedContentValues subValue : entity.getSubValues()) {
+                final ContentValues entryValues = subValue.values;
+                entryValues.put(Data.RAW_CONTACT_ID, rawContactId);
+
+                final long dataId = entryValues.getAsLong(Data._ID);
+                final String mimeType = entryValues.getAsString(Data.MIMETYPE);
+                if (mimeType == null) continue;
+
+                if (GroupMembership.CONTENT_ITEM_TYPE.equals(mimeType)) {
+                    Long groupId = entryValues.getAsLong(GroupMembership.GROUP_ROW_ID);
                     if (groupId != null) {
                         handleGroupMembership(groups, mContactData.getGroupMetaData(), groupId);
                     }
                     continue;
                 }
 
-                final DataKind kind = dataItem.getDataKind();
+                final DataKind kind = accountTypes.getKindOrFallback(
+                        accountType, dataSet, mimeType);
                 if (kind == null) continue;
 
-                final DetailViewEntry entry = DetailViewEntry.fromValues(mContext, dataItem,
-                        mContactData.isDirectoryEntry(), mContactData.getDirectoryId());
+                final DetailViewEntry entry = DetailViewEntry.fromValues(mContext, mimeType, kind,
+                        dataId, entryValues, mContactData.isDirectoryEntry(),
+                        mContactData.getDirectoryId());
                 entry.maxLines = kind.maxLinesForDisplay;
 
                 final boolean hasData = !TextUtils.isEmpty(entry.data);
-                final boolean isSuperPrimary = dataItem.isSuperPrimary();
+                Integer superPrimary = entryValues.getAsInteger(Data.IS_SUPER_PRIMARY);
+                final boolean isSuperPrimary = superPrimary != null && superPrimary != 0;
 
-                if (dataItem instanceof StructuredNameDataItem) {
+                if (StructuredName.CONTENT_ITEM_TYPE.equals(mimeType)) {
                     // Always ignore the name. It is shown in the header if set
-                } else if (dataItem instanceof PhoneDataItem && hasData) {
-                    PhoneDataItem phone = (PhoneDataItem) dataItem;
+                } else if (Phone.CONTENT_ITEM_TYPE.equals(mimeType) && hasData) {
                     // Build phone entries
-                    entry.data = phone.getFormattedPhoneNumber();
+                    String phoneNumberE164 =
+                            entryValues.getAsString(Phone.NORMALIZED_NUMBER);
+                    entry.data = PhoneNumberUtils.formatNumber(
+                            entry.data, phoneNumberE164, mDefaultCountryIso);
                     final Intent phoneIntent = mHasPhone ?
                             ContactsUtils.getCallIntent(entry.data) : null;
                     final Intent smsIntent = mHasSms ? new Intent(Intent.ACTION_SENDTO,
@@ -606,7 +636,7 @@ public class ContactDetailFragment extends Fragment implements FragmentKeyListen
                         // add to end of list
                         mPhoneEntries.add(entry);
                     }
-                } else if (dataItem instanceof EmailDataItem && hasData) {
+                } else if (Email.CONTENT_ITEM_TYPE.equals(mimeType) && hasData) {
                     // Build email entries
                     entry.intent = new Intent(Intent.ACTION_SENDTO,
                             Uri.fromParts(Constants.SCHEME_MAILTO, entry.data, null));
@@ -621,23 +651,24 @@ public class ContactDetailFragment extends Fragment implements FragmentKeyListen
                     // When Email rows have status, create additional Im row
                     final DataStatus status = mContactData.getStatuses().get(entry.id);
                     if (status != null) {
-                        EmailDataItem email = (EmailDataItem) dataItem;
-                        ImDataItem im = ImDataItem.createFromEmail(email);
-
-                        final DetailViewEntry imEntry = DetailViewEntry.fromValues(mContext, im,
-                                mContactData.isDirectoryEntry(), mContactData.getDirectoryId());
-                        buildImActions(mContext, imEntry, im);
+                        final String imMime = Im.CONTENT_ITEM_TYPE;
+                        final DataKind imKind = accountTypes.getKindOrFallback(accountType, dataSet,
+                                imMime);
+                        final DetailViewEntry imEntry = DetailViewEntry.fromValues(mContext, imMime,
+                                imKind, dataId, entryValues, mContactData.isDirectoryEntry(),
+                                mContactData.getDirectoryId());
+                        buildImActions(mContext, imEntry, entryValues);
                         imEntry.setPresence(status.getPresence());
-                        imEntry.maxLines = kind.maxLinesForDisplay;
+                        imEntry.maxLines = imKind.maxLinesForDisplay;
                         mImEntries.add(imEntry);
                     }
-                } else if (dataItem instanceof StructuredPostalDataItem && hasData) {
+                } else if (StructuredPostal.CONTENT_ITEM_TYPE.equals(mimeType) && hasData) {
                     // Build postal entries
                     entry.intent = StructuredPostalUtils.getViewPostalAddressIntent(entry.data);
                     mPostalEntries.add(entry);
-                } else if (dataItem instanceof ImDataItem && hasData) {
+                } else if (Im.CONTENT_ITEM_TYPE.equals(mimeType) && hasData) {
                     // Build IM entries
-                    buildImActions(mContext, entry, (ImDataItem) dataItem);
+                    buildImActions(mContext, entry, entryValues);
 
                     // Apply presence when available
                     final DataStatus status = mContactData.getStatuses().get(entry.id);
@@ -645,10 +676,10 @@ public class ContactDetailFragment extends Fragment implements FragmentKeyListen
                         entry.setPresence(status.getPresence());
                     }
                     mImEntries.add(entry);
-                } else if (dataItem instanceof OrganizationDataItem) {
+                } else if (Organization.CONTENT_ITEM_TYPE.equals(mimeType)) {
                     // Organizations are not shown. The first one is shown in the header
                     // and subsequent ones are not supported anymore
-                } else if (dataItem instanceof NicknameDataItem && hasData) {
+                } else if (Nickname.CONTENT_ITEM_TYPE.equals(mimeType) && hasData) {
                     // Build nickname entries
                     final boolean isNameRawContact =
                         (mContactData.getNameRawContactId() == rawContactId);
@@ -661,11 +692,11 @@ public class ContactDetailFragment extends Fragment implements FragmentKeyListen
                         entry.uri = null;
                         mNicknameEntries.add(entry);
                     }
-                } else if (dataItem instanceof NoteDataItem && hasData) {
+                } else if (Note.CONTENT_ITEM_TYPE.equals(mimeType) && hasData) {
                     // Build note entries
                     entry.uri = null;
                     mNoteEntries.add(entry);
-                } else if (dataItem instanceof WebsiteDataItem && hasData) {
+                } else if (Website.CONTENT_ITEM_TYPE.equals(mimeType) && hasData) {
                     // Build Website entries
                     entry.uri = null;
                     try {
@@ -676,7 +707,7 @@ public class ContactDetailFragment extends Fragment implements FragmentKeyListen
                         Log.e(TAG, "Couldn't parse website: " + entry.data);
                     }
                     mWebsiteEntries.add(entry);
-                } else if (dataItem instanceof SipAddressDataItem && hasData) {
+                } else if (SipAddress.CONTENT_ITEM_TYPE.equals(mimeType) && hasData) {
                     // Build SipAddress entries
                     entry.uri = null;
                     if (mHasSip) {
@@ -692,11 +723,11 @@ public class ContactDetailFragment extends Fragment implements FragmentKeyListen
                     // (Then, we'd also update FallbackAccountType.java to set
                     // secondary=false for this field, and tweak the weight
                     // of its DataKind.)
-                } else if (dataItem instanceof EventDataItem && hasData) {
+                } else if (Event.CONTENT_ITEM_TYPE.equals(mimeType) && hasData) {
                     entry.data = DateUtils.formatDate(mContext, entry.data);
                     entry.uri = null;
                     mEventEntries.add(entry);
-                } else if (dataItem instanceof RelationDataItem && hasData) {
+                } else if (Relation.CONTENT_ITEM_TYPE.equals(mimeType) && hasData) {
                     entry.intent = new Intent(Intent.ACTION_SEARCH);
                     entry.intent.putExtra(SearchManager.QUERY, entry.data);
                     entry.intent.setType(Contacts.CONTENT_TYPE);
@@ -706,12 +737,14 @@ public class ContactDetailFragment extends Fragment implements FragmentKeyListen
                     entry.intent = new Intent(Intent.ACTION_VIEW);
                     entry.intent.setDataAndType(entry.uri, entry.mimetype);
 
-                    entry.data = dataItem.buildDataString();
+                    if (kind.actionBody != null) {
+                         CharSequence body = kind.actionBody.inflateUsing(mContext, entryValues);
+                         entry.data = (body == null) ? null : body.toString();
+                    }
 
                     if (!TextUtils.isEmpty(entry.data)) {
                         // If the account type exists in the hash map, add it as another entry for
                         // that account type
-                        AccountType type = dataItem.getAccountType();
                         if (mOtherEntriesMap.containsKey(type)) {
                             List<DetailViewEntry> listEntries = mOtherEntriesMap.get(type);
                             listEntries.add(entry);
@@ -750,9 +783,9 @@ public class ContactDetailFragment extends Fragment implements FragmentKeyListen
      */
     private void setupFlattenedList() {
         // All contacts should have a header view (even if there is no data for the contact).
-        mAllEntries.add(new HeaderViewEntry());
+        //mAllEntries.add(new HeaderViewEntry()); //moditify by hhl
 
-        addPhoneticName();
+        //addPhoneticName(); //moditify by hhl
 
         flattenList(mPhoneEntries);
         flattenList(mSmsEntries);
@@ -769,6 +802,9 @@ public class ContactDetailFragment extends Fragment implements FragmentKeyListen
         flattenList(mGroupEntries);
         flattenList(mRelationEntries);
         flattenList(mNoteEntries);
+        
+        /*Wang:2012-11-19*/
+        addRingTone();
     }
 
     /**
@@ -916,6 +952,85 @@ public class ContactDetailFragment extends Fragment implements FragmentKeyListen
         // Clear old list because it's not needed anymore.
         entries.clear();
     }
+    
+    /**
+     * @author Wang
+     * @date 2012-11-19
+     * 
+     * @author lys
+     * @date 2013-03-20 update
+     * */
+    private void addRingTone(){
+        String title = mContext.getResources().getString(R.string.ringtone_title);
+        mAllEntries.add(new KindTitleViewEntry(title.toUpperCase()));
+        View.OnClickListener onClickListener = new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               // doPickRingtone();
+                dialogShowOption();
+            }
+        };
+        mAllEntries.add(new RingToneViewEntry(mContext, onClickListener));
+    }
+    
+    private int loadMediaPath = 0;
+    private String loadMediaTile;
+    /**
+     * @author lys
+     * @date 2013-03-20 update
+     * */
+   private void dialogShowOption(){
+       Builder builder = new AlertDialog.Builder(mContext);
+       
+       //builder.setIcon(R.drawable.ic_dialog_sound);
+       builder.setTitle(R.string.ringtone_title);
+       builder.setSingleChoiceItems(R.array.ringtone_entries, loadMediaPath, new DialogInterface.OnClickListener() {
+           @Override
+           public void onClick(DialogInterface dialog, int which) {
+               // TODO Auto-generated method stub
+               switch (which) {
+                   case 0:
+                       loadMediaPath = 0;
+                       loadMediaTile = mContext.getString(R.string.sound_ringtones);
+                       closeDialog(dialog);
+                       doPickRingtone();
+                       break;
+                   case 1:
+                       loadMediaPath = 1;
+                       loadMediaTile = mContext.getString(R.string.sound_music);
+                       closeDialog(dialog);
+                       if(Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())){
+                           //SoundPreference.super.onClick();
+                           doPickRingtoneLocalSD();
+                       }else{
+                           Toast.makeText(getContext(), R.string.sdcard_not_find, 1).show();
+                       }
+                       break;
+                   default:
+                       loadMediaPath = 0;
+                       break;
+               }
+           }
+       });
+       builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+           @Override
+           public void onClick(DialogInterface dialog, int which) {
+               closeDialog(dialog);
+           }
+       });
+       builder.show();
+   }
+   /**
+    * @author lys
+    * @date 2013-03-20 update
+    * */
+   private void closeDialog(DialogInterface dialog){
+       if(dialog!=null){
+           dialog.cancel();
+           dialog.dismiss();
+           dialog = null;
+       }
+   }
 
     /**
      * Maps group ID to the corresponding group name, collapses all synonymous groups.
@@ -940,27 +1055,37 @@ public class ContactDetailFragment extends Fragment implements FragmentKeyListen
         }
     }
 
+    private static String buildDataString(DataKind kind, ContentValues values,
+            Context context) {
+        if (kind.actionBody == null) {
+            return null;
+        }
+        CharSequence actionBody = kind.actionBody.inflateUsing(context, values);
+        return actionBody == null ? null : actionBody.toString();
+    }
+
     /**
      * Writes the Instant Messaging action into the given entry value.
      */
     @VisibleForTesting
     public static void buildImActions(Context context, DetailViewEntry entry,
-            ImDataItem im) {
-        final boolean isEmail = im.isCreatedFromEmail();
+            ContentValues values) {
+        final boolean isEmail = Email.CONTENT_ITEM_TYPE.equals(values.getAsString(Data.MIMETYPE));
 
-        if (!isEmail && !im.isProtocolValid()) {
+        if (!isEmail && !isProtocolValid(values)) {
             return;
         }
 
-        final String data = im.getData();
+        final String data = values.getAsString(isEmail ? Email.DATA : Im.DATA);
         if (TextUtils.isEmpty(data)) {
             return;
         }
 
-        final int protocol = isEmail ? Im.PROTOCOL_GOOGLE_TALK : im.getProtocol();
+        final int protocol = isEmail ? Im.PROTOCOL_GOOGLE_TALK : values.getAsInteger(Im.PROTOCOL);
 
         if (protocol == Im.PROTOCOL_GOOGLE_TALK) {
-            final int chatCapability = im.getChatCapability();
+            final Integer chatCapabilityObj = values.getAsInteger(Im.CHAT_CAPABILITY);
+            final int chatCapability = chatCapabilityObj == null ? 0 : chatCapabilityObj;
             entry.chatCapability = chatCapability;
             entry.typeString = Im.getProtocolLabel(context.getResources(), Im.PROTOCOL_GOOGLE_TALK,
                     null).toString();
@@ -981,7 +1106,7 @@ public class ContactDetailFragment extends Fragment implements FragmentKeyListen
             }
         } else {
             // Build an IM Intent
-            String host = im.getCustomProtocol();
+            String host = values.getAsString(Im.CUSTOM_PROTOCOL);
 
             if (protocol != Im.PROTOCOL_CUSTOM) {
                 // Try bringing in a well-known host for specific protocols
@@ -995,6 +1120,19 @@ public class ContactDetailFragment extends Fragment implements FragmentKeyListen
                 entry.intent = new Intent(Intent.ACTION_SENDTO, imUri);
             }
         }
+    }
+
+    private static boolean isProtocolValid(ContentValues values) {
+        String protocolString = values.getAsString(Im.PROTOCOL);
+        if (protocolString == null) {
+            return false;
+        }
+        try {
+            Integer.valueOf(protocolString);
+        } catch (NumberFormatException e) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -1203,38 +1341,6 @@ public class ContactDetailFragment extends Fragment implements FragmentKeyListen
 
         private boolean mIsInSubSection = false;
 
-        @Override
-        public String toString() {
-            StringBuilder sb = new StringBuilder();
-            sb.append("== DetailViewEntry ==\n");
-            sb.append("  type: " + type + "\n");
-            sb.append("  kind: " + kind + "\n");
-            sb.append("  typeString: " + typeString + "\n");
-            sb.append("  data: " + data + "\n");
-            sb.append("  uri: " + uri.toString() + "\n");
-            sb.append("  maxLines: " + maxLines + "\n");
-            sb.append("  mimetype: " + mimetype + "\n");
-            sb.append("  isPrimary: " + (isPrimary ? "true" : "false") + "\n");
-            sb.append("  secondaryActionIcon: " + secondaryActionIcon + "\n");
-            sb.append("  secondaryActionDescription: " + secondaryActionDescription + "\n");
-            if (intent == null) {
-                sb.append("  intent: " + intent.toString() + "\n");
-            } else {
-                sb.append("  intent: " + intent.toString() + "\n");
-            }
-            if (secondaryIntent == null) {
-                sb.append("  secondaryIntent: (null)\n");
-            } else {
-                sb.append("  secondaryIntent: " + secondaryIntent.toString() + "\n");
-            }
-            sb.append("  ids: " + Iterables.toString(ids) + "\n");
-            sb.append("  collapseCount: " + collapseCount + "\n");
-            sb.append("  presence: " + presence + "\n");
-            sb.append("  chatCapability: " + chatCapability + "\n");
-            sb.append("  mIsInSubsection: " + (mIsInSubSection ? "true" : "false") + "\n");
-            return sb.toString();
-        }
-
         DetailViewEntry() {
             super(ViewAdapter.VIEW_TYPE_DETAIL_ENTRY);
             isEnabled = true;
@@ -1243,34 +1349,34 @@ public class ContactDetailFragment extends Fragment implements FragmentKeyListen
         /**
          * Build new {@link DetailViewEntry} and populate from the given values.
          */
-        public static DetailViewEntry fromValues(Context context, DataItem item,
-                boolean isDirectoryEntry, long directoryId) {
+        public static DetailViewEntry fromValues(Context context, String mimeType, DataKind kind,
+                long dataId, ContentValues values, boolean isDirectoryEntry, long directoryId) {
             final DetailViewEntry entry = new DetailViewEntry();
-            entry.id = item.getId();
+            entry.id = dataId;
             entry.context = context;
             entry.uri = ContentUris.withAppendedId(Data.CONTENT_URI, entry.id);
             if (isDirectoryEntry) {
                 entry.uri = entry.uri.buildUpon().appendQueryParameter(
                         ContactsContract.DIRECTORY_PARAM_KEY, String.valueOf(directoryId)).build();
             }
-            entry.mimetype = item.getMimeType();
-            entry.kind = item.getKindString();
-            entry.data = item.buildDataString();
+            entry.mimetype = mimeType;
+            entry.kind = (kind.titleRes == -1 || kind.titleRes == 0) ? ""
+                    : context.getString(kind.titleRes);
+            entry.data = buildDataString(kind, values, context);
 
-            if (item.hasKindTypeColumn()) {
-                entry.type = item.getKindTypeColumn();
+            if (kind.typeColumn != null && values.containsKey(kind.typeColumn)) {
+                entry.type = values.getAsInteger(kind.typeColumn);
 
                 // get type string
                 entry.typeString = "";
-                for (EditType type : item.getDataKind().typeList) {
+                for (EditType type : kind.typeList) {
                     if (type.rawValue == entry.type) {
                         if (type.customColumn == null) {
                             // Non-custom type. Get its description from the resource
                             entry.typeString = context.getString(type.labelRes);
                         } else {
                             // Custom type. Read it from the database
-                            entry.typeString =
-                                    item.getContentValues().getAsString(type.customColumn);
+                            entry.typeString = values.getAsString(type.customColumn);
                         }
                         break;
                     }
@@ -1355,6 +1461,29 @@ public class ContactDetailFragment extends Fragment implements FragmentKeyListen
             fragmentListener.onItemClicked(intent);
         }
     }
+    
+    /**
+     * Ringtone entry
+     * @author Wang
+     * @date 2012-11-19
+     * */
+    private static class RingToneViewEntry extends ViewEntry{
+        private String mTitle;
+        private final View.OnClickListener mOnClickListener;
+
+        RingToneViewEntry(Context context, View.OnClickListener onClickListener) {
+            super(ViewAdapter.VIEW_TYPE_RINGTONE_ENTRY);
+//            mTitle = title;
+            this.mOnClickListener = onClickListener;
+        }
+        
+        @Override
+        public void click(View clickedView, Listener fragmentListener) {
+            if (mOnClickListener == null) return;
+            mOnClickListener.onClick(clickedView);
+        }
+        
+    }
 
     /**
      * Cache of the children views for a view that displays a header view entry.
@@ -1432,7 +1561,7 @@ public class ContactDetailFragment extends Fragment implements FragmentKeyListen
         public final View actionsViewContainer;
         public final View primaryActionView;
         public final View secondaryActionViewContainer;
-        public final View secondaryActionDivider;
+        //public final View secondaryActionDivider;
         public final View primaryIndicator;
 
         public DetailViewCache(View view,
@@ -1454,7 +1583,20 @@ public class ContactDetailFragment extends Fragment implements FragmentKeyListen
             secondaryActionButton = (ImageView) view.findViewById(
                     R.id.secondary_action_button);
 
-            secondaryActionDivider = view.findViewById(R.id.vertical_divider);
+            //secondaryActionDivider = view.findViewById(R.id.vertical_divider);
+        }
+    }
+    
+    /**
+     * Cache of the children views for a view that displays a RingToneView
+     * @author Wang
+     * @date 2012-11-19
+     */
+    private static class RingToneViewCache {
+        public final TextView ringtone;
+        public RingToneViewCache(View view) {
+            ringtone = (TextView) view.findViewById(R.id.ringtone_data);
+            mRingtoneName = ringtone;
         }
     }
 
@@ -1466,23 +1608,48 @@ public class ContactDetailFragment extends Fragment implements FragmentKeyListen
         public static final int VIEW_TYPE_NETWORK_TITLE_ENTRY = 3;
         public static final int VIEW_TYPE_ADD_CONNECTION_ENTRY = 4;
         public static final int VIEW_TYPE_SEPARATOR_ENTRY = 5;
-        private static final int VIEW_TYPE_COUNT = 6;
+        
+        /*Wang:2012-11-19*/
+        public static final int VIEW_TYPE_RINGTONE_ENTRY = 6;
+        /*Wang : 2012-11-19 +1 for count */
+        private static final int VIEW_TYPE_COUNT = 7;
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            switch (getItemViewType(position)) {
+        	int caseSwitch = getItemViewType(position);
+            switch (caseSwitch) {
                 case VIEW_TYPE_HEADER_ENTRY:
                     return getHeaderEntryView(convertView, parent);
-                case VIEW_TYPE_SEPARATOR_ENTRY:
+                case VIEW_TYPE_SEPARATOR_ENTRY://5,line
                     return getSeparatorEntryView(position, convertView, parent);
-                case VIEW_TYPE_KIND_TITLE_ENTRY:
+                case VIEW_TYPE_KIND_TITLE_ENTRY://2,title
                     return getKindTitleEntryView(position, convertView, parent);
-                case VIEW_TYPE_DETAIL_ENTRY:
-                    return getDetailEntryView(position, convertView, parent);
+                case VIEW_TYPE_DETAIL_ENTRY://0,number,name,icon
+                	View resultView = getDetailEntryView(position, convertView, parent);
+                	View itemView = resultView.findViewById(R.id.actions_view_container);
+                	//add by hhl,for item background
+                	int topCaseSwitch = getItemViewType(position-1);
+                	int bottomCaseSwitch = getItemViewType(position+1);
+                	if(topCaseSwitch == VIEW_TYPE_KIND_TITLE_ENTRY 
+                			&& bottomCaseSwitch == VIEW_TYPE_KIND_TITLE_ENTRY){
+                		itemView.setBackgroundResource(R.drawable.shendu_listview_item_overall);
+                	}else if(topCaseSwitch == VIEW_TYPE_SEPARATOR_ENTRY 
+                			&& bottomCaseSwitch == VIEW_TYPE_SEPARATOR_ENTRY){
+                		itemView.setBackgroundResource(R.drawable.shendu_listview_item_middle);
+                	}else if(topCaseSwitch == VIEW_TYPE_SEPARATOR_ENTRY 
+                			&& bottomCaseSwitch == VIEW_TYPE_KIND_TITLE_ENTRY){
+                		itemView.setBackgroundResource(R.drawable.shendu_listview_item_bottom);
+                	}else if(topCaseSwitch == VIEW_TYPE_KIND_TITLE_ENTRY 
+                			&& bottomCaseSwitch == VIEW_TYPE_SEPARATOR_ENTRY){
+                		itemView.setBackgroundResource(R.drawable.shendu_listview_item_top);
+                	}
+                    return resultView;
                 case VIEW_TYPE_NETWORK_TITLE_ENTRY:
                     return getNetworkTitleEntryView(position, convertView, parent);
                 case VIEW_TYPE_ADD_CONNECTION_ENTRY:
                     return getAddConnectionEntryView(position, convertView, parent);
+                case VIEW_TYPE_RINGTONE_ENTRY:/*Wang: 2012-11-19 */ //ring
+                    return getRingToneEntryView(position, convertView, parent);
                 default:
                     throw new IllegalStateException("Invalid view type ID " +
                             getItemViewType(position));
@@ -1490,6 +1657,7 @@ public class ContactDetailFragment extends Fragment implements FragmentKeyListen
         }
 
         private View getHeaderEntryView(View convertView, ViewGroup parent) {
+
             final int desiredLayoutResourceId = mContactHasSocialUpdates ?
                     R.layout.detail_header_contact_with_updates :
                     R.layout.detail_header_contact_without_updates;
@@ -1571,9 +1739,9 @@ public class ContactDetailFragment extends Fragment implements FragmentKeyListen
             final View result = (convertView != null) ? convertView :
                     mInflater.inflate(R.layout.contact_detail_separator_entry_view, parent, false);
 
-            result.setPadding(entry.isInSubSection() ? mViewEntryDimensions.getWidePaddingLeft() :
+            /*result.setPadding(entry.isInSubSection() ? mViewEntryDimensions.getWidePaddingLeft() :
                     mViewEntryDimensions.getPaddingLeft(), 0,
-                    mViewEntryDimensions.getPaddingRight(), 0);
+                    mViewEntryDimensions.getPaddingRight(), 0);*/
 
             return result;
         }
@@ -1636,6 +1804,49 @@ public class ContactDetailFragment extends Fragment implements FragmentKeyListen
             viewCache.icon.setImageDrawable(entry.getIcon());
             viewCache.primaryActionView.setOnClickListener(entry.mOnClickListener);
 
+            return result;
+        }
+        
+        /**
+         * Get RingToneEntryView from convertView or create a RingToneEntryView object
+         * @author Wang
+         * @date 2012-11-20
+         * */
+        private View getRingToneEntryView(int position, View convertView, ViewGroup parent) {
+            final RingToneViewEntry entry = (RingToneViewEntry) getItem(position);
+            final View result;
+            final RingToneViewCache viewCache;
+            if (convertView != null) {
+                result = convertView;
+                viewCache = (RingToneViewCache) result.getTag();
+            } else {
+                result = mInflater.inflate(R.layout.shendu_contact_detail_custom_ringtone_view,
+                        parent, false);
+                viewCache = new RingToneViewCache(result);
+                result.setTag(viewCache);
+            }
+            String title = null;
+            if(mContactData != null){
+                mCustomRingtone = mContactData.getCustomRingtone();
+             }
+            if(mCustomRingtone != null){
+                /**
+                 * @author lys
+                 * @date 2013.3.20
+                 */
+                //解决当铃声为音乐时，sdcard不可用时，显示id号，
+                if(mCustomRingtone.contains("external") && !Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
+                    //1.当前铃声为本地音乐，sdcard不可用的状态，使用默认的系统铃音
+                    title = mContext.getResources().getString(R.string.default_ringtone);
+                }else{
+                    //2.当前铃声为系统非默认的铃声，和当前本地铃音可用（设置本地铃声并且sdcard可用）
+                    title = RingtoneManager.getRingtone(mContext, Uri.parse(mCustomRingtone)).getTitle(mContext);
+                }
+            }else{
+                title = mContext.getResources().getString(R.string.default_ringtone);
+            }
+            viewCache.ringtone.setText(title);
+            viewCache.ringtone.setOnClickListener(entry.mOnClickListener);
             return result;
         }
 
@@ -1719,14 +1930,14 @@ public class ContactDetailFragment extends Fragment implements FragmentKeyListen
                 secondaryActionView.setContentDescription(secondaryActionDescription);
                 secondaryActionViewContainer.setTag(entry);
                 secondaryActionViewContainer.setVisibility(View.VISIBLE);
-                views.secondaryActionDivider.setVisibility(View.VISIBLE);
+                //views.secondaryActionDivider.setVisibility(View.VISIBLE);
             } else {
                 secondaryActionViewContainer.setVisibility(View.GONE);
-                views.secondaryActionDivider.setVisibility(View.GONE);
+                //views.secondaryActionDivider.setVisibility(View.GONE);
             }
 
             // Right and left padding should not have "pressed" effect.
-            view.setPadding(
+            /*view.setPadding(
                     entry.isInSubSection()
                             ? mViewEntryDimensions.getWidePaddingLeft()
                             : mViewEntryDimensions.getPaddingLeft(),
@@ -1742,7 +1953,7 @@ public class ContactDetailFragment extends Fragment implements FragmentKeyListen
                     secondaryActionViewContainer.getPaddingLeft(),
                     mViewEntryDimensions.getPaddingTop(),
                     secondaryActionViewContainer.getPaddingRight(),
-                    mViewEntryDimensions.getPaddingBottom());
+                    mViewEntryDimensions.getPaddingBottom());*/
         }
 
         private void setMaxLines(TextView textView, int maxLines) {
@@ -1861,11 +2072,6 @@ public class ContactDetailFragment extends Fragment implements FragmentKeyListen
         menu.setHeaderTitle(selectedEntry.data);
         menu.add(ContextMenu.NONE, ContextMenuIds.COPY_TEXT,
                 ContextMenu.NONE, getString(R.string.copy_text));
-
-        // Don't allow setting or clearing of defaults for directory contacts
-        if (mContactData.isDirectoryEntry()) {
-            return;
-        }
 
         String selectedMimeType = selectedEntry.mimetype;
 
@@ -1990,7 +2196,7 @@ public class ContactDetailFragment extends Fragment implements FragmentKeyListen
             if (mContactData.isUserProfile()) return false;
 
             // Only if exactly one raw contact
-            if (mContactData.getRawContacts().size() != 1) return false;
+            if (mContactData.getEntities().size() != 1) return false;
 
             // test if the default group is assigned
             final List<GroupMetaData> groups = mContactData.getGroupMetaData();
@@ -2002,20 +2208,28 @@ public class ContactDetailFragment extends Fragment implements FragmentKeyListen
             final long defaultGroupId = getDefaultGroupId(groups);
             if (defaultGroupId == -1) return false;
 
-            final RawContact rawContact = (RawContact) mContactData.getRawContacts().get(0);
-            final AccountType type = rawContact.getAccountType();
+            final Entity rawContactEntity = mContactData.getEntities().get(0);
+            ContentValues rawValues = rawContactEntity.getEntityValues();
+            final String accountType = rawValues.getAsString(RawContacts.ACCOUNT_TYPE);
+            final String dataSet = rawValues.getAsString(RawContacts.DATA_SET);
+            final AccountTypeManager accountTypes =
+                    AccountTypeManager.getInstance(mContext);
+            final AccountType type = accountTypes.getAccountType(accountType, dataSet);
             // Offline or non-writeable account? Nothing to fix
             if (type == null || !type.areContactsWritable()) return false;
 
             // Check whether the contact is in the default group
             boolean isInDefaultGroup = false;
-            for (DataItem dataItem : Iterables.filter(
-                    rawContact.getDataItems(), GroupMembershipDataItem.class)) {
-                GroupMembershipDataItem groupMembership = (GroupMembershipDataItem) dataItem;
-                final Long groupId = groupMembership.getGroupRowId();
-                if (groupId == defaultGroupId) {
-                    isInDefaultGroup = true;
-                    break;
+            for (NamedContentValues subValue : rawContactEntity.getSubValues()) {
+                final String mimeType = subValue.values.getAsString(Data.MIMETYPE);
+
+                if (GroupMembership.CONTENT_ITEM_TYPE.equals(mimeType)) {
+                    final Long groupId =
+                            subValue.values.getAsLong(GroupMembership.GROUP_ROW_ID);
+                    if (groupId == defaultGroupId) {
+                        isInDefaultGroup = true;
+                        break;
+                    }
                 }
             }
 
@@ -2035,16 +2249,19 @@ public class ContactDetailFragment extends Fragment implements FragmentKeyListen
             if (defaultGroupId == -1) return;
 
             // add the group membership to the current state
-            final RawContactDeltaList contactDeltaList = mContactData.createRawContactDeltaList();
-            final RawContactDelta rawContactEntityDelta = contactDeltaList.get(0);
+            final EntityDeltaList contactDeltaList = mContactData.createEntityDeltaList();
+            final EntityDelta rawContactEntityDelta = contactDeltaList.get(0);
 
             final AccountTypeManager accountTypes = AccountTypeManager.getInstance(mContext);
-            final AccountType type = rawContactEntityDelta.getAccountType(accountTypes);
+            final ValuesDelta values = rawContactEntityDelta.getValues();
+            final String accountType = values.getAsString(RawContacts.ACCOUNT_TYPE);
+            final String dataSet = values.getAsString(RawContacts.DATA_SET);
+            final AccountType type = accountTypes.getAccountType(accountType, dataSet);
             final DataKind groupMembershipKind = type.getKindForMimetype(
                     GroupMembership.CONTENT_ITEM_TYPE);
-            final ValuesDelta entry = RawContactModifier.insertChild(rawContactEntityDelta,
+            final ValuesDelta entry = EntityModifier.insertChild(rawContactEntityDelta,
                     groupMembershipKind);
-            entry.setGroupRowId(defaultGroupId);
+            entry.put(GroupMembership.GROUP_ROW_ID, defaultGroupId);
 
             // and fire off the intent. we don't need a callback, as the database listener
             // should update the ui
@@ -2181,7 +2398,7 @@ public class ContactDetailFragment extends Fragment implements FragmentKeyListen
         private final LayoutInflater mInflater;
         private final ArrayList<AccountType> mAccountTypes;
 
-        public InvitableAccountTypesAdapter(Context context, Contact contactData) {
+        public InvitableAccountTypesAdapter(Context context, ContactLoader.Result contactData) {
             mContext = context;
             mInflater = LayoutInflater.from(context);
             final List<AccountType> types = contactData.getInvitableAccountTypes();
@@ -2235,5 +2452,98 @@ public class ContactDetailFragment extends Fragment implements FragmentKeyListen
         public long getItemId(int position) {
             return position;
         }
+    }
+    
+    
+    /**=======================================
+     * etting RingTone 
+     * @author lys
+     * @date 2013-03-18
+     *  =======================================
+     * */
+    private void doPickRingtoneLocalSD() {
+
+        Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
+        // Allow user to pick 'Default'
+        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true);
+        // Show only ringtones
+        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_RINGTONE);
+        // Don't show 'Silent'
+        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false);
+
+        Uri ringtoneUri;
+        if (mCustomRingtone != null) {
+            ringtoneUri = Uri.parse(mCustomRingtone);
+        } else {
+            // Otherwise pick default ringtone Uri so that something is selected.
+            ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+        }
+
+        // Put checkmark next to the current ringtone for this contact
+        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, ringtoneUri);
+
+        intent.putExtra("loadMediaPath", loadMediaPath);
+        intent.putExtra("loadMediaTile", loadMediaTile);
+        
+        // Launch!
+        startActivityForResult(intent, REQUEST_CODE_PICK_RINGTONE);
+    }
+    
+    /**=======================================
+     * etting RingTone 
+     * @author Wang
+     * @date 2012-11-20
+     *  =======================================
+     * */
+    private void doPickRingtone() {
+
+        Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
+        // Allow user to pick 'Default'
+        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true);
+        // Show only ringtones
+        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_RINGTONE);
+        // Don't show 'Silent'
+        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false);
+
+        Uri ringtoneUri;
+        if (mCustomRingtone != null) {
+            ringtoneUri = Uri.parse(mCustomRingtone);
+        } else {
+            // Otherwise pick default ringtone Uri so that something is selected.
+            ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+        }
+
+        // Put checkmark next to the current ringtone for this contact
+        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, ringtoneUri);
+
+        // Launch!
+        startActivityForResult(intent, REQUEST_CODE_PICK_RINGTONE);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode != Activity.RESULT_OK) {
+            return;
+        }
+
+        switch (requestCode) {
+            case REQUEST_CODE_PICK_RINGTONE: {
+                Uri pickedUri = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
+                handleRingtonePicked(pickedUri);
+                break;
+            }
+        }
+    }
+
+    private void handleRingtonePicked(Uri pickedUri) {
+        if (pickedUri == null || RingtoneManager.isDefault(pickedUri)) {
+            mCustomRingtone = null;
+        } else {
+            mCustomRingtone = pickedUri.toString();
+            if(mRingtoneName != null) mRingtoneName.setText(RingtoneManager.getRingtone(mContext, pickedUri).getTitle(mContext));
+        }
+        Intent intent = ContactSaveService.createSetRingtone(
+                mContext, mLookupUri, mCustomRingtone);
+        mContext.startService(intent);
     }
 }

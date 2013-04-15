@@ -15,6 +15,19 @@
  */
 package com.android.contacts.interactions;
 
+import com.android.contacts.Collapser;
+import com.android.contacts.Collapser.Collapsible;
+import com.android.contacts.ContactSaveService;
+import com.android.contacts.ContactsUtils;
+import com.android.contacts.R;
+import com.android.contacts.activities.DialtactsActivity;
+import com.android.contacts.activities.TransactionSafeActivity;
+import com.android.contacts.model.AccountType;
+import com.android.contacts.model.AccountType.StringInflater;
+import com.android.contacts.model.AccountTypeManager;
+import com.android.contacts.model.DataKind;
+import com.google.common.annotations.VisibleForTesting;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -45,19 +58,6 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ListAdapter;
 import android.widget.TextView;
-
-import com.android.contacts.Collapser;
-import com.android.contacts.Collapser.Collapsible;
-import com.android.contacts.ContactSaveService;
-import com.android.contacts.ContactsUtils;
-import com.android.contacts.R;
-import com.android.contacts.activities.DialtactsActivity;
-import com.android.contacts.activities.TransactionSafeActivity;
-import com.android.contacts.model.account.AccountType;
-import com.android.contacts.model.account.AccountType.StringInflater;
-import com.android.contacts.model.dataitem.DataKind;
-import com.android.contacts.model.AccountTypeManager;
-import com.google.common.annotations.VisibleForTesting;
 
 import java.util.ArrayList;
 import java.util.List;
