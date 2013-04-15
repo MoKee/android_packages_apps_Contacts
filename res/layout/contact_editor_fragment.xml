@@ -13,13 +13,15 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-
+<!--  
+    android:background="@drawable/shendu_background_primary"
+    android:background="@drawable/shendu_background_bg"
+-->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
     android:fadingEdge="none"
-    android:background="@color/background_primary"
 >
 
     <LinearLayout android:id="@+id/editors"

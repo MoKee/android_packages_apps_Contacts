@@ -137,7 +137,7 @@
     <dimen name="list_section_height">25dip</dimen>
 
     <!-- Account title left padding -->
-    <dimen name="account_container_left_padding">16dip</dimen>
+    <dimen name="account_container_left_padding">8dip</dimen>
 
     <!-- Left padding for a group member list item -->
     <dimen name="group_member_item_left_padding">4dip</dimen>
@@ -168,10 +168,6 @@
     <!-- Just used in landscape mode -->
     <dimen name="dialpad_digits_height">0px</dimen>
     <dimen name="dialpad_digits_margin_bottom">0px</dimen>
-    <dimen name="dialpad_center_margin">3dp</dimen>
-    <dimen name="dialpad_button_margin">2dp</dimen>
-    <!-- Match call_button_height to Phone's dimens/in_call_end_button_height -->
-    <dimen name="call_button_height">74dp</dimen>
 
     <!-- Width of search view in action bar.  Use 0dip for MATCH_PARENT -->
     <dimen name="search_view_width">0dip</dimen>
@@ -197,7 +193,8 @@
       Use sp instead of dip so that the shadowbox heights can all scale uniformly
       when the font size is scaled for accessibility purposes
     -->
-    <dimen name="contact_tile_shadowbox_height">48sp</dimen>
+    <!-- Wang: -->
+    <dimen name="contact_tile_shadowbox_height">24dip</dimen>
 
     <!-- Top padding of the ListView in the contact tile list -->
     <dimen name="contact_tile_list_padding_top">0dip</dimen>
@@ -207,11 +204,11 @@
     <dimen name="call_log_call_action_width">48dip</dimen>
     <dimen name="call_log_icon_margin">4dip</dimen>
     <dimen name="call_log_inner_margin">8dip</dimen>
-    <dimen name="call_log_outer_margin">16dip</dimen>
+    <dimen name="call_log_outer_margin">10dip</dimen>
     <dimen name="call_log_indent_margin">24dip</dimen>
     <dimen name="call_log_list_item_height">56dip</dimen>
     <dimen name="call_log_list_contact_photo_size">64dip</dimen>
-    <dimen name="call_detail_contact_name_margin">24dip</dimen>
+    <dimen name="call_detail_contact_name_margin">13dip</dimen>
     <dimen name="call_detail_button_spacing">2dip</dimen>
 
     <!-- Empty message margins -->
@@ -254,6 +251,83 @@
     <!-- Min with of fake menu buttons, which should be same as ActionBar's one -->
     <dimen name="fake_menu_button_min_width">56dip</dimen>
 
-    <!-- Size of the pie chart in the call stats detail activity -->
-    <dimen name="call_stats_details_chart_size">140dip</dimen>
+    <!--  Shendu :  -->
+     <!-- Wang: Vertical and horizontal padding in between contact tiles -->
+     <dimen name="shendu_contacts_tiles_padding">8dip</dimen>
+      <!-- Wang:  contact tiles size-->
+     <dimen name="shendu_contacts_tiles_size">90dip</dimen>
+     <dimen name="shendu_custom_bar_spinner_width">150dip</dimen>
+    
+     <!-- shutao 2012-10-15 shendu The dialpad required length and width data -->
+    <dimen name="shendu_dialpad_bottom_height">59dip</dimen>
+    <dimen name="shendu_dialpad_bottom_t9toggle_width">64dip</dimen>
+    <dimen name="shendu_dialpad_bootom_dialButton_width">192dip</dimen>
+    <dimen name="shendu_call_log_list_contact_photo_size">48dip</dimen>
+    <dimen name="shendu_call_divider_padding">8dip</dimen>
+    <dimen name="shendu_dialpad_new_item_height">61dip</dimen>
+    <dimen name="shendu_dialpad_bootem_height">59.4dip</dimen>
+    <dimen name="shendu_dialpad_call_show_Left">96dip</dimen>
+    <dimen name="shendu_dialpad_left">1.3dip</dimen>
+    <dimen name="shendu_dialpad_top">2dip</dimen>
+    <dimen name="shendu_dialpad_right">0.6dip</dimen>
+    
+    <!-- Wang: Name Avatar params -->  
+    <dimen name="shendu_name_avatar_size">64dip</dimen>  <!-- Wang: 2012-11-12  -->
+    <dimen name="shendu_name_avatar_text_size">32sp</dimen> <!-- Wang: 2012-11-14 -->
+
+     <!-- Wang: FastSearch params --> 
+     <dimen name="shendu_fastsearch_pad_space_padding">7dip</dimen> 
+     <!-- shutao 2013-3-5 -->
+     <dimen name="shendu_dialpad_list_marginleft">10dip</dimen>
+     <dimen name="shendu_dialpad_list_marginright">10dip</dimen>
+     <dimen name="shendu_dialpad_list_height">64dp</dimen>
+     <dimen name="shendu_dialpad_new_contacts_list_hieght">64dip</dimen>
+     <dimen name="shendu_call_detail_date_text_size">16sp</dimen>
+     <dimen name="shendu_call_detail_date_text_s_size">14sp</dimen>
+     <dimen name="shendu_call_detail_text_size">12sp</dimen>
+     
+	<!-- hhl:20130221 -->
+    <dimen name="contacts_edit_photo_height">68dip</dimen>
+    <dimen name="contacts_edit_photo_width">76dip</dimen>
+    <dimen name="contacts_edittext_height">43dip</dimen>
+    <dimen name="contacts_edittext_one_width">287dip</dimen>
+    <dimen name="contacts_edittext_other_width">200dip</dimen>
+    <dimen name="contacts_editspinner_one_width">288dip</dimen>
+    <dimen name="contacts_padding_left">20dp</dimen>
+    <dimen name="contacts_padding_middle">8dp</dimen>
+    <dimen name="fast_search_inputpad_height">362dp</dimen>
+    <dimen name="fast_search_inputpad_width">190dp</dimen>
+    <dimen name="fast_search_inputpad_margin_right">4dp</dimen>
+    <dimen name="fast_search_inputpad_padding_left">3dp</dimen>
+    <dimen name="fast_search_inputpad_padding_bottom">7dp</dimen>
+    <dimen name="contacts_view_photo_height">44dp</dimen>
+    <dimen name="contacts_view_person_data_height">64dp</dimen>
+    <dimen name="contacts_view_header_setting_data_height">69dp</dimen>
+    <dimen name="group_editor_actionbar_dividing_height">43dp</dimen>
+    <dimen name="new_actionbar_size">55dp</dimen>
+    <dimen name="contacts_detail_actionbar_padding">15dp</dimen>
+    <dimen name="contact_detail_list_item_height">61dp</dimen>
+	<dimen name="item_group_membership_paddingleft">12dp</dimen>
+	<dimen name="list_separator_textview_height">40dp</dimen>
+	<dimen name="contacts_dividing_line_height">0.5dp</dimen>
+	<dimen name="organization_editor_view_switcher_textview_height">34.5dp</dimen>
+	<dimen name="contact_listitemview_name_height">25dp</dimen>
+	<dimen name="contact_listitemview_label_height">19dp</dimen>
+	<dimen name="contact_listitemview_label_width">28dp</dimen>
+	<dimen name="contact_detail_ringtone_view_textview_height">41dp</dimen>
+	<dimen name="quickcontent_default_height">131dp</dimen>
+	<dimen name="quickcontent_itemview_height">65dp</dimen>
+     
+    <dimen name="contacts_view_name_size">18sp</dimen>
+    <dimen name="fast_search_inputpad_edittext_size">21sp</dimen>
+    <dimen name="contacts_view_box_number_size">20sp</dimen>
+    <dimen name="favorites_item_view_title_size">14sp</dimen>
+    <dimen name="group_editor_actionbar_text_size">18sp</dimen>
+    <dimen name="group_view_count_size">12sp</dimen>
+    <dimen name="contacts_view_header_count_size">16sp</dimen>
+    <dimen name="contacts_text_size">15sp</dimen>
+    <dimen name="contacts_view_actionbar_textview_size">12sp</dimen>
+     
+    <dimen name="edit_delete_button_paddingLeft">2dp</dimen>
+    <dimen name="edit_delete_button_paddingRight">0dp</dimen>
 </resources>

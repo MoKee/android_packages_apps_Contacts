@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/fastsearch_pad_bg"
+    android:gravity="center"
+    android:paddingBottom="@dimen/fast_search_inputpad_padding_bottom"
+    android:paddingLeft="@dimen/fast_search_inputpad_padding_left"
+    android:paddingRight="@dimen/fast_search_inputpad_padding_left"
+    android:paddingTop="@dimen/fast_search_inputpad_padding_left"
+    >
+    <!-- 
+    -->
+
+    <LinearLayout style="@style/FastSearchPadRowStyle">
+        <EditText
+            android:id="@+id/display"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textSize="@dimen/fast_search_inputpad_edittext_size"
+            android:textColor="@color/fast_search_inputpad_edittext_color"
+            android:background="@drawable/shendu_fastsearch_edit_text_holo_light"/>
+    </LinearLayout>
+
+    <LinearLayout style="@style/FastSearchPadRowStyle" >
+
+        <Button
+            android:id="@+id/fast_a"
+            style="@style/FastSearchPadButtonStyle"
+            android:text="@string/fast_a" />
+
+        <Button
+            android:id="@+id/fast_b"
+            style="@style/FastSearchPadButtonStyle"
+            android:text="@string/fast_b" />
+
+        <Button
+            android:id="@+id/fast_c"
+            style="@style/FastSearchPadButtonStyle"
+            android:text="@string/fast_c" />
+
+        <Button
+            android:id="@+id/fast_d"
+            style="@style/FastSearchPadButtonStyle"
+            android:text="@string/fast_d" />
+    </LinearLayout>
+
+    <LinearLayout style="@style/FastSearchPadRowStyle" >
+
+        <Button
+            android:id="@+id/fast_e"
+            style="@style/FastSearchPadButtonStyle"
+            android:text="@string/fast_e" />
+
+        <Button
+            android:id="@+id/fast_f"
+            style="@style/FastSearchPadButtonStyle"
+            android:text="@string/fast_f" />
+
+        <Button
+            android:id="@+id/fast_g"
+            style="@style/FastSearchPadButtonStyle"
+            android:text="@string/fast_g" />
+
+        <Button
+            android:id="@+id/fast_h"
+            style="@style/FastSearchPadButtonStyle"
+            android:text="@string/fast_h" />
+    </LinearLayout>
+
+    <LinearLayout style="@style/FastSearchPadRowStyle" >
+
+        <Button
+            android:id="@+id/fast_i"
+            style="@style/FastSearchPadButtonStyle"
+            android:text="@string/fast_i" />
+
+        <Button
+            android:id="@+id/fast_j"
+            style="@style/FastSearchPadButtonStyle"
+            android:text="@string/fast_j" />
+
+        <Button
+            android:id="@+id/fast_k"
+            style="@style/FastSearchPadButtonStyle"
+            android:text="@string/fast_k" />
+
+        <Button
+            android:id="@+id/fast_l"
+            style="@style/FastSearchPadButtonStyle"
+            android:text="@string/fast_l" />
+    </LinearLayout>
+
+    <LinearLayout style="@style/FastSearchPadRowStyle" >
+
+        <Button
+            android:id="@+id/fast_m"
+            style="@style/FastSearchPadButtonStyle"
+            android:text="@string/fast_m" />
+
+        <Button
+            android:id="@+id/fast_n"
+            style="@style/FastSearchPadButtonStyle"
+            android:text="@string/fast_n" />
+
+        <Button
+            android:id="@+id/fast_o"
+            style="@style/FastSearchPadButtonStyle"
+            android:text="@string/fast_o" />
+
+        <Button
+            android:id="@+id/fast_p"
+            style="@style/FastSearchPadButtonStyle"
+            android:text="@string/fast_p" />
+    </LinearLayout>
+
+    <LinearLayout style="@style/FastSearchPadRowStyle" >
+
+        <Button
+            android:id="@+id/fast_q"
+            style="@style/FastSearchPadButtonStyle"
+            android:text="@string/fast_q" />
+
+        <Button
+            android:id="@+id/fast_r"
+            style="@style/FastSearchPadButtonStyle"
+            android:text="@string/fast_r" />
+
+        <Button
+            android:id="@+id/fast_s"
+            style="@style/FastSearchPadButtonStyle"
+            android:text="@string/fast_s" />
+
+        <Button
+            android:id="@+id/fast_t"
+            style="@style/FastSearchPadButtonStyle"
+            android:text="@string/fast_t" />
+    </LinearLayout>
+
+    <LinearLayout style="@style/FastSearchPadRowStyle" >
+
+        <Button
+            android:id="@+id/fast_u"
+            style="@style/FastSearchPadButtonStyle"
+            android:text="@string/fast_u" />
+
+        <Button
+            android:id="@+id/fast_v"
+            style="@style/FastSearchPadButtonStyle"
+            android:text="@string/fast_v" />
+
+        <Button
+            android:id="@+id/fast_w"
+            style="@style/FastSearchPadButtonStyle"
+            android:text="@string/fast_w" />
+
+        <Button
+            android:id="@+id/fast_x"
+            style="@style/FastSearchPadButtonStyle"
+            android:text="@string/fast_x" />
+    </LinearLayout>
+
+    <LinearLayout style="@style/FastSearchPadRowStyle" >
+
+        <Button
+            android:id="@+id/fast_y"
+            style="@style/FastSearchPadButtonStyle"
+            android:text="@string/fast_y" />
+
+        <Button
+            android:id="@+id/fast_z"
+            style="@style/FastSearchPadButtonStyle"
+            android:text="@string/fast_z" />
+
+        <Button
+            android:id="@+id/delete"
+            style="@style/FastSearchPadButtonStyle"
+            android:layout_weight="2"
+            android:background="@drawable/fastsearch_delete_btn"
+            />
+    </LinearLayout>
+
+</LinearLayout>

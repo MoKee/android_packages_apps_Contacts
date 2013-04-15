@@ -18,9 +18,22 @@
     <item
         android:id="@+id/menu_edit_group"
         android:title="@string/menu_editGroup"
+        android:icon="@drawable/ic_menu_edit_contact_holo_light"
         android:alphabeticShortcut="e" />
 
+    <!--  add by hhl
+        android:showAsAction="ifRoom"
+    <item
+        android:id="@+id/menu_add_group_item"
+        android:title="@string/shendu_group_editor_add_members" 
+        android:icon="@drawable/ic_menu_add_contact_holo_light"
+        android:showAsAction="ifRoom"
+        />
+        android:showAsAction="ifRoom"
+    -->
     <item
         android:id="@+id/menu_delete_group"
-        android:title="@string/menu_deleteGroup" />
+        android:title="@string/menu_deleteGroup" 
+        android:icon="@drawable/ic_menu_cancel_holo_dark"
+        />
 </menu>

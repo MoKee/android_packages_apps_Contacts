@@ -16,6 +16,24 @@
 
 package com.android.contacts.group;
 
+import com.android.contacts.ContactPhotoManager;
+import com.android.contacts.ContactSaveService;
+import com.android.contacts.GroupMemberLoader;
+import com.android.contacts.GroupMemberLoader.GroupEditorQuery;
+import com.android.contacts.GroupMetaDataLoader;
+import com.android.contacts.R;
+import com.android.contacts.activities.GroupEditorActivity;
+import com.android.contacts.activities.ShenDuContactSelectionActivity;
+import com.android.contacts.editor.SelectAccountDialogFragment;
+import com.android.contacts.group.SuggestedMemberListAdapter.SuggestedMember;
+import com.android.contacts.list.ShenduContactPickAdapter.MemberWithoutRawContactId;
+import com.android.contacts.model.AccountType;
+import com.android.contacts.model.AccountTypeManager;
+import com.android.contacts.model.AccountWithDataSet;
+import com.android.contacts.util.AccountsListAdapter.AccountListFilter;
+import com.android.contacts.util.ViewUtil;
+import com.android.internal.util.Objects;
+
 import android.accounts.Account;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -24,22 +42,27 @@ import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.LoaderManager;
 import android.app.LoaderManager.LoaderCallbacks;
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnKeyListener;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.Intents;
+import android.provider.ContactsContract.RawContacts;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -56,22 +79,6 @@ import android.widget.ListView;
 import android.widget.QuickContactBadge;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.android.contacts.ContactPhotoManager;
-import com.android.contacts.ContactSaveService;
-import com.android.contacts.GroupMemberLoader;
-import com.android.contacts.GroupMemberLoader.GroupEditorQuery;
-import com.android.contacts.GroupMetaDataLoader;
-import com.android.contacts.R;
-import com.android.contacts.activities.GroupEditorActivity;
-import com.android.contacts.editor.SelectAccountDialogFragment;
-import com.android.contacts.group.SuggestedMemberListAdapter.SuggestedMember;
-import com.android.contacts.model.AccountTypeManager;
-import com.android.contacts.model.account.AccountType;
-import com.android.contacts.model.account.AccountWithDataSet;
-import com.android.contacts.util.AccountsListAdapter.AccountListFilter;
-import com.android.contacts.util.ViewUtil;
-import com.android.internal.util.Objects;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -200,6 +207,11 @@ public class GroupEditorFragment extends Fragment implements SelectAccountDialog
     private ArrayList<Member> mListMembersToRemove = new ArrayList<Member>();
     private ArrayList<Member> mListToDisplay = new ArrayList<Member>();
 
+    /* Wang: */
+    private static final String EXCLUED_RAWCONTACTS_IDS_KEY = "exclued_ids";
+
+    private View mAddMemberParent; //add by hhl,for set bg
+    
     public GroupEditorFragment() {
     }
 
@@ -222,8 +234,9 @@ public class GroupEditorFragment extends Fragment implements SelectAccountDialog
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
+        log(">>onActivityCreated >>");
         if (savedInstanceState != null) {
+            log(">>1");
             // Just restore from the saved state.  No loading.
             onRestoreInstanceState(savedInstanceState);
             if (mStatus == Status.SELECTING_ACCOUNT) {
@@ -234,12 +247,15 @@ public class GroupEditorFragment extends Fragment implements SelectAccountDialog
                 setupEditorForAccount();
             }
         } else if (Intent.ACTION_EDIT.equals(mAction)) {
+            log(">>2");
             startGroupMetaDataLoader();
         } else if (Intent.ACTION_INSERT.equals(mAction)) {
+            log(">>3");
             final Account account = mIntentExtras == null ? null :
                     (Account) mIntentExtras.getParcelable(Intents.Insert.ACCOUNT);
             final String dataSet = mIntentExtras == null ? null :
                     mIntentExtras.getString(Intents.Insert.DATA_SET);
+            
 
             if (account != null) {
                 // Account specified in Intent - no data set can be specified in this manner.
@@ -316,6 +332,8 @@ public class GroupEditorFragment extends Fragment implements SelectAccountDialog
             Log.e(TAG, "No accounts were found.");
             if (mListener != null) {
                 mListener.onAccountsNotFound();
+                // Wang:
+                setupEditorForLocalAccount();
             }
             return;
         }
@@ -362,7 +380,14 @@ public class GroupEditorFragment extends Fragment implements SelectAccountDialog
      */
     private boolean isGroupMembershipEditable() {
         if (mAccountType == null) {
+            log("AccountType is null");
             return false;
+        } else if (mAccountType.length() == 0 && mAccountName.length() == 0) {/*
+                                                                               * Wang
+                                                                               * :
+                                                                               */
+            log("Local Accout !!");
+            return true;
         }
         return getAccountType().isGroupMembershipEditable();
     }
@@ -374,7 +399,7 @@ public class GroupEditorFragment extends Fragment implements SelectAccountDialog
         final AccountType accountType = getAccountType();
         final boolean editable = isGroupMembershipEditable();
         boolean isNewEditor = false;
-        mMemberListAdapter.setIsGroupMembershipEditable(editable);
+        //mMemberListAdapter.setIsGroupMembershipEditable(editable);
 
         // Since this method can be called multiple time, remove old editor if the editor type
         // is different from the new one and mark the editor with a tag so it can be found for
@@ -382,6 +407,7 @@ public class GroupEditorFragment extends Fragment implements SelectAccountDialog
         View editorView;
         int newGroupEditorId =
                 editable ? R.layout.group_editor_view : R.layout.external_group_editor_view;
+        log("setupEditorForAccount =>"+"editable:"+editable+"/newGroupEditorId:"+newGroupEditorId);
         if (newGroupEditorId != mLastGroupEditorId) {
             View oldEditorView = mRootView.findViewWithTag(CURRENT_EDITOR_TAG);
             if (oldEditorView != null) {
@@ -403,13 +429,33 @@ public class GroupEditorFragment extends Fragment implements SelectAccountDialog
         mAutoCompleteTextView = (AutoCompleteTextView) editorView.findViewById(
                 R.id.add_member_field);
 
+        /* Wang: shendu UI */
+        //configureAddNewMembersView(editorView);
+        
+        mMemberListAdapter.setIsGroupMembershipEditable(editable);
         mListView = (ListView) editorView.findViewById(android.R.id.list);
+        mAddMemberParent = LayoutInflater.from(mContext).inflate(R.layout.group_editor_view_foot_view,null);
+        mListView.addFooterView(mAddMemberParent);
         mListView.setAdapter(mMemberListAdapter);
+
+        mAddMemberParent.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO Launch to Shendu Selection Activity
+                Intent selectMembersIntent = new Intent(mContext,
+                        ShenDuContactSelectionActivity.class);
+                if (mListToDisplay != null) {
+                    long[] existedIds = convertToContactIdArray(mListToDisplay);
+                    selectMembersIntent.putExtra(EXCLUED_RAWCONTACTS_IDS_KEY, existedIds);
+                }
+                startActivityForResult(selectMembersIntent, 0);
+            }
+        });
 
         // Setup the account header, only when exists.
         if (editorView.findViewById(R.id.account_header) != null) {
             CharSequence accountTypeDisplayLabel = accountType.getDisplayLabel(mContext);
-            ImageView accountIcon = (ImageView) editorView.findViewById(R.id.account_icon);
+            //ImageView accountIcon = (ImageView) editorView.findViewById(R.id.account_icon); //do not used,remove by hhl
             TextView accountTypeTextView = (TextView) editorView.findViewById(R.id.account_type);
             TextView accountNameTextView = (TextView) editorView.findViewById(R.id.account_name);
             if (!TextUtils.isEmpty(mAccountName)) {
@@ -417,7 +463,7 @@ public class GroupEditorFragment extends Fragment implements SelectAccountDialog
                         mContext.getString(R.string.from_account_format, mAccountName));
             }
             accountTypeTextView.setText(accountTypeDisplayLabel);
-            accountIcon.setImageDrawable(accountType.getDisplayIcon(mContext));
+            //accountIcon.setImageDrawable(accountType.getDisplayIcon(mContext));
         }
 
         // Setup the autocomplete adapter (for contacts to suggest to add to the group) based on the
@@ -458,7 +504,181 @@ public class GroupEditorFragment extends Fragment implements SelectAccountDialog
         if(isNewEditor) {
             mRootView.addView(editorView);
         }
+
         mStatus = Status.EDITING;
+    }
+
+    /**
+     * Sets up the editor based on the local group's account name and type .
+     * 
+     * @author Wang
+     * @param
+     * @return
+     * @date 2012-8-21
+     */
+    private void setupEditorForLocalAccount() {
+        //
+        mAccountType = "";
+        mAccountName = "";
+        final AccountType accountType = getAccountType();
+        final boolean editable = true;
+        boolean isNewEditor = false;
+        //mMemberListAdapter.setIsGroupMembershipEditable(editable);
+
+        // Since this method can be called multiple time, remove old editor if
+        // the editor type
+        // is different from the new one and mark the editor with a tag so it
+        // can be found for
+        // removal if needed
+        View editorView;
+        int newGroupEditorId =
+                editable ? R.layout.group_editor_view : R.layout.external_group_editor_view;
+        if (newGroupEditorId != mLastGroupEditorId) {
+            View oldEditorView = mRootView.findViewWithTag(CURRENT_EDITOR_TAG);
+            if (oldEditorView != null) {
+                mRootView.removeView(oldEditorView);
+            }
+            editorView = mLayoutInflater.inflate(newGroupEditorId, mRootView, false);
+            editorView.setTag(CURRENT_EDITOR_TAG);
+            mAutoCompleteAdapter = null;
+            mLastGroupEditorId = newGroupEditorId;
+            isNewEditor = true;
+        } else {
+            editorView = mRootView.findViewWithTag(CURRENT_EDITOR_TAG);
+            if (editorView == null) {
+                throw new IllegalStateException("Group editor view not found");
+            }
+        }
+
+        mGroupNameView = (TextView) editorView.findViewById(R.id.group_name);
+        mAutoCompleteTextView = (AutoCompleteTextView) editorView.findViewById(
+                R.id.add_member_field);
+
+        /* Wang: shendu UI */
+        //configureAddNewMembersView(editorView);
+
+        mAddMemberParent = LayoutInflater.from(mContext).inflate(R.layout.group_editor_view_foot_view,null);
+        mMemberListAdapter.setIsGroupMembershipEditable(editable);
+        mListView = (ListView) editorView.findViewById(android.R.id.list);
+        mListView.addFooterView(mAddMemberParent,null,false);
+        mListView.setAdapter(mMemberListAdapter);
+
+        mAddMemberParent.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO Launch to Shendu Selection Activity
+                Intent selectMembersIntent = new Intent(mContext,
+                        ShenDuContactSelectionActivity.class);
+                if (mListToDisplay != null) {
+                    long[] existedIds = convertToContactIdArray(mListToDisplay);
+                    selectMembersIntent.putExtra(EXCLUED_RAWCONTACTS_IDS_KEY, existedIds);
+                }
+                startActivityForResult(selectMembersIntent, 0);
+            }
+        });
+        
+        // Setup the account header, only when exists.
+        if (editorView.findViewById(R.id.account_header) != null) {
+            CharSequence accountTypeDisplayLabel = accountType.getDisplayLabel(mContext);
+            //do not used,remove by hhl
+            //ImageView accountIcon = (ImageView) editorView.findViewById(R.id.account_icon);
+            TextView accountTypeTextView = (TextView) editorView.findViewById(R.id.account_type);
+            TextView accountNameTextView = (TextView) editorView.findViewById(R.id.account_name);
+            if (!TextUtils.isEmpty(mAccountName)) {
+                accountNameTextView.setText(
+                        mContext.getString(R.string.from_account_format, mAccountName));
+            }
+            accountTypeTextView.setText(accountTypeDisplayLabel);
+            //accountIcon.setImageDrawable(accountType.getDisplayIcon(mContext));
+        }
+
+        // Setup the autocomplete adapter (for contacts to suggest to add to the
+        // group) based on the
+        // account name and type. For groups that cannot have membership edited,
+        // there will be no
+        // autocomplete text view.
+        if (mAutoCompleteTextView != null) {
+            mAutoCompleteAdapter = new SuggestedMemberListAdapter(mContext,
+                    android.R.layout.simple_dropdown_item_1line);
+            mAutoCompleteAdapter.setContentResolver(mContentResolver);
+            mAutoCompleteAdapter.setAccountType(mAccountType);
+            mAutoCompleteAdapter.setAccountName(mAccountName);
+            mAutoCompleteAdapter.setDataSet(mDataSet);
+            mAutoCompleteTextView.setAdapter(mAutoCompleteAdapter);
+            mAutoCompleteTextView.setOnItemClickListener(new OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    SuggestedMember member = (SuggestedMember) view.getTag();
+                    if (member == null) {
+                        return; // just in case
+                    }
+                    loadMemberToAddToGroup(member.getRawContactId(),
+                            String.valueOf(member.getContactId()));
+
+                    // Update the autocomplete adapter so the contact doesn't
+                    // get suggested again
+                    mAutoCompleteAdapter.addNewMember(member.getContactId());
+
+                    // Clear out the text field
+                    mAutoCompleteTextView.setText("");
+                }
+            });
+            // Update the exempt list. (mListToDisplay might have been restored
+            // from the saved
+            // state.)
+            mAutoCompleteAdapter.updateExistingMembersList(mListToDisplay);
+        }
+
+        // If the group name is ready only, don't let the user focus on the
+        // field.
+        mGroupNameView.setFocusable(!mGroupNameIsReadOnly);
+        if (isNewEditor) {
+            mRootView.addView(editorView);
+        }
+
+        mStatus = Status.EDITING;
+    }
+
+    /**
+     * Configure AddNewMembersView
+     * 
+     * @author Wang
+     * @param editorView Root view of addNewMembers button
+     * @return
+     * @date 2012-9-4
+     */
+    private void configureAddNewMembersView(View editorView) {
+    	/*
+    	if(mListToDisplay!=null){
+    	}*/
+    	//mAddMemberParent = editorView.findViewById(R.id.add_member_view);
+        //View addNewMembers = editorView.findViewById(R.id.add_member_view);
+        //log("addNewMembers =>"+addNewMembers);
+    	/*mAddMemberParent.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO Launch to Shendu Selection Activity
+                Intent selectMembersIntent = new Intent(v.getContext(),
+                        ShenDuContactSelectionActivity.class);
+                if (mListToDisplay != null) {
+                    long[] existedIds = convertToContactIdArray(mListToDisplay);
+                    selectMembersIntent.putExtra(EXCLUED_RAWCONTACTS_IDS_KEY, existedIds);
+                }
+                startActivityForResult(selectMembersIntent, 0);
+            }
+        });*/
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (data == null)
+            return;
+        ArrayList<MemberWithoutRawContactId> list = data.getParcelableArrayListExtra("data");
+        if (list == null || list.size() <= 0)
+            return;
+        MemberProcessTask task = new MemberProcessTask(getActivity());
+        task.execute(list);
     }
 
     public void load(String action, Uri groupUri, Bundle intentExtras) {
@@ -481,8 +701,12 @@ public class GroupEditorFragment extends Fragment implements SelectAccountDialog
         mAccountType = cursor.getString(GroupMetaDataLoader.ACCOUNT_TYPE);
         mDataSet = cursor.getString(GroupMetaDataLoader.DATA_SET);
         mGroupNameIsReadOnly = (cursor.getInt(GroupMetaDataLoader.IS_READ_ONLY) == 1);
-        setupEditorForAccount();
-
+        //Wang:
+        if(isLocalAccount()){
+            setupEditorForLocalAccount();
+        }else{
+            setupEditorForAccount();
+        }
         // Setup the group metadata display
         mGroupNameView.setText(mOriginalGroupName);
     }
@@ -521,7 +745,8 @@ public class GroupEditorFragment extends Fragment implements SelectAccountDialog
         return false;
     }
 
-    private boolean revert() {
+    //moditify by hhl
+    public boolean revert() {
         if (!hasNameChange() && !hasMembershipChange()) {
             doRevertAction();
         } else {
@@ -533,7 +758,198 @@ public class GroupEditorFragment extends Fragment implements SelectAccountDialog
     private void doRevertAction() {
         // When this Fragment is closed we don't want it to auto-save
         mStatus = Status.CLOSING;
-        if (mListener != null) mListener.onReverted();
+        if (mListener != null)
+            mListener.onReverted();
+    }
+
+    private class MemberProcessTask extends
+            AsyncTask<ArrayList<MemberWithoutRawContactId>, Integer, Void> {
+
+        private Context mContext;
+        private ContentResolver mResolver;
+        private String[] mContactsIds;
+        private final String[] projection = {
+                RawContacts._ID,
+                RawContacts.DELETED
+        };
+        private static final int RAWCONTACTS_ID_INDEX = 0;
+        private ProgressDialog mProgressDialog;
+        private ProgressDialogFragment mProgressDialogFragment;
+        private static final int PROGRESS_MAX = 100;
+        private final String formatMessage;
+        private int totalLengh;
+
+        public MemberProcessTask(Context context) {
+            mContext = context;
+            mResolver = context.getContentResolver();
+            formatMessage = getResources().getString(
+                    R.string.group_insert_members_message);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            // mProgressDialog = new ProgressDialog(getActivity());
+            // mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            // mProgressDialog.setMax(PROGRESS_MAX);
+            String prepareMsg = getResources().getString(R.string.message_prepare);
+            mProgressDialogFragment = new ProgressDialogFragment();
+            mProgressDialogFragment.show(GroupEditorFragment.this.getFragmentManager(),
+                    "progressEditor");
+            mProgressDialogFragment.setMessage(prepareMsg);
+            // mProgressDialog.setMessage(prepareMsg);
+            // mProgressDialog.show();
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            // queryMemebers(mGroupId); //refresh ui
+            // if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            // mProgressDialog.dismiss();
+            // mProgressDialog = null;
+            // }
+            onNotifyDataSetChanged();
+            if (mProgressDialogFragment != null) {
+                mProgressDialogFragment.dismiss();
+            }
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            final int hasInserted = values[0];
+            String message = String.format(formatMessage, hasInserted,
+                    totalLengh);
+            // mProgressDialog.setMessage(message);
+            mProgressDialogFragment.setMessage(message);
+            int progress = hasInserted * PROGRESS_MAX / totalLengh;
+            // mProgressDialog.setProgress(progress);
+            mProgressDialogFragment.setProgress(progress);
+        }
+
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+        }
+
+        @Override
+        protected Void doInBackground(ArrayList<MemberWithoutRawContactId>... params) {
+            if (params == null || params[0] == null || params[0].size() == 0) {
+                return null;
+            }
+            ArrayList<MemberWithoutRawContactId> entryList = params[0];
+            int hasFinished = 0;
+            totalLengh = entryList.size();
+            for (MemberWithoutRawContactId item : entryList) {
+                Cursor c = mResolver.query(RawContacts.CONTENT_URI,
+                        projection, RawContacts.CONTACT_ID + "=?",
+                        new String[] {
+                            String.valueOf(item.getContactId())
+                        }, null);
+                if (c != null)
+                    c.moveToFirst();
+                if (c.isNull(RAWCONTACTS_ID_INDEX))
+                    break;
+                long rawId = c.getLong(RAWCONTACTS_ID_INDEX);
+                Member m = new Member(rawId, item.getLookupKey(), item.getContactId(),
+                        item.getDisplayName(), item.getPhotoUri());
+                addMemberWithoutNotify(m);
+                hasFinished++;
+                publishProgress(hasFinished);
+            }
+            return null;
+        }
+    }
+
+    /**
+     * ProgressDialog when insert new member into display listview.
+     * 
+     * @author Wang
+     * @date 2012-9-11
+     */
+    public static class ProgressDialogFragment extends DialogFragment {
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+
+            final ProgressDialog dialog = new ProgressDialog(getActivity());
+//             dialog.setIndeterminate(true);
+            dialog.setCancelable(false);
+
+             // Disable the back button
+             OnKeyListener keyListener = new OnKeyListener() {
+            
+             @Override
+             public boolean onKey(DialogInterface dialog, int keyCode,
+             KeyEvent event) {
+            
+             if( keyCode == KeyEvent.KEYCODE_BACK){
+             return true;
+             }
+             return false;
+             }
+             };
+             dialog.setOnKeyListener(keyListener);
+            dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            dialog.setMax(100);
+            String prepareMsg = getResources().getString(R.string.message_prepare);
+            dialog.setMessage(prepareMsg);
+            return dialog;
+        }
+
+        // public static void show(GroupEditorFragment fragment) {
+        // ProgressDialogFragment dialog = new ProgressDialogFragment();
+        // dialog.setTargetFragment(fragment, 0);
+        // dialog.show(fragment.getFragmentManager(), "progressEditor");
+        // }
+
+        public void setMessage(String msg) {
+            ProgressDialog dialog = (ProgressDialog) getDialog();
+            if (dialog != null)
+                dialog.setMessage(msg);
+        }
+
+        public void setProgress(int progress) {
+            ProgressDialog dialog = (ProgressDialog) getDialog();
+            if (dialog != null)
+                dialog.setProgress(progress);
+        }
+
+    }
+
+    /**
+     * ProgressDialog when save new member into group database.
+     * 
+     * @author Wang
+     * @date 2012-9-11
+     */
+    public static class SaveProgressDialogFragment extends DialogFragment {
+        public static void show(GroupEditorFragment fragment) {
+            SaveProgressDialogFragment dialog = new SaveProgressDialogFragment();
+            dialog.setTargetFragment(fragment, 0);
+            dialog.show(fragment.getFragmentManager(), "saveEditor");
+        }
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            final ProgressDialog dialog = new ProgressDialog(getActivity());
+            OnKeyListener keyListener = new OnKeyListener() {
+
+                @Override
+                public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+                    if (keyCode == KeyEvent.KEYCODE_BACK) {
+                        return true;
+                    }
+                    return false;
+                }
+            };
+            dialog.setOnKeyListener(keyListener);
+            dialog.setCancelable(false);
+            dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            String prepareMsg = getResources().getString(R.string.message_prepare);
+            dialog.setMessage(prepareMsg);
+            return dialog;
+        }
     }
 
     public static class CancelEditDialogFragment extends DialogFragment {
@@ -564,8 +980,21 @@ public class GroupEditorFragment extends Fragment implements SelectAccountDialog
     }
 
     /**
-     * Saves or creates the group based on the mode, and if successful
-     * finishes the activity. This actually only handles saving the group name.
+     * Given current account is local account
+     * 
+     * @author Wang
+     * @param
+     * @return true when local account , otherwise is unlocal account
+     * @date 2012-8-21
+     */
+    private boolean isLocalAccount() {
+        return TextUtils.isEmpty(mAccountName) && TextUtils.isEmpty(mAccountType);
+    }
+
+    /**
+     * Saves or creates the group based on the mode, and if successful finishes
+     * the activity. This actually only handles saving the group name.
+     * 
      * @return true when successful
      */
     public boolean save() {
@@ -589,14 +1018,22 @@ public class GroupEditorFragment extends Fragment implements SelectAccountDialog
         if (activity == null) {
             return false;
         }
+        // Wang:
+        SaveProgressDialogFragment.show(GroupEditorFragment.this);
+
         Intent saveIntent = null;
         if (Intent.ACTION_INSERT.equals(mAction)) {
             // Create array of raw contact IDs for contacts to add to the group
             long[] membersToAddArray = convertToArray(mListMembersToAdd);
 
-            // Create the save intent to create the group and add members at the same time
-            saveIntent = ContactSaveService.createNewGroupIntent(activity,
-                    new AccountWithDataSet(mAccountName, mAccountType, mDataSet),
+            /* Wang : given different dataset by location */
+            AccountWithDataSet dataSet = (isLocalAccount() ? new AccountWithDataSet(mAccountName,
+                    mAccountType, mDataSet, true) : new AccountWithDataSet(mAccountName,
+                    mAccountType, mDataSet));
+
+            // Create the save intent to create the group and add members at the
+            // same time
+            saveIntent = ContactSaveService.createNewGroupIntent(activity, dataSet,
                     mGroupNameView.getText().toString(),
                     membersToAddArray, activity.getClass(),
                     GroupEditorActivity.ACTION_SAVE_COMPLETED);
@@ -690,6 +1127,23 @@ public class GroupEditorFragment extends Fragment implements SelectAccountDialog
         return membersArray;
     }
 
+    /**
+     * Convert list of members to contact id array.
+     * 
+     * @author Wang
+     * @param listMembers list of members to convert into array
+     * @return long[] the converted array
+     * @date 2012-9-4
+     */
+    private static long[] convertToContactIdArray(List<Member> listMembers) {
+        int size = listMembers.size();
+        long[] membersArray = new long[size];
+        for (int i = 0; i < size; i++) {
+            membersArray[i] = listMembers.get(i).getContactId();
+        }
+        return membersArray;
+    }
+
     private void addExistingMembers(List<Member> members) {
 
         // Re-create the list to display
@@ -714,6 +1168,27 @@ public class GroupEditorFragment extends Fragment implements SelectAccountDialog
 
         // Update the autocomplete adapter so the contact doesn't get suggested again
         mAutoCompleteAdapter.addNewMember(member.getContactId());
+    }
+
+    /**
+     * Add Member and don't Notify DataSet Changed
+     * 
+     * @author Wang
+     * @date 2012-9-11
+     */
+    private void addMemberWithoutNotify(Member member) {
+        mListMembersToAdd.add(member);
+        mListToDisplay.add(member);
+    };
+
+    /**
+     * Notify Adapter DataSet has Changed
+     * 
+     * @author Wang
+     * @date 2012-9-11
+     */
+    private void onNotifyDataSetChanged() {
+        mMemberListAdapter.notifyDataSetChanged();
     }
 
     private void removeMember(Member member) {
@@ -942,6 +1417,14 @@ public class GroupEditorFragment extends Fragment implements SelectAccountDialog
             } else {
                 result = convertView;
             }
+
+          //add by hhl,for item bg
+            if(position == 0){
+            	result.setBackgroundResource(R.drawable.shendu_listview_item_top);
+            }else{
+            	result.setBackgroundResource(R.drawable.shendu_listview_item_middle);
+            }
+            
             final Member member = getItem(position);
 
             QuickContactBadge badge = (QuickContactBadge) result.findViewById(R.id.badge);
@@ -960,14 +1443,25 @@ public class GroupEditorFragment extends Fragment implements SelectAccountDialog
                 });
             }
 
+            /*Wang: 2012-11-15*/
             mPhotoManager.loadPhoto(badge, member.getPhotoUri(),
-                    ViewUtil.getConstantPreLayoutWidth(badge), false);
+                    ViewUtil.getConstantPreLayoutWidth(badge), false,member.getDisplayName(), -1);
             return result;
         }
 
         @Override
         public int getCount() {
-            return mListToDisplay.size();
+        	//for rounder background
+        	int listSize = mListToDisplay.size();
+        	if(mAddMemberParent!=null){
+        		if(listSize>0){
+        			mAddMemberParent.setBackgroundResource(R.drawable.shendu_listview_item_bottom);
+        		}else{
+        			mAddMemberParent.setBackgroundResource(R.drawable.shendu_listview_item_overall);
+        		}
+        	}
+            return listSize;
+        	//return mListToDisplay.size();
         }
 
         @Override
@@ -983,5 +1477,13 @@ public class GroupEditorFragment extends Fragment implements SelectAccountDialog
         public void setIsGroupMembershipEditable(boolean editable) {
             mIsGroupMembershipEditable = editable;
         }
+    }
+
+    private static final boolean debug = false;
+
+    private static void log(String msg) {
+        msg = "Editor -> fragment -> " + msg;
+        if (debug)
+            Log.i("shenduGroup", msg);
     }
 }

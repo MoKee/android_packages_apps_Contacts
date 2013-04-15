@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2011 The Android Open Source Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+<resources>
+    <dimen name="group_detail_border_padding">32dip</dimen>
+    <dimen name="group_editor_side_padding">64dip</dimen>
+    <dimen name="contact_detail_list_top_padding">32dip</dimen>
+    <!-- Wang:2012-11-28 -->
+    <dimen name="contact_tile_list_padding_top">0dip</dimen>
+    <dimen name="list_visible_scrollbar_padding">20dip</dimen>
+    <dimen name="detail_contact_photo_size">256dip</dimen>
+    <!-- shutao:2013-1-29 -->
+    <dimen name="shendu_dialpad_bottom_height">68dip</dimen>
+    <dimen name="shendu_dialpad_bootem_height">67dip</dimen>
+    <dimen name="shendu_dialpad_call_show_Left">120.0dip</dimen>
+    
+    <dimen name="shendu_dialpad_left">0.5dip</dimen>
+    <dimen name="shendu_dialpad_top">2dip</dimen>
+    <dimen name="shendu_dialpad_right">1dip</dimen>
+    <dimen name="dialpad_horizontal_margin">0dip</dimen>
+    <!-- shutao: 2013-1-29 -->
+    <dimen name="shendu_dialpad_list_marginleft">10dip</dimen>
+    <dimen name="shendu_dialpad_list_marginright">10dip</dimen>
+    <dimen name="shendu_dialpad_list_height">72dp</dimen>
+    <dimen name="shendu_dialpad_new_contacts_list_hieght">66.5dip</dimen>
+    <dimen name="shendu_call_log_list_contact_photo_size">56dip</dimen>
+    <dimen name="shendu_call_detail_date_text_size">16sp</dimen>
+    <dimen name="shendu_call_detail_date_text_s_size">14sp</dimen>
+    <dimen name="shendu_call_detail_text_size">12sp</dimen>
+    
+    <!-- hhl:20130221 -->
+    <dimen name="contacts_edit_photo_height">77.5dip</dimen>
+    <dimen name="contacts_edit_photo_width">86.5dip</dimen>
+    <dimen name="contacts_edittext_height">43dip</dimen>
+    <dimen name="contacts_edittext_one_width">287dip</dimen>
+    <dimen name="contacts_edittext_other_width">200dip</dimen>
+    <dimen name="contacts_editspinner_one_width">320dip</dimen>
+    <dimen name="contacts_padding_left">20dp</dimen>
+    <dimen name="contacts_padding_middle">9dp</dimen>
+    <dimen name="editor_round_button_padding_left">5dp</dimen><!-- has -->
+    <dimen name="editor_round_button_padding_right">6dp</dimen><!-- has -->
+    <dimen name="editor_round_button_padding_top">5.5dp</dimen><!-- has -->
+    <dimen name="editor_round_button_padding_bottom">5.5dp</dimen><!-- has -->
+    <dimen name="fast_search_inputpad_height">362dp</dimen>
+    <dimen name="fast_search_inputpad_width">190dp</dimen>
+    <dimen name="fast_search_inputpad_margin_right">4dp</dimen>
+    <dimen name="fast_search_inputpad_padding_left">3dp</dimen>
+    <dimen name="fast_search_inputpad_padding_bottom">7dp</dimen>
+    <dimen name="contacts_view_photo_height">44dp</dimen>
+    <dimen name="contacts_view_person_data_height">64dp</dimen>
+    <dimen name="contacts_view_header_setting_data_height">69dp</dimen>
+    <dimen name="account_container_left_padding">10dp</dimen><!-- has -->
+    <dimen name="group_editor_actionbar_dividing_height">43dp</dimen>
+    <dimen name="new_actionbar_size">55dp</dimen>
+    <dimen name="contacts_detail_actionbar_padding">15dp</dimen>
+    <dimen name="contact_detail_list_item_height">61dp</dimen>
+	<dimen name="shendu_contacts_tiles_padding">10dp</dimen><!-- not used -->
+	<dimen name="item_group_membership_paddingleft">12dp</dimen>
+	<dimen name="list_separator_textview_height">48dp</dimen>
+	<dimen name="contacts_dividing_line_height">0.5dp</dimen>
+	<dimen name="organization_editor_view_switcher_textview_height">34.5dp</dimen>
+	<dimen name="contact_listitemview_name_height">25dp</dimen>
+	<dimen name="contact_listitemview_label_height">19dp</dimen>
+	<dimen name="contact_listitemview_label_width">28dp</dimen>
+	<dimen name="contact_detail_ringtone_view_textview_height">41dp</dimen>
+	<dimen name="quickcontent_default_height">131dp</dimen>
+	<dimen name="quickcontent_itemview_height">65dp</dimen>
+     
+    <dimen name="shendu_name_avatar_size">44sp</dimen><!-- has -->
+    <dimen name="shendu_name_avatar_text_size">35sp</dimen><!-- has -->
+    <dimen name="contacts_view_name_size">25sp</dimen>
+    <dimen name="fast_search_inputpad_edittext_size">21sp</dimen>
+    <dimen name="contacts_view_box_number_size">20sp</dimen>
+    <dimen name="favorites_item_view_title_size">19sp</dimen>
+    <dimen name="group_editor_actionbar_text_size">18sp</dimen>
+    <dimen name="group_view_count_size">17sp</dimen>
+    <dimen name="contacts_view_header_count_size">16sp</dimen>
+    <dimen name="contacts_text_size">15sp</dimen>
+    <dimen name="contacts_view_actionbar_textview_size">9sp</dimen>
+    
+    <dimen name="edit_delete_button_paddingLeft">5dp</dimen>
+    <dimen name="edit_delete_button_paddingRight">6dp</dimen>
+</resources>

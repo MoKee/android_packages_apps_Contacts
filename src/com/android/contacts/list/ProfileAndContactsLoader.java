@@ -15,6 +15,8 @@
  */
 package com.android.contacts.list;
 
+import com.google.android.collect.Lists;
+
 import android.content.Context;
 import android.content.CursorLoader;
 import android.database.Cursor;
@@ -22,8 +24,6 @@ import android.database.MatrixCursor;
 import android.database.MergeCursor;
 import android.os.Bundle;
 import android.provider.ContactsContract.Profile;
-
-import com.google.common.collect.Lists;
 
 import java.util.List;
 

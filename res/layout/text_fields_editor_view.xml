@@ -18,8 +18,13 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/account_container_left_padding"
+    >
 
+    <!-- 
+		android:paddingLeft="@dimen/contacts_padding_left"
+    -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -30,17 +35,21 @@
         android:clickable="true">
 
         <include
-            layout="@layout/edit_field_list_with_anchor_view" />
+            android:id="@+id/spinner"
+            layout="@layout/edit_spinner"
+            android:visibility="gone" />
+
+        <include layout="@layout/edit_field_list_with_anchor_view" />
 
         <include
             android:id="@+id/expansion_view_container"
             layout="@layout/edit_expansion_view"
             android:visibility="gone" />
 
-        <include
+        <!--<include
             android:id="@+id/spinner"
             layout="@layout/edit_spinner"
-            android:visibility="gone" />
+            android:visibility="gone" /> -->
 
         <include
             android:id="@+id/delete_button_container"

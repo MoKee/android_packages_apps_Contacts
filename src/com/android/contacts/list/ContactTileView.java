@@ -15,6 +15,11 @@
  */
 package com.android.contacts.list;
 
+import com.android.contacts.ContactPhotoManager;
+import com.android.contacts.ContactsUtils;
+import com.android.contacts.R;
+import com.android.contacts.list.ContactTileAdapter.ContactEntry;
+
 import android.content.Context;
 import android.graphics.Rect;
 import android.net.Uri;
@@ -25,11 +30,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.QuickContactBadge;
 import android.widget.TextView;
-
-import com.android.contacts.ContactPhotoManager;
-import com.android.contacts.ContactsUtils;
-import com.android.contacts.R;
-import com.android.contacts.list.ContactTileAdapter.ContactEntry;
 
 /**
  * A ContactTile displays a contact's picture and name
@@ -48,6 +48,8 @@ public abstract class ContactTileView extends FrameLayout {
     private View mPushState;
     private View mHorizontalDivider;
     protected Listener mListener;
+    
+    private View mItemParent; //add by hhl,for item background
 
     public ContactTileView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -66,6 +68,8 @@ public abstract class ContactTileView extends FrameLayout {
         mPushState = findViewById(R.id.contact_tile_push_state);
         mHorizontalDivider = findViewById(R.id.contact_tile_horizontal_divider);
 
+        mItemParent = findViewById(R.id.contact_title_frequent_item_parent_id); //add
+        
         OnClickListener listener = createClickListener();
 
         if(mPushState != null) {
@@ -105,10 +109,12 @@ public abstract class ContactTileView extends FrameLayout {
                 if (entry.status == null) {
                     mStatus.setVisibility(View.GONE);
                 } else {
-                    mStatus.setText(entry.status);
-                    mStatus.setCompoundDrawablesWithIntrinsicBounds(entry.presenceIcon,
-                            null, null, null);
-                    mStatus.setVisibility(View.VISIBLE);
+                    /*Wang:*/
+//                    mStatus.setText(entry.status);
+//                    mStatus.setCompoundDrawablesWithIntrinsicBounds(entry.presenceIcon,
+//                            null, null, null);
+//                    mStatus.setVisibility(View.VISIBLE);
+                    mStatus.setVisibility(View.GONE);
                 }
             }
 
@@ -125,16 +131,18 @@ public abstract class ContactTileView extends FrameLayout {
 
             if (mPhotoManager != null) {
                 if (mPhoto != null) {
+                    /*Wang:2012-11-15*/
                     mPhotoManager.loadPhoto(mPhoto, entry.photoUri, getApproximateImageSize(),
-                            isDarkTheme());
+                            isDarkTheme(), entry.name, -1);
 
                     if (mQuickContact != null) {
                         mQuickContact.assignContactUri(mLookupUri);
                     }
                 } else if (mQuickContact != null) {
                     mQuickContact.assignContactUri(mLookupUri);
+                    /*Wang:2012-11-15*/
                     mPhotoManager.loadPhoto(mQuickContact, entry.photoUri,
-                            getApproximateImageSize(), isDarkTheme());
+                            getApproximateImageSize(), isDarkTheme(), entry.name, -1);
                 }
             } else {
                 Log.w(TAG, "contactPhotoManager not set");
@@ -156,6 +164,10 @@ public abstract class ContactTileView extends FrameLayout {
 
     public void setHorizontalDividerVisibility(int visibility) {
         if (mHorizontalDivider != null) mHorizontalDivider.setVisibility(visibility);
+    }
+    
+    public void setItemParentBackground(int resId){//add
+    	if(resId != 0) mItemParent.setBackgroundResource(resId);
     }
 
     public Uri getLookupUri() {

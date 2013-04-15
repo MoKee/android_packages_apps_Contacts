@@ -16,7 +16,18 @@
 
 package com.android.contacts.editor;
 
+import com.android.contacts.GroupMetaDataLoader;
+import com.android.contacts.R;
+import com.android.contacts.model.AccountType;
+import com.android.contacts.model.AccountType.EditType;
+import com.android.contacts.model.DataKind;
+import com.android.contacts.model.EntityDelta;
+import com.android.contacts.model.EntityDelta.ValuesDelta;
+import com.android.contacts.model.EntityModifier;
+import com.android.internal.util.Objects;
+
 import android.content.Context;
+import android.content.Entity;
 import android.database.Cursor;
 import android.provider.ContactsContract.CommonDataKinds.GroupMembership;
 import android.provider.ContactsContract.CommonDataKinds.Organization;
@@ -24,8 +35,10 @@ import android.provider.ContactsContract.CommonDataKinds.Photo;
 import android.provider.ContactsContract.CommonDataKinds.StructuredName;
 import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.Data;
+import android.provider.ContactsContract.RawContacts;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -36,39 +49,29 @@ import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
-import com.android.contacts.GroupMetaDataLoader;
-import com.android.contacts.R;
-import com.android.contacts.model.RawContactDelta;
-import com.android.contacts.model.RawContactDelta.ValuesDelta;
-import com.android.contacts.model.RawContactModifier;
-import com.android.contacts.model.account.AccountType;
-import com.android.contacts.model.account.AccountType.EditType;
-import com.android.contacts.model.dataitem.DataKind;
-import com.android.internal.util.Objects;
-
 import java.util.ArrayList;
 
 /**
  * Custom view that provides all the editor interaction for a specific
- * {@link Contacts} represented through an {@link RawContactDelta}. Callers can
+ * {@link Contacts} represented through an {@link EntityDelta}. Callers can
  * reuse this view and quickly rebuild its contents through
- * {@link #setState(RawContactDelta, AccountType, ViewIdGenerator)}.
+ * {@link #setState(EntityDelta, AccountType, ViewIdGenerator)}.
  * <p>
  * Internal updates are performed against {@link ValuesDelta} so that the
- * source {@link RawContact} can be swapped out. Any state-based changes, such as
+ * source {@link Entity} can be swapped out. Any state-based changes, such as
  * adding {@link Data} rows or changing {@link EditType}, are performed through
- * {@link RawContactModifier} to ensure that {@link AccountType} are enforced.
+ * {@link EntityModifier} to ensure that {@link AccountType} are enforced.
  */
 public class RawContactEditorView extends BaseRawContactEditorView {
     private LayoutInflater mInflater;
 
     private StructuredNameEditorView mName;
-    private PhoneticNameEditorView mPhoneticName;
+    //private PhoneticNameEditorView mPhoneticName; //do not used,remove by hhl
     private GroupMembershipView mGroupMembershipView;
 
     private ViewGroup mFields;
 
-    private ImageView mAccountIcon;
+    //private ImageView mAccountIcon; //do not used,remove by hhl
     private TextView mAccountTypeTextView;
     private TextView mAccountNameTextView;
 
@@ -78,7 +81,7 @@ public class RawContactEditorView extends BaseRawContactEditorView {
     private boolean mAutoAddToDefaultGroup = true;
     private Cursor mGroupMetaData;
     private DataKind mGroupMembershipKind;
-    private RawContactDelta mState;
+    private EntityDelta mState;
 
     private boolean mPhoneticNameAdded;
 
@@ -103,9 +106,9 @@ public class RawContactEditorView extends BaseRawContactEditorView {
             mName.setEnabled(enabled);
         }
 
-        if (mPhoneticName != null) {
+        /*if (mPhoneticName != null) {
             mPhoneticName.setEnabled(enabled);
-        }
+        }*/
 
         if (mFields != null) {
             int count = mFields.getChildCount();
@@ -130,12 +133,12 @@ public class RawContactEditorView extends BaseRawContactEditorView {
         mName = (StructuredNameEditorView)findViewById(R.id.edit_name);
         mName.setDeletable(false);
 
-        mPhoneticName = (PhoneticNameEditorView)findViewById(R.id.edit_phonetic_name);
-        mPhoneticName.setDeletable(false);
+        //mPhoneticName = (PhoneticNameEditorView)findViewById(R.id.edit_phonetic_name);
+        //mPhoneticName.setDeletable(false);
 
         mFields = (ViewGroup)findViewById(R.id.sect_fields);
 
-        mAccountIcon = (ImageView) findViewById(R.id.account_icon);
+        //mAccountIcon = (ImageView) findViewById(R.id.account_icon);
         mAccountTypeTextView = (TextView) findViewById(R.id.account_type);
         mAccountNameTextView = (TextView) findViewById(R.id.account_name);
 
@@ -150,11 +153,11 @@ public class RawContactEditorView extends BaseRawContactEditorView {
 
     /**
      * Set the internal state for this view, given a current
-     * {@link RawContactDelta} state and the {@link AccountType} that
+     * {@link EntityDelta} state and the {@link AccountType} that
      * apply to that state.
      */
     @Override
-    public void setState(RawContactDelta state, AccountType type, ViewIdGenerator vig,
+    public void setState(EntityDelta state, AccountType type, ViewIdGenerator vig,
             boolean isProfile) {
 
         mState = state;
@@ -168,14 +171,15 @@ public class RawContactEditorView extends BaseRawContactEditorView {
         setId(vig.getId(state, null, null, ViewIdGenerator.NO_VIEW_INDEX));
 
         // Make sure we have a StructuredName and Organization
-        RawContactModifier.ensureKindExists(state, type, StructuredName.CONTENT_ITEM_TYPE);
-        RawContactModifier.ensureKindExists(state, type, Organization.CONTENT_ITEM_TYPE);
+        EntityModifier.ensureKindExists(state, type, StructuredName.CONTENT_ITEM_TYPE);
+        EntityModifier.ensureKindExists(state, type, Organization.CONTENT_ITEM_TYPE);
 
-        mRawContactId = state.getRawContactId();
+        ValuesDelta values = state.getValues();
+        mRawContactId = values.getAsLong(RawContacts._ID);
 
         // Fill in the account info
         if (isProfile) {
-            String accountName = state.getAccountName();
+            String accountName = values.getAsString(RawContacts.ACCOUNT_NAME);
             if (TextUtils.isEmpty(accountName)) {
                 mAccountNameTextView.setVisibility(View.GONE);
                 mAccountTypeTextView.setText(R.string.local_profile_title);
@@ -186,7 +190,7 @@ public class RawContactEditorView extends BaseRawContactEditorView {
                 mAccountNameTextView.setText(accountName);
             }
         } else {
-            String accountName = state.getAccountName();
+            String accountName = values.getAsString(RawContacts.ACCOUNT_NAME);
             CharSequence accountType = type.getDisplayLabel(mContext);
             if (TextUtils.isEmpty(accountType)) {
                 accountType = mContext.getString(R.string.account_phone);
@@ -202,20 +206,20 @@ public class RawContactEditorView extends BaseRawContactEditorView {
             mAccountTypeTextView.setText(
                     mContext.getString(R.string.account_type_format, accountType));
         }
-        mAccountIcon.setImageDrawable(type.getDisplayIcon(mContext));
+        //mAccountIcon.setImageDrawable(type.getDisplayIcon(mContext));
 
         // Show photo editor when supported
-        RawContactModifier.ensureKindExists(state, type, Photo.CONTENT_ITEM_TYPE);
+        EntityModifier.ensureKindExists(state, type, Photo.CONTENT_ITEM_TYPE);
         setHasPhotoEditor((type.getKindForMimetype(Photo.CONTENT_ITEM_TYPE) != null));
         getPhotoEditor().setEnabled(isEnabled());
         mName.setEnabled(isEnabled());
 
-        mPhoneticName.setEnabled(isEnabled());
+        //mPhoneticName.setEnabled(isEnabled());
 
         // Show and hide the appropriate views
         mFields.setVisibility(View.VISIBLE);
         mName.setVisibility(View.VISIBLE);
-        mPhoneticName.setVisibility(View.VISIBLE);
+        //mPhoneticName.setVisibility(View.VISIBLE);
 
         mGroupMembershipKind = type.getKindForMimetype(GroupMembership.CONTENT_ITEM_TYPE);
         if (mGroupMembershipKind != null) {
@@ -237,9 +241,9 @@ public class RawContactEditorView extends BaseRawContactEditorView {
                 mName.setValues(
                         type.getKindForMimetype(DataKind.PSEUDO_MIME_TYPE_DISPLAY_NAME),
                         primary, state, false, vig);
-                mPhoneticName.setValues(
+                /*mPhoneticName.setValues(
                         type.getKindForMimetype(DataKind.PSEUDO_MIME_TYPE_PHONETIC_NAME),
-                        primary, state, false, vig);
+                        primary, state, false, vig);*/
             } else if (Photo.CONTENT_ITEM_TYPE.equals(mimeType)) {
                 // Handle special case editor for photos
                 final ValuesDelta primary = state.getPrimaryEntry(mimeType);
@@ -250,20 +254,23 @@ public class RawContactEditorView extends BaseRawContactEditorView {
                 }
             } else if (Organization.CONTENT_ITEM_TYPE.equals(mimeType)) {
                 // Create the organization section
+                //final KindSectionView section = (KindSectionView) mInflater.inflate(
+                        //R.layout.item_kind_section, mFields, false);
                 final KindSectionView section = (KindSectionView) mInflater.inflate(
-                        R.layout.item_kind_section, mFields, false);
+                        R.layout.item_kind_organization, null, false);
                 section.setTitleVisible(false);
                 section.setEnabled(isEnabled());
                 section.setState(kind, state, false, vig);
 
                 // If there is organization info for the contact already, display it
-                if (!section.isEmpty()) {
+                /*if (!section.isEmpty()) {
                     mFields.addView(section);
-                } else {
+                } else {*/
                     // Otherwise provide the user with an "add organization" button that shows the
                     // EditText fields only when clicked
-                    final View organizationView = mInflater.inflate(
-                            R.layout.organization_editor_view_switcher, mFields, false);
+                    /*final View organizationView = mInflater.inflate(
+                            R.layout.organization_editor_view_switcher, mFields, false);*/
+                    final View organizationView = findViewById(R.id.edit_organization_id);
                     final View addOrganizationButton = organizationView.findViewById(
                             R.id.add_organization_button);
                     final ViewGroup organizationSectionViewContainer =
@@ -282,8 +289,8 @@ public class RawContactEditorView extends BaseRawContactEditorView {
                         }
                     });
 
-                    mFields.addView(organizationView);
-                }
+                    //mFields.addView(organizationView);
+                //}
             } else {
                 // Otherwise use generic section-based editors
                 if (kind.fieldList == null) continue;
@@ -329,16 +336,25 @@ public class RawContactEditorView extends BaseRawContactEditorView {
      * contacts that's "My Contacts").
      */
     private void addToDefaultGroupIfNeeded() {
-        if (!mAutoAddToDefaultGroup || mGroupMetaData == null || mGroupMetaData.isClosed()
+        log(">>addToDefaultGroupIfNeeded<<");
+        log(" mAutoAddToDefaultGroup="+mAutoAddToDefaultGroup+" mGroupMetaData="+mGroupMetaData+" mState="+mState);
+//        if (!mAutoAddToDefaultGroup || mGroupMetaData == null || mGroupMetaData.isClosed()
+//                || mState == null) {
+//            log(" return ");
+//            return;
+//        }
+//Wang:
+        if (mGroupMetaData == null || mGroupMetaData.isClosed()
                 || mState == null) {
+            log(" return ");
             return;
         }
-
+        
         boolean hasGroupMembership = false;
         ArrayList<ValuesDelta> entries = mState.getMimeEntries(GroupMembership.CONTENT_ITEM_TYPE);
         if (entries != null) {
             for (ValuesDelta values : entries) {
-                Long id = values.getGroupRowId();
+                Long id = values.getAsLong(GroupMembership.GROUP_ROW_ID);
                 if (id != null && id.longValue() != 0) {
                     hasGroupMembership = true;
                     break;
@@ -349,8 +365,8 @@ public class RawContactEditorView extends BaseRawContactEditorView {
         if (!hasGroupMembership) {
             long defaultGroupId = getDefaultGroupId();
             if (defaultGroupId != -1) {
-                ValuesDelta entry = RawContactModifier.insertChild(mState, mGroupMembershipKind);
-                entry.setGroupRowId(defaultGroupId);
+                ValuesDelta entry = EntityModifier.insertChild(mState, mGroupMembershipKind);
+                entry.put(GroupMembership.GROUP_ROW_ID, defaultGroupId);
             }
         }
     }
@@ -360,13 +376,17 @@ public class RawContactEditorView extends BaseRawContactEditorView {
      * account.  Returns -1 if there is no such group.
      */
     private long getDefaultGroupId() {
-        String accountType = mState.getAccountType();
-        String accountName = mState.getAccountName();
-        String accountDataSet = mState.getDataSet();
+        String accountType = mState.getValues().getAsString(RawContacts.ACCOUNT_TYPE);
+        String accountName = mState.getValues().getAsString(RawContacts.ACCOUNT_NAME);
+        String accountDataSet = mState.getValues().getAsString(RawContacts.DATA_SET);
         mGroupMetaData.moveToPosition(-1);
         while (mGroupMetaData.moveToNext()) {
             String name = mGroupMetaData.getString(GroupMetaDataLoader.ACCOUNT_NAME);
+            //Wang:
+            if(name == null) name = "";
             String type = mGroupMetaData.getString(GroupMetaDataLoader.ACCOUNT_TYPE);
+            //Wang:
+            if(type == null) type = "";
             String dataSet = mGroupMetaData.getString(GroupMetaDataLoader.DATA_SET);
             if (name.equals(accountName) && type.equals(accountType)
                     && Objects.equal(dataSet, accountDataSet)) {
@@ -385,18 +405,19 @@ public class RawContactEditorView extends BaseRawContactEditorView {
     }
 
     public TextFieldsEditorView getPhoneticNameEditor() {
-        return mPhoneticName;
+        //return mPhoneticName; //do not used,remove by hhl
+    	return null;
     }
 
     private void updatePhoneticNameVisibility() {
         boolean showByDefault =
                 getContext().getResources().getBoolean(R.bool.config_editor_include_phonetic_name);
 
-        if (showByDefault || mPhoneticName.hasData() || mPhoneticNameAdded) {
+        /*if (showByDefault || mPhoneticName.hasData() || mPhoneticNameAdded) {
             mPhoneticName.setVisibility(View.VISIBLE);
         } else {
             mPhoneticName.setVisibility(View.GONE);
-        }
+        }*/
     }
 
     @Override
@@ -430,10 +451,10 @@ public class RawContactEditorView extends BaseRawContactEditorView {
                     continue;
                 }
 
-                if (DataKind.PSEUDO_MIME_TYPE_PHONETIC_NAME.equals(kind.mimeType)
+                /*if (DataKind.PSEUDO_MIME_TYPE_PHONETIC_NAME.equals(kind.mimeType)
                         && mPhoneticName.getVisibility() == View.VISIBLE) {
                     continue;
-                }
+                }*/
 
                 fields.add(sectionView);
             }
@@ -471,5 +492,11 @@ public class RawContactEditorView extends BaseRawContactEditorView {
         });
 
         popupMenu.show();
+    }
+    
+    private static final boolean debug = false;
+    private static void log(String msg){
+        msg = "RawContactEditorView -> " + msg;
+        if(debug) Log.i("shenduNewContacts", msg);
     }
 }

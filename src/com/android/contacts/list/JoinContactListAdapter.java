@@ -15,6 +15,8 @@
  */
 package com.android.contacts.list;
 
+import com.android.contacts.R;
+
 import android.content.Context;
 import android.content.CursorLoader;
 import android.database.Cursor;
@@ -29,8 +31,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
-import com.android.contacts.R;
 
 public class JoinContactListAdapter extends ContactListAdapter {
 

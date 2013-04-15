@@ -16,6 +16,13 @@
 
 package com.android.contacts.editor;
 
+import com.android.contacts.R;
+import com.android.contacts.editor.Editor.EditorListener;
+import com.android.contacts.model.DataKind;
+import com.android.contacts.model.EntityDelta;
+import com.android.contacts.model.EntityDelta.ValuesDelta;
+import com.android.contacts.model.EntityModifier;
+
 import android.content.Context;
 import android.provider.ContactsContract.Data;
 import android.text.TextUtils;
@@ -25,13 +32,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import com.android.contacts.R;
-import com.android.contacts.editor.Editor.EditorListener;
-import com.android.contacts.model.RawContactModifier;
-import com.android.contacts.model.RawContactDelta;
-import com.android.contacts.model.RawContactDelta.ValuesDelta;
-import com.android.contacts.model.dataitem.DataKind;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +50,7 @@ public class KindSectionView extends LinearLayout implements EditorListener {
     private String mTitleString;
 
     private DataKind mKind;
-    private RawContactDelta mState;
+    private EntityDelta mState;
     private boolean mReadOnly;
 
     private ViewIdGenerator mViewIdGenerator;
@@ -113,12 +113,18 @@ public class KindSectionView extends LinearLayout implements EditorListener {
     public void onDeleteRequested(Editor editor) {
         // If there is only 1 editor in the section, then don't allow the user to delete it.
         // Just clear the fields in the editor.
+        final boolean animate;
         if (getEditorCount() == 1) {
             editor.clearAllFields();
+            animate = true;
         } else {
             // Otherwise it's okay to delete this {@link Editor}
             editor.deleteEditor();
+
+            // This is already animated, don't do anything further here
+            animate = false;
         }
+        updateAddFooterVisible(animate);
     }
 
     @Override
@@ -130,7 +136,7 @@ public class KindSectionView extends LinearLayout implements EditorListener {
         }
     }
 
-    public void setState(DataKind kind, RawContactDelta state, boolean readOnly, ViewIdGenerator vig) {
+    public void setState(DataKind kind, EntityDelta state, boolean readOnly, ViewIdGenerator vig) {
         mKind = kind;
         mState = state;
         mReadOnly = readOnly;
@@ -231,7 +237,7 @@ public class KindSectionView extends LinearLayout implements EditorListener {
             updateEmptyEditors();
             // If there are no existing empty editors and it's possible to add
             // another field, then make the "add footer" field visible.
-            if (!hasEmptyEditor() && RawContactModifier.canInsert(mState, mKind)) {
+            if (!hasEmptyEditor() && EntityModifier.canInsert(mState, mKind)) {
                 if (animate) {
                     EditorAnimator.getInstance().showAddFieldFooter(mAddFieldFooter);
                 } else {
@@ -358,7 +364,7 @@ public class KindSectionView extends LinearLayout implements EditorListener {
 
         // Insert a new child, create its view and set its focus
         if (values == null) {
-            values = RawContactModifier.insertChild(mState, mKind);
+            values = EntityModifier.insertChild(mState, mKind);
         }
 
         final View newField = createEditorView(values);

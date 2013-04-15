@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <LinearLayout
+		android:id="@+id/cancel_menu_item_parent"
+		android:layout_width="wrap_content"
+		android:layout_height="match_parent"
+		android:duplicateParentState="true"
+        android:layout_alignParentLeft="true"
+		android:orientation="horizontal" 
+		>
+	    <TextView
+	        android:id="@+id/cancel_menu_item"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+        	android:layout_gravity="center"
+	        android:background="@drawable/shendu_actionbar_back_bg"
+	        />
+    </LinearLayout>
+    
+    <LinearLayout
+        android:id="@+id/options_spinner"
+        style="?android:attr/actionDropDownStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_toRightOf="@id/cancel_menu_item_parent"
+        android:gravity="center_vertical"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/spinner_line_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-4dip"
+            android:ellipsize="end"
+            android:includeFontPadding="false"
+            android:paddingRight="@dimen/item_group_membership_paddingleft"
+        	android:layout_gravity="center_vertical"
+            android:singleLine="true"
+            android:textColor="@color/action_bar_button_text_color"
+            android:textSize="@dimen/group_editor_actionbar_text_size" 
+            />
+    </LinearLayout>
+    
+    <!--  
+        android:dividerPadding="12dip"
+        android:divider="?android:attr/dividerVertical"
+        android:showDividers="end" 
+    -->
+    <LinearLayout
+        android:id="@+id/save_menu_item"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_toRightOf="@id/options_spinner"
+        android:layout_alignParentRight="true"
+        android:gravity="right"
+        android:clickable="true"
+        android:orientation="horizontal"
+        >
+
+        <LinearLayout
+            style="?android:attr/actionButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:duplicateParentState="true"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:id="@+id/icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="8dip"
+            	android:textSize="@dimen/group_editor_actionbar_text_size"
+                android:text="@string/menu_done"
+                android:textColor="@color/action_bar_button_text_color"
+                android:drawableLeft="@drawable/ic_menu_done_holo_dark" />
+        </LinearLayout>
+    </LinearLayout>
+
+
+
+</RelativeLayout>

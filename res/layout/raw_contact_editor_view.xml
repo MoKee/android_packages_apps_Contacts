@@ -34,30 +34,44 @@
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:orientation="horizontal"
-            android:paddingTop="8dip">
-
+            android:paddingTop="@dimen/contacts_padding_middle"
+            android:paddingBottom="@dimen/contacts_padding_middle"
+            android:paddingLeft="@dimen/contacts_padding_left"
+            >
+            <include
+                android:id="@+id/edit_photo"
+                layout="@layout/item_photo_editor" 
+                />
             <LinearLayout
                 android:layout_height="wrap_content"
                 android:layout_width="0dip"
                 android:layout_weight="1"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                >
 
                 <include
                     android:id="@+id/edit_name"
-                    layout="@layout/structured_name_editor_view" />
-
+                    layout="@layout/structured_name_editor_view" 
+                    />
+                <include 
+                    android:id="@+id/edit_organization_id"
+                    layout="@layout/organization_editor_view_switcher"
+                    />
+<!-- 
                 <include
                     android:id="@+id/edit_phonetic_name"
                     layout="@layout/phonetic_name_editor_view" />
-
-            </LinearLayout>
-
-            <include
-                android:id="@+id/edit_photo"
-                android:layout_marginRight="8dip"
-                layout="@layout/item_photo_editor" />
-
-        </LinearLayout>
+-->
+            </LinearLayout>          
+       	</LinearLayout>
+       	
+		<View 
+			android:layout_width="match_parent"
+			android:layout_height="@dimen/contacts_dividing_line_height"
+			android:layout_marginLeft="@dimen/account_container_left_padding"
+			android:layout_marginRight="@dimen/account_container_left_padding"
+			android:background="@drawable/contacts_dividing_line"
+			/>  
 
         <LinearLayout
             android:id="@+id/sect_fields"
@@ -69,9 +83,10 @@
         <Button
             android:id="@+id/button_add_field"
             android:text="@string/add_field"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="@dimen/contacts_edittext_other_width"
+            android:layout_height="@dimen/contacts_edittext_height"
             android:layout_gravity="center"
+            android:background="@drawable/contacts_button_bg"
             android:layout_marginBottom="32dip"/>
 
     </LinearLayout>

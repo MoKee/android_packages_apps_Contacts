@@ -16,7 +16,16 @@
 
 package com.android.contacts.editor;
 
+import com.android.contacts.ContactsUtils;
+import com.android.contacts.R;
+import com.android.contacts.model.AccountType.EditField;
+import com.android.contacts.model.DataKind;
+import com.android.contacts.model.EntityDelta;
+import com.android.contacts.model.EntityDelta.ValuesDelta;
+import com.android.contacts.util.PhoneNumberFormatter;
+
 import android.content.Context;
+import android.content.Entity;
 import android.graphics.Rect;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -35,17 +44,9 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
-import com.android.contacts.ContactsUtils;
-import com.android.contacts.R;
-import com.android.contacts.model.RawContactDelta;
-import com.android.contacts.model.RawContactDelta.ValuesDelta;
-import com.android.contacts.model.account.AccountType.EditField;
-import com.android.contacts.model.dataitem.DataKind;
-import com.android.contacts.util.PhoneNumberFormatter;
-
 /**
  * Simple editor that handles labels and any {@link EditField} defined for the
- * entry. Uses {@link ValuesDelta} to read any existing {@link RawContact} values,
+ * entry. Uses {@link ValuesDelta} to read any existing {@link Entity} values,
  * and to correctly write any changes values.
  */
 public class TextFieldsEditorView extends LabeledEditorView {
@@ -79,8 +80,10 @@ public class TextFieldsEditorView extends LabeledEditorView {
         setDrawingCacheEnabled(true);
         setAlwaysDrawnWithCacheEnabled(true);
 
+        //mMinFieldHeight = mContext.getResources().getDimensionPixelSize(
+                //R.dimen.editor_min_line_item_height);
         mMinFieldHeight = mContext.getResources().getDimensionPixelSize(
-                R.dimen.editor_min_line_item_height);
+                        R.dimen.contacts_edittext_height);
         mFields = (ViewGroup) findViewById(R.id.editors);
         mExpansionView = (ImageView) findViewById(R.id.expansion_view);
         mExpansionViewContainer = findViewById(R.id.expansion_view_container);
@@ -170,7 +173,7 @@ public class TextFieldsEditorView extends LabeledEditorView {
     }
 
     @Override
-    public void setValues(DataKind kind, ValuesDelta entry, RawContactDelta state, boolean readOnly,
+    public void setValues(DataKind kind, ValuesDelta entry, EntityDelta state, boolean readOnly,
             ViewIdGenerator vig) {
         super.setValues(kind, entry, state, readOnly, vig);
         // Remove edit texts that we currently have
@@ -186,6 +189,10 @@ public class TextFieldsEditorView extends LabeledEditorView {
         for (int index = 0; index < fieldCount; index++) {
             final EditField field = kind.fieldList.get(index);
             final EditText fieldView = new EditText(mContext);
+            fieldView.setBackgroundResource(R.drawable.contacts_edittext_bg);//add by hll
+            fieldView.setTextSize(R.dimen.favorites_item_view_title_size);
+            fieldView.setTextColor(R.color.secondary_text_color);
+           // fieldView.setTextColorHint(R.color.contacts_text_hint_color);
             fieldView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
                     field.isMultiLine() ? LayoutParams.WRAP_CONTENT : mMinFieldHeight));
             // Set either a minimum line requirement or a minimum height (because {@link TextView}
@@ -196,7 +203,7 @@ public class TextFieldsEditorView extends LabeledEditorView {
                 fieldView.setMinHeight(mMinFieldHeight);
             }
             fieldView.setTextAppearance(getContext(), android.R.style.TextAppearance_Medium);
-            fieldView.setGravity(Gravity.TOP);
+            fieldView.setGravity(Gravity.CENTER_VERTICAL);//moditify by hhl
             mFieldEditTexts[index] = fieldView;
             fieldView.setId(vig.getId(state, kind, entry, index));
             if (field.titleRes > 0) {

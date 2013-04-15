@@ -16,6 +16,13 @@
 
 package com.android.contacts.activities;
 
+import com.android.contacts.ContactsActivity;
+import com.android.contacts.R;
+import com.android.contacts.group.GroupDetailDisplayUtils;
+import com.android.contacts.group.GroupDetailFragment;
+import com.android.contacts.model.AccountType;
+import com.android.contacts.model.AccountTypeManager;
+
 import android.app.ActionBar;
 import android.content.ContentUris;
 import android.content.Intent;
@@ -28,13 +35,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-
-import com.android.contacts.ContactsActivity;
-import com.android.contacts.R;
-import com.android.contacts.group.GroupDetailDisplayUtils;
-import com.android.contacts.group.GroupDetailFragment;
-import com.android.contacts.model.AccountTypeManager;
-import com.android.contacts.model.account.AccountType;
 
 public class GroupDetailActivity extends ContactsActivity {
 
