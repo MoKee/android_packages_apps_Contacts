@@ -19,6 +19,7 @@ import android.content.Context;
 import android.content.CursorLoader;
 import android.net.Uri;
 import android.provider.ContactsContract.Groups;
+import android.util.Log;
 
 /**
  * Group meta-data loader. Loads all groups or just a single group from the
@@ -49,8 +50,12 @@ public final class GroupMetaDataLoader extends CursorLoader {
     public final static int DELETED = 8;
 
     public GroupMetaDataLoader(Context context, Uri groupUri) {
-        super(context, ensureIsGroupUri(groupUri), COLUMNS, Groups.ACCOUNT_TYPE + " NOT NULL AND "
-                + Groups.ACCOUNT_NAME + " NOT NULL", null, null);
+//        super(context, ensureIsGroupUri(groupUri), COLUMNS, Groups.ACCOUNT_TYPE + " NOT NULL AND "
+//                + Groups.ACCOUNT_NAME + " NOT NULL", null, null);
+        //Wang:
+        super(context, ensureIsGroupUri(groupUri), COLUMNS, null , null, null);
+        log(">>GroupMetaDataLoader<<");
+        log(" groupUri =>"+groupUri);
     }
 
     /**
@@ -66,5 +71,11 @@ public final class GroupMetaDataLoader extends CursorLoader {
             throw new IllegalArgumentException("Invalid group Uri: " + groupUri);
         }
         return groupUri;
+    }
+    
+    private static final boolean debug = false;
+    private static void log(String msg){
+        msg = "GroupDataLoader -> " + msg;
+        if(debug) Log.i("shenduNewContacts", msg);
     }
 }

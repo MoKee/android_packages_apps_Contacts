@@ -15,11 +15,13 @@
 -->
 
 <!-- "Delete field" button in the contact editor. -->
-
+<!-- 
+    android:layout_height="@dimen/editor_min_line_item_height"
+-->
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
-    android:layout_height="@dimen/editor_min_line_item_height"
+    android:layout_height="match_parent"
     android:layout_marginRight="2dip"
     android:layout_gravity="bottom">
     <ImageView
@@ -30,9 +32,13 @@
         android:duplicateParentState="true"
         android:background="?android:attr/selectableItemBackground"
         android:src="@drawable/ic_menu_remove_field_holo_light"
-        android:paddingLeft="@dimen/editor_round_button_padding_left"
-        android:paddingRight="@dimen/editor_round_button_padding_right"
+        android:paddingLeft="@dimen/edit_delete_button_paddingLeft"
+        android:paddingRight="@dimen/edit_delete_button_paddingRight"
         android:paddingTop="@dimen/editor_round_button_padding_top"
         android:paddingBottom="@dimen/editor_round_button_padding_bottom"
         android:contentDescription="@string/description_minus_button" />
 </FrameLayout>
+<!--  
+        android:paddingLeft="@dimen/editor_round_button_padding_left"
+        android:paddingRight="@dimen/editor_round_button_padding_right"
+-->

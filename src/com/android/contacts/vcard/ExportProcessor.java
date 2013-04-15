@@ -15,6 +15,11 @@
  */
 package com.android.contacts.vcard;
 
+import com.android.contacts.R;
+import com.android.contacts.activities.PeopleActivity;
+import com.android.vcard.VCardComposer;
+import com.android.vcard.VCardConfig;
+
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.ContentResolver;
@@ -26,11 +31,6 @@ import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.RawContactsEntity;
 import android.text.TextUtils;
 import android.util.Log;
-
-import com.android.contacts.R;
-import com.android.contacts.activities.PeopleActivity;
-import com.android.vcard.VCardComposer;
-import com.android.vcard.VCardConfig;
 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;

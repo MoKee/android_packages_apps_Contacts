@@ -16,6 +16,11 @@
 
 package com.android.contacts.util;
 
+import com.android.contacts.R;
+import com.android.contacts.model.AccountType;
+import com.android.contacts.model.AccountTypeManager;
+import com.android.contacts.model.AccountWithDataSet;
+
 import android.content.Context;
 import android.text.TextUtils.TruncateAt;
 import android.view.LayoutInflater;
@@ -24,11 +29,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.android.contacts.R;
-import com.android.contacts.model.AccountTypeManager;
-import com.android.contacts.model.account.AccountType;
-import com.android.contacts.model.account.AccountWithDataSet;
 
 import java.util.ArrayList;
 import java.util.List;

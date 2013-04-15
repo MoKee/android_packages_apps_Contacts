@@ -16,6 +16,20 @@
 
 package com.android.contacts.vcard;
 
+import com.android.contacts.ContactsActivity;
+import com.android.contacts.R;
+import com.android.contacts.model.AccountTypeManager;
+import com.android.contacts.model.AccountWithDataSet;
+import com.android.contacts.util.AccountSelectionUtil;
+import com.android.vcard.VCardEntryCounter;
+import com.android.vcard.VCardParser;
+import com.android.vcard.VCardParser_V21;
+import com.android.vcard.VCardParser_V30;
+import com.android.vcard.VCardSourceDetector;
+import com.android.vcard.exception.VCardException;
+import com.android.vcard.exception.VCardNestedException;
+import com.android.vcard.exception.VCardVersionException;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -45,20 +59,6 @@ import android.text.TextUtils;
 import android.text.style.RelativeSizeSpan;
 import android.util.Log;
 import android.widget.Toast;
-
-import com.android.contacts.ContactsActivity;
-import com.android.contacts.R;
-import com.android.contacts.model.AccountTypeManager;
-import com.android.contacts.model.account.AccountWithDataSet;
-import com.android.contacts.util.AccountSelectionUtil;
-import com.android.vcard.VCardEntryCounter;
-import com.android.vcard.VCardParser;
-import com.android.vcard.VCardParser_V21;
-import com.android.vcard.VCardParser_V30;
-import com.android.vcard.VCardSourceDetector;
-import com.android.vcard.exception.VCardException;
-import com.android.vcard.exception.VCardNestedException;
-import com.android.vcard.exception.VCardVersionException;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -760,11 +760,9 @@ public class ImportVCardActivity extends ContactsActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (!isFinishing()) {
-                    mVCardCacheThread = new VCardCacheThread(uris);
-                    mListener = new NotificationImportExportListener(ImportVCardActivity.this);
-                    showDialog(R.id.dialog_cache_vcard);
-                }
+                mVCardCacheThread = new VCardCacheThread(uris);
+                mListener = new NotificationImportExportListener(ImportVCardActivity.this);
+                showDialog(R.id.dialog_cache_vcard);
             }
         });
     }

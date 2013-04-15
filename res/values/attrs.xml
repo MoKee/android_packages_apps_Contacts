@@ -74,6 +74,8 @@
         <attr name="list_item_padding_left" format="dimension"/>
         <attr name="list_item_gap_between_image_and_text" format="dimension"/>
         <attr name="list_item_gap_between_label_and_data" format="dimension"/>
+        <attr name="list_item_call_button_padding" format="dimension"/>
+        <attr name="list_item_vertical_divider_margin" format="dimension"/>
         <attr name="list_item_presence_icon_margin" format="dimension"/>
         <attr name="list_item_presence_icon_size" format="dimension"/>
         <attr name="list_item_photo_size" format="dimension"/>
@@ -109,18 +111,5 @@
 
     <declare-styleable name="Favorites">
         <attr name="favorites_padding_bottom" format="dimension" />
-    </declare-styleable>
-
-    <declare-styleable name="AnchoredScrollView">
-        <attr name="anchorView" format="reference" />
-        <attr name="anchorAtBottom" format="boolean" />
-        <attr name="anchoredView" format="reference" />
-    </declare-styleable>
-
-    <declare-styleable name="LinearColorBar">
-        <attr name="redColor" format="color" />
-        <attr name="greenColor" format="color" />
-        <attr name="blueColor" format="color" />
-        <attr name="backgroundColor" format="color" />
     </declare-styleable>
 </resources>

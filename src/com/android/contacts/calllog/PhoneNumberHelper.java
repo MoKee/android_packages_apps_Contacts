@@ -16,12 +16,14 @@
 
 package com.android.contacts.calllog;
 
-import android.content.res.Resources;
-import android.telephony.PhoneNumberUtils;
-import android.text.TextUtils;
-
+import com.android.contacts.ContactsUtils;
 import com.android.contacts.R;
 import com.android.internal.telephony.CallerInfo;
+
+import android.content.res.Resources;
+import android.net.Uri;
+import android.telephony.PhoneNumberUtils;
+import android.text.TextUtils;
 
 /**
  * Helper for formatting and managing phone numbers.

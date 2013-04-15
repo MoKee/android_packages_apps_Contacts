@@ -24,56 +24,82 @@
     paddingRight, as the body part should touch the right edge.  Instead we make each child have
     either marginRight or paddingRight.
 -->
-
+<!--
+    android:paddingLeft="?attr/list_item_padding_left"
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp"
+-->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingLeft="?attr/list_item_padding_left"
-    android:paddingTop="?attr/list_item_padding_top"
-    android:paddingBottom="?attr/list_item_padding_bottom"
-    android:minHeight="@dimen/detail_min_line_item_height" >
-
-    <View
-        android:id="@+id/divider"
-        android:layout_width="match_parent"
-        android:layout_height="1dip"
-        android:layout_marginRight="?attr/list_item_padding_right"
-        android:background="?android:attr/listDivider" />
+    android:minHeight="@dimen/detail_min_line_item_height" 
+    >
 
     <include
         android:id="@+id/group_list_header"
         layout="@layout/group_browse_list_account_header"
         android:visibility="gone" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+    <!-- 
         android:paddingTop="8dip"
         android:paddingLeft="8dip"
         android:paddingBottom="8dip"
+    -->
+    <LinearLayout
+        android:id="@+id/group_view_listview_item_linearlayout_id"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:duplicateParentState="true"
-        android:background="@drawable/group_list_item_background">
-
+        >
+<!-- 
+        android:background="@drawable/group_list_item_background"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="?android:attr/textColorSecondary"
+-->
         <TextView
             android:id="@+id/label"
             android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_width="match_parent"
+            android:layout_marginLeft="@dimen/account_container_left_padding"
+            android:layout_marginRight="@dimen/account_container_left_padding"
+            android:layout_marginTop="@dimen/account_container_left_padding"
+            android:layout_gravity="center_horizontal"
+            android:textColor="@color/group_view_name_color"
+            android:textSize="@dimen/contacts_view_box_number_size"
             android:ellipsize="end"
-            android:singleLine="true" />
+            android:singleLine="true" 
+            />
 
         <TextView
             android:id="@+id/count"
             android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="?android:attr/textColorSecondary"
+            android:layout_width="match_parent"
+            android:layout_marginLeft="@dimen/account_container_left_padding"
+            android:layout_marginRight="@dimen/account_container_left_padding"
+            android:layout_marginBottom="@dimen/account_container_left_padding"
+            android:layout_gravity="center_horizontal"
+            android:textColor="@color/group_view_count_color"
+            android:textSize="@dimen/group_view_count_size"
             android:ellipsize="end"
-            android:singleLine="true" />
+            android:singleLine="true" 
+            />
 
     </LinearLayout>
+    
+<!-- 
+        android:layout_marginRight="?attr/list_item_padding_right"
+        android:background="?android:attr/listDivider" 
+-->
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/contacts_dividing_line_height"
+        android:background="@drawable/contacts_dividing_line" 
+        />
+    
 </LinearLayout>
 

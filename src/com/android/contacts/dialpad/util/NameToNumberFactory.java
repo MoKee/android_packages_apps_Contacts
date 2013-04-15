@@ -24,7 +24,7 @@ import android.content.Context;
 /**
  * @author barami
  * Return a instance of NameToNumber class or inherited classes.
- *
+ * 
  * Default instance is NameToNumber class that acts like previous nameToNumber function of T9Search class.
  * This will be added to support complex T9 search. (ex: In a hangul, '가나다' will be searched by 'ㄱ', 'ㄴ', 'ㄱㄴ', etc.)
  */

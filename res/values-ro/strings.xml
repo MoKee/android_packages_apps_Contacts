@@ -53,8 +53,8 @@
     <string name="menu_splitAggregate" msgid="8368636463748691868">"Separaţi"</string>
     <string name="menu_editGroup" msgid="5062005185370983720">"Editaţi"</string>
     <string name="menu_deleteGroup" msgid="3486380004411482874">"Ştergeţi"</string>
-    <string name="menu_new_contact_action_bar" msgid="7263362129442119188">"Adăugaţi o persoană de contact"</string>
-    <string name="menu_new_group_action_bar" msgid="3520232877587377175">"Adăugaţi un grup"</string>
+    <string name="menu_new_contact_action_bar" msgid="8887818026717394343">"Nouă"</string>
+    <string name="menu_new_group_action_bar" msgid="5055346725617932394">"Nou"</string>
     <string name="splitConfirmation_title" msgid="633640935430370530">"Intrare separată?"</string>
     <string name="splitConfirmation" msgid="740190210499587175">"Această persoană de contact va fi separată în mai multe intrări în Agendă."</string>
     <string name="menu_joinAggregate" msgid="5027981918265667970">"Alăturaţi-vă"</string>
@@ -137,7 +137,6 @@
     <string name="contactsAllLabel" msgid="6479708629170672169">"Toată Agenda"</string>
     <string name="contactsGroupsLabel" msgid="2841971472518003524">"Grupuri"</string>
     <string name="contactsFavoritesLabel" msgid="8417039765586853670">"Favorite"</string>
-    <string name="dialerAllContactsLabel" msgid="1025920923112988336">"Preferate și toată agenda"</string>
     <string name="dialerIconLabel" msgid="6500826552823403796">"Telefon"</string>
     <string name="recentCallsIconLabel" msgid="1419116422359067949">"Jurnal de apeluri"</string>
     <string name="menu_sendTextMessage" msgid="6937343460284499306">"Trimiteţi un mesaj text"</string>
@@ -211,7 +210,7 @@
     <string name="description_delete_button" msgid="6263102114033407382">"tasta backspace"</string>
     <string name="description_digits_edittext" msgid="8760207516497016437">"numărul de apelat"</string>
     <string name="description_contact_photo" msgid="3387458082667894062">"fotografia persoanei din agendă"</string>
-    <string name="description_minus_button" msgid="6908099247930477551">"ştergeţi"</string>
+    <string name="description_minus_button" msgid="387136707700230172">"minus"</string>
     <string name="description_plus_button" msgid="515164827856229880">"plus"</string>
     <string name="description_view_contact_detail" msgid="9133251213656414807">"Afişaţi persoana din agendă"</string>
     <string name="no_sdcard_message" product="nosdcard" msgid="5242558018442357189">"Nu s-a găsit o stocare."</string>
@@ -511,10 +510,6 @@
     <string name="voicemail_fetching_timout" msgid="6691792377574905201">"Nu s-a putut prelua mesajul vocal."</string>
     <string name="call_log_new_header" msgid="846546437517724715">"Noi"</string>
     <string name="call_log_old_header" msgid="6262205894314263629">"Mai vechi"</string>
-    <string name="call_log_voicemail_header" msgid="3945407886667089173">"Numai apelurile cu mesaje vocale"</string>
-    <string name="call_log_incoming_header" msgid="2787722299753674684">"Numai apelurile primite"</string>
-    <string name="call_log_outgoing_header" msgid="761009180766735769">"Numai apelurile efectuate"</string>
-    <string name="call_log_missed_header" msgid="8017148056610855956">"Numai apelurile nepreluate"</string>
     <string name="voicemail_status_voicemail_not_available" msgid="3021980206152528883">"Nu se poate realiza conectarea la serverul de mesagerie vocală."</string>
     <string name="voicemail_status_messages_waiting" msgid="7113421459602803605">"Nu se conectează server mesagerie vocală. Aşteaptă mesaje noi."</string>
     <string name="voicemail_status_configure_voicemail" msgid="3738537770636895689">"Configuraţi mesageria vocală."</string>
@@ -529,9 +524,6 @@
     <string name="call_log_item_count_and_date" msgid="7641933305703520787">"(<xliff:g id="COUNT">%1$d</xliff:g>) <xliff:g id="DATE">%2$s</xliff:g>"</string>
     <string name="group_name_hint" msgid="238359485263401293">"Numele grupului"</string>
     <string name="nfc_vcard_file_name" msgid="2823095213265993609">"Cont.prim.pr.NFC"</string>
-    <string name="menu_show_outgoing_only" msgid="1965570298133301970">"Numai apelurile efectuate"</string>
-    <string name="menu_show_incoming_only" msgid="7534206815238877417">"Numai apelurile primite"</string>
-    <string name="menu_show_missed_only" msgid="154473166059743996">"Numai apelurile nepreluate"</string>
     <string name="menu_show_voicemails_only" msgid="1898421289561435703">"Afişaţi numai mesajele vocale"</string>
     <string name="menu_show_all_calls" msgid="7560347482073345885">"Afişaţi toate apelurile"</string>
     <string name="status_available" msgid="5586870015822828392">"Disponibil(ă)"</string>
@@ -567,11 +559,7 @@
     <string name="dialog_phone_call_prohibited_message" msgid="6554711866586660441">"Apelul nu a fost trimis"</string>
     <string name="dialog_voicemail_not_ready_message" msgid="4384716252789515378">"Pentru a configura mesageria vocală, accesaţi Meniu &gt; Setări."</string>
     <string name="dialog_voicemail_airplane_mode_message" msgid="530922773669546093">"Pentru a apela mesageria vocală, mai întâi dezactivaţi modul Avion."</string>
-    <string name="menu_export_database" msgid="2659719297530170820">"Exportaţi fişierele bazei de date"</string>
     <string name="action_menu_overflow_description" msgid="2303272250613084574">"Mai multe opţiuni"</string>
-    <string name="expand_collapse_name_fields_description" msgid="8682630859539604311">"Extindeţi sau restrângeţi câmpurile pentru nume"</string>
-
-    <string name="t9_loading">Încărcare\u2026</string>
     <string name="t9_sort_title">"Modul de sortare T9"</string>
     <string name="t9_sort_summary">"Alegeți cum să se filtreze rezultatele T9"</string>
     <string name="t9_sort_name">"Potrivire după nume întâi"</string>

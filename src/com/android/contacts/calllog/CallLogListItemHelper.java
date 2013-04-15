@@ -16,14 +16,14 @@
 
 package com.android.contacts.calllog;
 
+import com.android.contacts.PhoneCallDetails;
+import com.android.contacts.PhoneCallDetailsHelper;
+import com.android.contacts.R;
+
 import android.content.res.Resources;
 import android.provider.CallLog.Calls;
 import android.text.TextUtils;
 import android.view.View;
-
-import com.android.contacts.PhoneCallDetails;
-import com.android.contacts.PhoneCallDetailsHelper;
-import com.android.contacts.R;
 
 /**
  * Helper class to fill in the views of a call log entry.
@@ -66,15 +66,15 @@ import com.android.contacts.R;
         if (canPlay) {
             // Playback action takes preference.
             configurePlaySecondaryAction(views, isHighlighted);
-            views.dividerView.setVisibility(View.VISIBLE);
+//            views.dividerView.setVisibility(View.VISIBLE);
         } else if (canCall) {
             // Call is the secondary action.
             configureCallSecondaryAction(views, details);
-            views.dividerView.setVisibility(View.VISIBLE);
+//            views.dividerView.setVisibility(View.VISIBLE);
         } else {
             // No action available.
             views.secondaryActionView.setVisibility(View.GONE);
-            views.dividerView.setVisibility(View.GONE);
+//            views.dividerView.setVisibility(View.GONE);
         }
     }
 
@@ -82,7 +82,9 @@ import com.android.contacts.R;
     private void configureCallSecondaryAction(CallLogListItemViews views,
             PhoneCallDetails details) {
         views.secondaryActionView.setVisibility(View.VISIBLE);
-        views.secondaryActionView.setImageResource(R.drawable.ic_ab_dialer_holo_dark);
+//        views.secondaryActionView.setImageResource(R.drawable.ic_ab_dialer_holo_dark);
+        /** shutao 2012-10-16*/
+//        views.secondaryActionView.setImageResource(R.drawable.shendu_arrow);
         views.secondaryActionView.setContentDescription(getCallActionDescription(details));
     }
 

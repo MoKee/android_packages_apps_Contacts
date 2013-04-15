@@ -1,0 +1,32 @@
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <!-- <item android:state_focused="true"  
+        android:state_enabled="false" 
+        android:state_pressed="true" 
+        android:drawable="@drawable/shendu_item_overall_default" 
+        />
+    
+    <item android:state_focused="true"  
+        android:state_enabled="false"                              
+        android:drawable="@drawable/shendu_item_overall_default" 
+        />
+    
+    <item android:state_focused="true"
+        android:state_pressed="true" 
+        android:drawable="@drawable/shendu_item_overall_selector_transition" 
+        /> -->
+    
+    <item                                
+        android:state_pressed="true" 
+        android:drawable="@drawable/shendu_item_overall_press" 
+        />
+    
+    <!-- <item android:state_focused="true"
+        android:drawable="@drawable/shendu_item_overall_default" 
+        /> -->
+    
+    <item
+        android:drawable="@drawable/shendu_item_overall_default" 
+        />
+    
+</selector>

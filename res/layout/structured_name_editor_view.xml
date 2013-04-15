@@ -14,11 +14,15 @@
      limitations under the License.
 -->
 
+<!-- 
+	android:background="@android:color/holo_blue_light"
+-->
+
 <com.android.contacts.editor.StructuredNameEditorView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="@dimen/editor_min_line_item_height"
+    android:minHeight="@dimen/contacts_edittext_height"
     android:orientation="vertical">
 
     <include
@@ -38,7 +42,7 @@
 
         <include
             android:id="@+id/expansion_view_container"
-            layout="@layout/name_edit_expansion_view"
+            layout="@layout/edit_expansion_view"
             android:visibility="gone" />
 
         <include

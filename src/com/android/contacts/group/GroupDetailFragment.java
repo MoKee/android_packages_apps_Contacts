@@ -16,6 +16,17 @@
 
 package com.android.contacts.group;
 
+import com.android.contacts.ContactPhotoManager;
+import com.android.contacts.GroupMemberLoader;
+import com.android.contacts.GroupMetaDataLoader;
+import com.android.contacts.R;
+import com.android.contacts.interactions.GroupDeletionDialogFragment;
+import com.android.contacts.list.ContactTileAdapter;
+import com.android.contacts.list.ContactTileAdapter.DisplayType;
+import com.android.contacts.list.ContactTileView;
+import com.android.contacts.model.AccountType;
+import com.android.contacts.model.AccountTypeManager;
+
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.LoaderManager;
@@ -44,17 +55,6 @@ import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import com.android.contacts.ContactPhotoManager;
-import com.android.contacts.GroupMemberLoader;
-import com.android.contacts.GroupMetaDataLoader;
-import com.android.contacts.R;
-import com.android.contacts.interactions.GroupDeletionDialogFragment;
-import com.android.contacts.list.ContactTileAdapter;
-import com.android.contacts.list.ContactTileAdapter.DisplayType;
-import com.android.contacts.list.ContactTileView;
-import com.android.contacts.model.AccountTypeManager;
-import com.android.contacts.model.account.AccountType;
 
 /**
  * Displays the details of a group and shows a list of actions possible for the group.
@@ -155,7 +155,6 @@ public class GroupDetailFragment extends Fragment implements OnScrollListener {
                 R.id.group_source_view_container);
         mEmptyView = mRootView.findViewById(android.R.id.empty);
         mMemberListView = (ListView) mRootView.findViewById(android.R.id.list);
-        mMemberListView.setItemsCanFocus(true);
         mMemberListView.setAdapter(mAdapter);
 
         return mRootView;
@@ -437,6 +436,9 @@ public class GroupDetailFragment extends Fragment implements OnScrollListener {
                 if (mListener != null) mListener.onEditRequested(mGroupUri);
                 break;
             }
+            /*case R.id.menu_add_group_item:
+            	Intent selectMembersIntent = new Intent(mContext,ShenDuContactSelectionActivity.class);
+            	break;*/
             case R.id.menu_delete_group: {
                 GroupDeletionDialogFragment.show(getFragmentManager(), mGroupId, mGroupName,
                         mCloseActivityAfterDelete);

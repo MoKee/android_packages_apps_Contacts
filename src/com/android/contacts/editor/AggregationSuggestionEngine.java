@@ -16,6 +16,9 @@
 
 package com.android.contacts.editor;
 
+import com.android.contacts.model.EntityDelta.ValuesDelta;
+import com.google.android.collect.Lists;
+
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.ContentObserver;
@@ -36,9 +39,6 @@ import android.provider.ContactsContract.Contacts.AggregationSuggestions.Builder
 import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.RawContacts;
 import android.text.TextUtils;
-
-import com.android.contacts.model.RawContactDelta.ValuesDelta;
-import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
 import java.util.Arrays;
