@@ -5,7 +5,6 @@ LOCAL_MODULE_TAGS := optional
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
-LOCAL_JAVA_LIBRARIES := telephony-common
 LOCAL_STATIC_JAVA_LIBRARIES := \
     com.android.phone.common \
     com.android.vcard \
@@ -14,6 +13,8 @@ LOCAL_STATIC_JAVA_LIBRARIES := \
     android-support-v13 \
     android-support-v4 \
     android-ex-variablespeed \
+
+LOCAL_JAVA_LIBRARIES := telephony-common
 
 LOCAL_REQUIRED_MODULES := libvariablespeed
 

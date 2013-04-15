@@ -15,22 +15,36 @@
  */
 package com.android.contacts.list;
 
+import com.android.contacts.ContactSaveService;
+import com.android.contacts.preference.ContactsPreferences;
+
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.CursorLoader;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.net.Uri.Builder;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
+import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.Contacts;
+import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.Directory;
+import android.provider.ContactsContract.RawContacts;
 import android.provider.ContactsContract.SearchSnippetColumns;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
-
-import com.android.contacts.preference.ContactsPreferences;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -182,7 +196,7 @@ public class DefaultContactListAdapter extends ContactListAdapter {
     }
 
     @Override
-    protected void bindView(View itemView, int partition, Cursor cursor, int position) {
+    protected void bindView(View itemView,final int partition, Cursor cursor, final int position) {
         final ContactListItemView view = (ContactListItemView)itemView;
 
         view.setHighlightedPrefix(isSearchMode() ? getUpperCaseQueryString() : null);
@@ -192,7 +206,8 @@ public class DefaultContactListAdapter extends ContactListAdapter {
         }
 
         bindSectionHeaderAndDivider(view, position, cursor);
-
+        //Wang:
+        bindName(view, cursor);
         if (isQuickContactEnabled()) {
             bindQuickContact(view, partition, cursor, ContactQuery.CONTACT_PHOTO_ID,
                     ContactQuery.CONTACT_PHOTO_URI, ContactQuery.CONTACT_ID,
@@ -202,8 +217,8 @@ public class DefaultContactListAdapter extends ContactListAdapter {
                 bindPhoto(view, partition, cursor);
             }
         }
-
-        bindName(view, cursor);
+          //Wang:
+//        bindName(view, cursor);
         bindPresenceAndStatusMessage(view, cursor);
 
         if (isSearchMode()) {
@@ -211,6 +226,228 @@ public class DefaultContactListAdapter extends ContactListAdapter {
         } else {
             view.setSnippet(null);
         }
+        // Wang:
+        /*boolean hasPhone = cursor.getInt(ContactQuery.CONTACT_HAS_PHONE_NUMBER) != 0;
+        final long contactId = cursor.getLong(ContactQuery.CONTACT_ID);
+        if (!isSearchMode() && hasPhone) {
+            view.setOnCallButtonClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int pos = (Integer) v.getTag();
+                    Cursor cursor = DefaultContactListAdapter.this.getCursor(partition);
+                    if (cursor.moveToPosition(pos)) {
+                        doCallAction(cursor);
+                    }
+                }
+            });
+            view.showCallButton(position, position);
+        } else {
+            view.hideCallButton();
+        }*/
+        view.hideCallButton();
+
+    }
+
+    /**
+     * Display error information.
+     * 
+     * @author Wang
+     * @date 2012-9-12
+     */
+    private void signalError() {
+        Toast.makeText(mContext, "Number Invalid!", 200).show();
+
+    }
+
+    /**
+     * Process Call Action.
+     * 
+     * @author Wang
+     * @date 2012-9-12
+     * @param cursor ContactQuery cursor
+     */
+    private void doCallAction(Cursor cursor) {
+        boolean hasPhone = cursor.getInt(ContactQuery.CONTACT_HAS_PHONE_NUMBER) != 0;
+        if (!hasPhone) {
+            signalError();
+            return;
+        }
+        long contactId = cursor.getLong(ContactQuery.CONTACT_ID);
+        log(">>>doCallAction => contactId =" + contactId);
+        String phone = null;
+        Cursor phonesCursor = null;
+        phonesCursor = queryPhoneNumbers(contactId);
+        if (phonesCursor == null || phonesCursor.getCount() == 0) {
+            // No valid number
+            signalError();
+            return;
+        } else if (phonesCursor.getCount() == 1) {
+            // only one number, call it.
+            phone = phonesCursor.getString(phonesCursor.getColumnIndex(Phone.NUMBER));
+        } else {
+            phonesCursor.moveToPosition(-1);
+            ArrayList<Entry> entryList = new ArrayList<Entry>(phonesCursor.getCount());
+            while (phonesCursor.moveToNext()) {
+                if (phonesCursor.getInt(phonesCursor.
+                        getColumnIndex(Phone.IS_SUPER_PRIMARY)) != 0) {
+                    // Found super primary, call it.
+                    phone = phonesCursor.
+                            getString(phonesCursor.getColumnIndex(Phone.NUMBER));
+                    break;
+                }
+                String num = phonesCursor.
+                        getString(phonesCursor.getColumnIndex(Phone.NUMBER));
+                long dataId = phonesCursor.getLong(phonesCursor
+                        .getColumnIndex(Contacts.Data._ID));
+                Entry entry = new Entry(dataId, num);
+                entryList.add(entry);
+            }
+            //Wang:
+            if(TextUtils.isEmpty(phone)){
+                showDefaultContactSelectionDialog(entryList);
+                if (phonesCursor != null) {
+                    phonesCursor.close();
+                }
+                return ;
+            }
+        }
+        if (!TextUtils.isEmpty(phone)) {
+            makePhoneCall(phone);
+        }
+        if (phonesCursor != null) {
+            phonesCursor.close();
+        }
+    }
+
+    private void setDefaultContactMethod(long id) {
+        Intent setIntent = ContactSaveService.createSetSuperPrimaryIntent(mContext, id);
+        mContext.startService(setIntent);
+    }
+
+    /**
+     * Query PhoneNumbers by contactId.
+     * 
+     * @author Wang
+     * @date 2012-9-12
+     * @param contactId
+     */
+    private Cursor queryPhoneNumbers(long contactId) {
+        return queryPhoneNumbers(mContext.getContentResolver(), contactId);
+    }
+
+    /**
+     * Query PhoneNumbers by contactId and pass param contentresolver.
+     * 
+     * @author Wang
+     * @date 2012-9-12
+     * @param resolver
+     * @param contactId
+     */
+    private Cursor queryPhoneNumbers(ContentResolver resolver, long contactId) {
+        Uri baseUri = ContentUris.withAppendedId(Contacts.CONTENT_URI, contactId);
+        Uri dataUri = Uri.withAppendedPath(baseUri, Contacts.Data.CONTENT_DIRECTORY);
+        Cursor c = resolver.query(dataUri,
+                new String[] {
+                        Phone._ID, Phone.NUMBER, Phone.IS_SUPER_PRIMARY,
+                        RawContacts.ACCOUNT_TYPE, Phone.TYPE, Phone.LABEL, Contacts.Data._ID
+                },
+                Data.MIMETYPE + "=?", new String[] {
+                    Phone.CONTENT_ITEM_TYPE
+                }, null);
+        if (c != null) {
+            if (c.moveToFirst()) {
+                return c;
+            }
+            c.close();
+        }
+        return null;
+    }
+
+    /**
+     * Make phone call
+     * 
+     * @author Wang
+     * @date 2012-9-12
+     * @param number the phone number to dial.
+     */
+    private void makePhoneCall(String number) {
+        log("makePhoneCall =>" + number);
+        final Intent intent = new Intent(Intent.ACTION_CALL_PRIVILEGED,
+                Uri.fromParts("tel", number, null));
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        if (mContext != null)
+            mContext.startActivity(intent);
+    }
+
+    private void showDefaultContactSelectionDialog(ArrayList<Entry> list) {
+        try {
+            DefaultContactSelectionDialog dialog = new DefaultContactSelectionDialog(mContext,
+                    list);
+            Activity act = (Activity) mContext;
+            dialog.show(act.getFragmentManager(), "default_contact");
+        } catch (Exception e) {
+            Toast.makeText(mContext, "Error", 200).show();
+        }
+    }
+
+    /**
+     * Default Contact Selection Dialog Fragment
+     * 
+     * @author Wang
+     * @date 2012-9-14
+     */
+    private class DefaultContactSelectionDialog extends DialogFragment {
+        private ArrayList<Entry> mList;
+        private Context mContext;
+        private String[] mPhoneNumbers;
+
+        public DefaultContactSelectionDialog(Context ctx, ArrayList<Entry> list) {
+            mList = list;
+            mContext = ctx;
+            mPhoneNumbers = new String[list.size()];
+            for (int i = 0; i < list.size(); i++) {
+               String phone =  list.get(i).phoneNumber;
+               log("==>phone:"+phone);
+                mPhoneNumbers[i] = phone;
+            }
+        }
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // TODO Auto-generated method stub
+            return new AlertDialog.Builder(mContext)
+//                    .setIconAttribute(android.R.attr.alertDialogIcon)
+                    .setTitle(com.android.contacts.R.string.message_using_number)
+                    .setItems(mPhoneNumbers,  new
+                            DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int
+                                whichButton) {
+                            /*
+                             * User clicked on a radio button do some
+                             * stuff
+                             */
+                            makePhoneCall(mPhoneNumbers[whichButton]);
+                        }
+                    })
+                    .create();
+        }
+
+    }
+
+    /**
+     * Entry Class
+     * 
+     * @author Wang
+     * @date 2012-9-14
+     */
+    private class Entry {
+        public Entry(long dataId, String phoneNumber) {
+            this.dataId = dataId;
+            this.phoneNumber = phoneNumber;
+        }
+
+        long dataId;
+        String phoneNumber;
     }
 
     private boolean isCustomFilterForPhoneNumbersOnly() {
@@ -218,5 +455,12 @@ public class DefaultContactListAdapter extends ContactListAdapter {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
         return prefs.getBoolean(ContactsPreferences.PREF_DISPLAY_ONLY_PHONES,
                 ContactsPreferences.PREF_DISPLAY_ONLY_PHONES_DEFAULT);
+    }
+
+    private static final boolean debug = false;
+
+    private static void log(String msg) {
+        if (debug)
+            Log.i("Shendu", msg);
     }
 }

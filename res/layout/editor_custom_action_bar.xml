@@ -14,48 +14,81 @@
      limitations under the License.
 -->
 
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:baselineAligned="false" 
+    android:background="@drawable/edit_contacts_action_bar_bg"
+    >
+
+<!--
+        android:visibility="gone"
+-->    
 
     <LinearLayout
-        android:id="@+id/save_menu_item"
-        android:layout_width="wrap_content"
+        android:id="@+id/cancel_menu_item"
+        style="?android:attr/actionButtonStyle"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:divider="?android:attr/dividerVertical"
-        android:showDividers="end"
-        android:dividerPadding="12dip"
-        android:orientation="horizontal">
+        android:layout_weight="0.5"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        >
 
-        <LinearLayout
+        <ImageView
+            android:id="@+id/cancel_icon"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:duplicateParentState="true"
-            style="?android:attr/actionButtonStyle">
-
-            <ImageView
-                android:id="@+id/icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginRight="8dip"
-                android:src="@drawable/ic_menu_done_holo_dark"
-                android:description="@string/menu_done" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginRight="20dip"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="@color/action_bar_button_text_color"
-                android:text="@string/menu_done"
-                style="@android:style/Widget.Holo.ActionBar.TabText" />
-
-        </LinearLayout>
-
+            android:layout_height="wrap_content"
+            android:layout_marginRight="8dip"
+            android:description="@string/menu_doNotSave"
+            android:src="@drawable/ic_menu_cancel_holo_dark" />
+		<!-- 
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            style="@android:style/Widget.Holo.ActionBar.TabText"
+		-->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/menu_doNotSave"
+            android:textSize="@dimen/group_editor_actionbar_text_size"
+            android:textColor="@color/action_bar_button_text_color" />
     </LinearLayout>
 
-</FrameLayout>
+	<View 
+	    android:id="@+id/cancel_save_menu_dividing_id"
+	    android:layout_width="@dimen/contacts_dividing_line_height"
+	    android:layout_height="@dimen/group_editor_actionbar_dividing_height"
+	    android:background="@color/contacts_dividing_line_color"
+	    android:layout_gravity="center_vertical"
+        android:visibility="gone"
+	    />
+	
+	<LinearLayout
+        android:id="@+id/save_menu_item"
+        style="?android:attr/actionButtonStyle"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.5"
+        android:gravity="center"
+        android:orientation="horizontal" >
+
+        <ImageView
+            android:id="@+id/icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="8dip"
+            android:description="@string/menu_done"
+            android:src="@drawable/ic_menu_done_holo_dark" />
+		<!--  
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            style="@android:style/Widget.Holo.ActionBar.TabText"
+		-->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/menu_done"
+            android:textSize="@dimen/group_editor_actionbar_text_size"
+            android:textColor="@color/action_bar_button_text_color" />
+    </LinearLayout>
+</LinearLayout>

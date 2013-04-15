@@ -16,10 +16,10 @@
 
 <!-- Layout parameters are set programmatically. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/FragmentActionBarPadding"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:paddingBottom="@dimen/shendu_dialpad_bottom_height"
     android:divider="?android:attr/dividerHorizontal"
     android:showDividers="end">
 
@@ -27,37 +27,11 @@
         android:id="@+id/voicemail_status"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
         android:visibility="gone">
         <include layout="@layout/call_log_voicemail_status"
     />
-    </FrameLayout>
-
-    <FrameLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        >
-        <TextView
-            android:id="@+id/filter_status"
-            style="@style/ContactListSeparatorTextViewStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/call_log_outer_margin"
-            android:layout_marginRight="@dimen/call_log_outer_margin"
-            android:paddingTop="@dimen/call_log_inner_margin"
-            android:paddingBottom="@dimen/call_log_inner_margin"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentBottom="true"
-            android:visibility="gone"
-            />
-        <View
-            android:id="@+id/call_log_divider"
-            android:layout_width="match_parent"
-            android:layout_height="1px"
-            android:layout_marginLeft="@dimen/call_log_outer_margin"
-            android:layout_marginRight="@dimen/call_log_outer_margin"
-            android:layout_gravity="bottom"
-            android:background="#55ffffff"
-            />
     </FrameLayout>
     <FrameLayout
         android:layout_width="match_parent"
@@ -66,12 +40,15 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fadingEdge="none"
+            android:layout_marginLeft="@dimen/shendu_dialpad_list_marginleft"
+            android:layout_marginRight="@dimen/shendu_dialpad_list_marginright"
             android:scrollbarStyle="outsideOverlay"
-            android:divider="@null"
+            android:divider="@drawable/shendu_selected_bottom_divider"
+            android:dividerHeight="0.5dp"
         />
         <TextView android:id="@android:id/empty"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:text="@string/recentCalls_empty"
             android:gravity="center"
             android:layout_marginTop="@dimen/empty_message_top_margin"

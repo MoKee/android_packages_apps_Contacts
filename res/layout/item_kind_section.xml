@@ -25,15 +25,34 @@
     <include
         android:id="@+id/kind_title_layout"
         layout="@layout/edit_kind_title" />
-
+    <!-- Wang:
+        android:paddingLeft="6dip"
+        android:paddingLeft="@dimen/contacts_padding_middle"
+        android:paddingRight="6dp"
+    -->
     <LinearLayout
-        android:id="@+id/kind_editors"
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical" />
+        android:layout_height="wrap_content" 
+        android:orientation="vertical"
+        android:layout_marginLeft="@dimen/account_container_left_padding"
+        android:layout_marginRight="@dimen/account_container_left_padding"
+        android:paddingLeft="@dimen/account_container_left_padding"
+        android:paddingTop="@dimen/account_container_left_padding"
+        android:paddingBottom="@dimen/account_container_left_padding"
+        android:background="@drawable/shendu_listview_item_overall"
+       	>
+        <LinearLayout
+            android:id="@+id/kind_editors"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    
+        <include
+            android:id="@+id/add_field_footer"
+            layout="@layout/edit_add_field" />
 
-    <include
-        android:id="@+id/add_field_footer"
-        layout="@layout/edit_add_field" />
+    </LinearLayout>
+
 
 </com.android.contacts.editor.KindSectionView>

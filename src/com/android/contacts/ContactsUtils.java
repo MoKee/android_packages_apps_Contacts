@@ -16,9 +16,15 @@
 
 package com.android.contacts;
 
+import com.android.contacts.activities.DialtactsActivity;
+import com.android.contacts.model.AccountType;
+import com.android.contacts.model.AccountTypeManager;
+import com.android.contacts.model.AccountWithDataSet;
+import com.android.contacts.test.NeededForTesting;
+import com.android.contacts.util.Constants;
+
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Rect;
 import android.location.CountryDetector;
@@ -32,14 +38,6 @@ import android.telephony.PhoneNumberUtils;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
-
-import com.android.contacts.activities.DialtactsActivity;
-import com.android.contacts.model.AccountTypeManager;
-import com.android.contacts.model.account.AccountType;
-import com.android.contacts.model.account.AccountWithDataSet;
-import com.android.contacts.test.NeededForTesting;
-import com.android.contacts.util.Constants;
-import com.google.common.annotations.VisibleForTesting;
 
 import java.util.List;
 
@@ -76,16 +74,16 @@ public class ContactsUtils {
         switch (protocol) {
             case Im.PROTOCOL_GOOGLE_TALK:
                 return ProviderNames.GTALK;
-            case Im.PROTOCOL_AIM:
-                return ProviderNames.AIM;
+            //case Im.PROTOCOL_AIM://do not used,remove by hhl
+                //return ProviderNames.AIM;
             case Im.PROTOCOL_MSN:
                 return ProviderNames.MSN;
             case Im.PROTOCOL_YAHOO:
                 return ProviderNames.YAHOO;
-            case Im.PROTOCOL_ICQ:
-                return ProviderNames.ICQ;
-            case Im.PROTOCOL_JABBER:
-                return ProviderNames.JABBER;
+            //case Im.PROTOCOL_ICQ:
+                //return ProviderNames.ICQ;
+            //case Im.PROTOCOL_JABBER:
+                //return ProviderNames.JABBER;
             case Im.PROTOCOL_SKYPE:
                 return ProviderNames.SKYPE;
             case Im.PROTOCOL_QQ:
@@ -225,50 +223,13 @@ public class ContactsUtils {
     }
 
     /**
-     * Checks whether two phone numbers resolve to the same phone.
-     */
-    public static boolean phoneNumbersEqual(String number1, String number2) {
-        if (PhoneNumberUtils.isUriNumber(number1) || PhoneNumberUtils.isUriNumber(number2)) {
-            return sipAddressesEqual(number1, number2);
-        } else {
-            return PhoneNumberUtils.compare(number1, number2);
-        }
-    }
-
-    @VisibleForTesting
-    static boolean sipAddressesEqual(String number1, String number2) {
-        if (number1 == null || number2 == null) return number1 == number2;
-
-        int index1 = number1.indexOf('@');
-        final String userinfo1;
-        final String rest1;
-        if (index1 != -1) {
-            userinfo1 = number1.substring(0, index1);
-            rest1 = number1.substring(index1);
-        } else {
-            userinfo1 = number1;
-            rest1 = "";
-        }
-
-        int index2 = number2.indexOf('@');
-        final String userinfo2;
-        final String rest2;
-        if (index2 != -1) {
-            userinfo2 = number2.substring(0, index2);
-            rest2 = number2.substring(index2);
-        } else {
-            userinfo2 = number2;
-            rest2 = "";
-        }
-
-        return userinfo1.equals(userinfo2) && rest1.equalsIgnoreCase(rest2);
-    }
-
-    /**
      * Return Uri with an appropriate scheme, accepting Voicemail, SIP, and usual phone call
      * numbers.
      */
     public static Uri getCallUri(String number) {
+        if (PhoneNumberUtils.isVoiceMailNumber(number)) {
+            return Uri.parse("voicemail:");
+        }
         if (PhoneNumberUtils.isUriNumber(number)) {
              return Uri.fromParts(Constants.SCHEME_SIP, number, null);
         }
@@ -369,13 +330,5 @@ public class ContactsUtils {
             }
         }
         return sThumbnailSize;
-    }
-
-    /**
-     * @return if the context is in landscape orientation.
-     */
-    public static boolean isLandscape(Context context) {
-        return context.getResources().getConfiguration().orientation
-                == Configuration.ORIENTATION_LANDSCAPE;
     }
 }

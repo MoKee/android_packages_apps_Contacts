@@ -40,10 +40,44 @@
     <item>#</item>
     <item>+</item>
   </string-array>
-  <string-array name="call_stats_nav_items">
-    <item>@string/call_stats_nav_all</item>
-    <item>@string/call_stats_nav_incoming</item>
-    <item>@string/call_stats_nav_outgoing</item>
-    <item>@string/call_stats_nav_missed</item>
-  </string-array>
+      <!-- shutao 2012-10-15 Unfamiliar No. menu -->
+    <string-array name="new_contact_t9_menu_values" translatable="false">
+        <item>Unknown City</item>
+        <item>New Contact</item>
+<!--         <item>Add To Contact</item> -->
+        <item>Send a message</item>
+    </string-array>
+    
+    <!-- Shendu -->
+    <!-- just for test -->
+<!--
+      <string-array name="action_list">
+        <item>Mercury</item>
+        <item>Venus</item>
+        <item>Earth</item>
+    </string-array>
+-->
+    
+    <!-- shutao 2012-10-15 -->
+    <string-array name="shendu_onlongmenu_list">
+        <item>Send SMS</item>
+    </string-array>
+    
+     <string-array name="shendu_calllog_list">
+        <item>Send SMS</item>
+        <item>Remove From Call Log</item>
+    </string-array>
+    
+     
+         <!-- add phone Ringtone -->
+    <string-array name="ringtone_entries">
+        <item>@string/sound_ringtones</item>
+        <item>@string/sound_music</item>
+    </string-array>
+    <!-- add phone Ringtone -->
+    <string-array name="ringtone_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+     
 </resources>

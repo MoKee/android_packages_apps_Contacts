@@ -17,6 +17,6 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item android:state_activated="true" android:color="#FFFFFF" />
-    <item android:color="#777777" /> <!-- not selected -->
+    <item android:color="@color/shendu_secondary_text_color" /> <!-- not selected -->
 
 </selector>

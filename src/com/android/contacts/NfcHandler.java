@@ -16,6 +16,8 @@
 
 package com.android.contacts;
 
+import com.android.contacts.detail.ContactDetailFragment;
+
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.net.Uri;
@@ -25,9 +27,8 @@ import android.nfc.NfcAdapter;
 import android.nfc.NfcEvent;
 import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.Profile;
-import android.util.Log;
 
-import com.android.contacts.detail.ContactDetailFragment;
+import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

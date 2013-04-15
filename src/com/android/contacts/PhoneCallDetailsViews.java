@@ -16,11 +16,12 @@
 
 package com.android.contacts;
 
+import com.android.contacts.calllog.CallTypeIconsView;
+
 import android.content.Context;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.android.contacts.calllog.CallTypeIconsView;
 
 /**
  * Encapsulates the views that are used to display the details of a phone call in the call log.
@@ -32,18 +33,21 @@ public final class PhoneCallDetailsViews {
     public final TextView callTypeAndDate;
     public final TextView numberView;
     public final TextView labelView;
-    public final TextView locationView;
+    /** shutao  2012-8-24 add attribution*/
+    public final TextView attributionView;
+    public final ImageView callTypeIcon;
 
     private PhoneCallDetailsViews(TextView nameView, View callTypeView,
             CallTypeIconsView callTypeIcons, TextView callTypeAndDate, TextView numberView,
-            TextView labelView, TextView locationView) {
+            TextView labelView ,TextView attributionView , ImageView callTypeIcon) {
         this.nameView = nameView;
         this.callTypeView = callTypeView;
         this.callTypeIcons = callTypeIcons;
         this.callTypeAndDate = callTypeAndDate;
         this.numberView = numberView;
         this.labelView = labelView;
-        this.locationView = locationView;
+        this.attributionView = attributionView;
+        this.callTypeIcon = callTypeIcon;
     }
 
     /**
@@ -60,7 +64,8 @@ public final class PhoneCallDetailsViews {
                 (TextView) view.findViewById(R.id.call_count_and_date),
                 (TextView) view.findViewById(R.id.number),
                 (TextView) view.findViewById(R.id.label),
-                (TextView) view.findViewById(R.id.location));
+                (TextView) view.findViewById(R.id.shendu_call_attribution),
+                (ImageView)view.findViewById(R.id.shendu_image_tpye_icon));
     }
 
     public static PhoneCallDetailsViews createForTest(Context context) {
@@ -71,6 +76,7 @@ public final class PhoneCallDetailsViews {
                 new TextView(context),
                 new TextView(context),
                 new TextView(context),
-                new TextView(context));
+                new TextView(context),
+                new ImageView(context));
     }
 }

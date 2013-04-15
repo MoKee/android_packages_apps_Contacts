@@ -17,11 +17,21 @@
 <!-- Spinner for a field in the contact editor. -->
 
 <!-- Note: explicitly override the default left and right padding on spinner -->
+<!-- Wang:modify display position -->
 <Spinner
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/spinner"
-    android:layout_gravity="bottom"
+    android:gravity="center"
+    android:layout_width="@dimen/contacts_edit_photo_width"
+    android:layout_height="@dimen/contacts_edittext_height"
+    android:background="@drawable/contacts_editspinner_bg"
+    android:layout_marginRight="@dimen/contacts_padding_middle"
+    />
+<!-- 
+    android:layout_marginRight="@dimen/contacts_padding_middle"
+    android:layout_marginLeft="@dimen/contacts_padding_left"
     android:layout_width="@dimen/editor_type_label_width"
     android:layout_height="@dimen/editor_min_line_item_height"
     android:paddingLeft="0dip"
-    android:paddingRight="10dip"/>
+    android:paddingRight="30dip"
+ -->

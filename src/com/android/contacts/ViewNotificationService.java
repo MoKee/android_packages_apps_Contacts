@@ -16,16 +16,14 @@
 
 package com.android.contacts;
 
+import com.android.contacts.ContactLoader.Result;
+
 import android.app.Service;
 import android.content.Intent;
 import android.content.Loader;
 import android.content.Loader.OnLoadCompleteListener;
 import android.os.IBinder;
 import android.util.Log;
-
-import com.android.contacts.model.Contact;
-import com.android.contacts.model.ContactLoader;
-
 
 /**
  * Service that sends out a view notification for a contact. At the moment, this is only
@@ -43,9 +41,9 @@ public class ViewNotificationService extends Service {
         // We simply need to start a Loader here. When its done, it will send out the
         // View-Notification automatically.
         final ContactLoader contactLoader = new ContactLoader(this, intent.getData(), true);
-        contactLoader.registerListener(0, new OnLoadCompleteListener<Contact>() {
+        contactLoader.registerListener(0, new OnLoadCompleteListener<ContactLoader.Result>() {
             @Override
-            public void onLoadComplete(Loader<Contact> loader, Contact data) {
+            public void onLoadComplete(Loader<Result> loader, Result data) {
                 try {
                     loader.reset();
                 } catch (RuntimeException e) {

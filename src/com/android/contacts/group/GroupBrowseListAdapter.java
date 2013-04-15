@@ -16,22 +16,26 @@
 
 package com.android.contacts.group;
 
+import com.android.contacts.ContactPhotoManager;
+import com.android.contacts.GroupListLoader;
+import com.android.contacts.R;
+import com.android.contacts.model.AccountType;
+import com.android.contacts.model.AccountTypeManager;
+import com.android.internal.util.Objects;
+
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.provider.ContactsContract.Groups;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import com.android.contacts.GroupListLoader;
-import com.android.contacts.R;
-import com.android.contacts.model.AccountTypeManager;
-import com.android.contacts.model.account.AccountType;
-import com.android.internal.util.Objects;
 
 /**
  * Adapter to populate the list of groups.
@@ -113,6 +117,7 @@ public class GroupBrowseListAdapter extends BaseAdapter {
 
     @Override
     public GroupListItem getItem(int position) {
+        log(">>>getItem => position ="+position);
         if (mCursor == null || mCursor.isClosed() || !mCursor.moveToPosition(position)) {
             return null;
         }
@@ -122,7 +127,15 @@ public class GroupBrowseListAdapter extends BaseAdapter {
         long groupId = mCursor.getLong(GroupListLoader.GROUP_ID);
         String title = mCursor.getString(GroupListLoader.TITLE);
         int memberCount = mCursor.getInt(GroupListLoader.MEMBER_COUNT);
-
+        //Wang:local account maybe null 2012-10-17
+        if(accountName == null){
+            accountName = "";
+        }
+        if(accountType == null){
+            accountType = "";
+        }
+        log(" accountName="+accountName+" | accountType="+accountType+" | dataSet="+dataSet+" | groupId ="+groupId);
+        
         // Figure out if this is the first group for this account name / account type pair by
         // checking the previous entry. This is to determine whether or not we need to display an
         // account header in this item.
@@ -132,14 +145,25 @@ public class GroupBrowseListAdapter extends BaseAdapter {
             String previousGroupAccountName = mCursor.getString(GroupListLoader.ACCOUNT_NAME);
             String previousGroupAccountType = mCursor.getString(GroupListLoader.ACCOUNT_TYPE);
             String previousGroupDataSet = mCursor.getString(GroupListLoader.DATA_SET);
-
+          //Wang:local account maybe null 2012-10-17
+            if(previousGroupAccountName == null){
+                previousGroupAccountName = "";
+            }
+            if(previousGroupAccountType == null){
+                previousGroupAccountType = "";
+            }
+            log("  ====> check isFirstGroupInAccount ");
+            log("  previousIndex = "+previousIndex);
+            log("  previousGroupAccountName = "+previousGroupAccountName+" | previousGroupAccountType="+previousGroupAccountType+" | previousGroupDataSet="+previousGroupDataSet);
+            log("  (compare with accountName etc.)");
+            log("  <====");
             if (accountName.equals(previousGroupAccountName) &&
                     accountType.equals(previousGroupAccountType) &&
                     Objects.equal(dataSet, previousGroupDataSet)) {
                 isFirstGroupInAccount = false;
             }
         }
-
+        log("  ********isFirstGroupInAccount ="+isFirstGroupInAccount);
         return new GroupListItem(accountName, accountType, dataSet, groupId, title,
                 isFirstGroupInAccount, memberCount);
     }
@@ -157,12 +181,34 @@ public class GroupBrowseListAdapter extends BaseAdapter {
             viewCache = new GroupListItemViewCache(result);
             result.setTag(viewCache);
         }
+        
+        //add by hhl,for item bg
+        int cursorCount = getCount();
+        //LinearLayout itemLayout = (LinearLayout)result.findViewById(R.id.group_view_listview_item_linearlayout_id);
+        if(cursorCount == 1){
+        	viewCache.divider.setVisibility(View.GONE);
+        	viewCache.itemLayout.setBackgroundResource(R.drawable.shendu_listview_item_overall);
+        }else{
+        	if(position == 0){
+            	viewCache.divider.setVisibility(View.VISIBLE);
+        		//viewCache.itemLayout.setBackgroundColor(Color.BLUE);
+        		viewCache.itemLayout.setBackgroundResource(R.drawable.shendu_listview_item_top);
+        	}else if(position == (cursorCount-1)){
+        		viewCache.divider.setVisibility(View.GONE);
+        		//viewCache.itemLayout.setBackgroundColor(Color.RED);
+        		viewCache.itemLayout.setBackgroundResource(R.drawable.shendu_listview_item_bottom);
+        	}else{
+            	viewCache.divider.setVisibility(View.VISIBLE);
+        		//viewCache.itemLayout.setBackgroundColor(Color.GREEN);
+        		viewCache.itemLayout.setBackgroundResource(R.drawable.shendu_listview_item_middle);
+        	}
+        }
 
         // Add a header if this is the first group in an account and hide the divider
         if (entry.isFirstGroupInAccount()) {
             bindHeaderView(entry, viewCache);
             viewCache.accountHeader.setVisibility(View.VISIBLE);
-            viewCache.divider.setVisibility(View.GONE);
+//            viewCache.divider.setVisibility(View.GONE);
             if (position == 0) {
                 // Have the list's top padding in the first header.
                 //
@@ -175,7 +221,7 @@ public class GroupBrowseListAdapter extends BaseAdapter {
             }
         } else {
             viewCache.accountHeader.setVisibility(View.GONE);
-            viewCache.divider.setVisibility(View.VISIBLE);
+//            viewCache.divider.setVisibility(View.VISIBLE);
             viewCache.accountHeaderExtraTopPadding.setVisibility(View.GONE);
         }
 
@@ -197,6 +243,7 @@ public class GroupBrowseListAdapter extends BaseAdapter {
     private void bindHeaderView(GroupListItem entry, GroupListItemViewCache viewCache) {
         AccountType accountType = mAccountTypeManager.getAccountType(
                 entry.getAccountType(), entry.getDataSet());
+        log("bindHeader / accountType : "+entry.getAccountType()+", accountName : "+entry.getAccountName()+", dataSet : "+entry.getDataSet());
         viewCache.accountType.setText(accountType.getDisplayLabel(mContext).toString());
         viewCache.accountName.setText(entry.getAccountName());
     }
@@ -217,6 +264,7 @@ public class GroupBrowseListAdapter extends BaseAdapter {
         public final View accountHeader;
         public final View accountHeaderExtraTopPadding;
         public final View divider;
+        public final LinearLayout itemLayout;//add by hhl,for item bg
         private Uri mUri;
 
         public GroupListItemViewCache(View view) {
@@ -227,6 +275,7 @@ public class GroupBrowseListAdapter extends BaseAdapter {
             accountHeader = view.findViewById(R.id.group_list_header);
             accountHeaderExtraTopPadding = view.findViewById(R.id.header_extra_top_padding);
             divider = view.findViewById(R.id.divider);
+            itemLayout = (LinearLayout)view.findViewById(R.id.group_view_listview_item_linearlayout_id); //add 
         }
 
         public void setUri(Uri uri) {
@@ -236,5 +285,11 @@ public class GroupBrowseListAdapter extends BaseAdapter {
         public Uri getUri() {
             return mUri;
         }
+    }
+    
+    private static final boolean debug = false;
+    private static void log(String msg){
+        msg = "Adapter -> "+msg;
+        if(debug) Log.i("shenduGroup", msg);
     }
 }
