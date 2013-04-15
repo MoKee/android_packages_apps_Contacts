@@ -16,6 +16,15 @@
 
 package com.android.contacts.editor;
 
+import com.android.contacts.ContactsUtils;
+import com.android.contacts.R;
+import com.android.contacts.model.AccountType;
+import com.android.contacts.model.AccountWithDataSet;
+import com.android.contacts.model.DataKind;
+import com.android.contacts.model.EntityDelta;
+import com.android.contacts.model.EntityDelta.ValuesDelta;
+import com.android.contacts.model.EntityModifier;
+
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.res.Resources;
@@ -37,15 +46,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.contacts.ContactsUtils;
-import com.android.contacts.R;
-import com.android.contacts.model.RawContactModifier;
-import com.android.contacts.model.RawContactDelta;
-import com.android.contacts.model.RawContactDelta.ValuesDelta;
-import com.android.contacts.model.account.AccountType;
-import com.android.contacts.model.account.AccountWithDataSet;
-import com.android.contacts.model.dataitem.DataKind;
-
 import java.util.ArrayList;
 
 /**
@@ -60,7 +60,7 @@ public class RawContactReadOnlyEditorView extends BaseRawContactEditorView
     private ViewGroup mGeneral;
 
     private View mAccountContainer;
-    private ImageView mAccountIcon;
+    //private ImageView mAccountIcon; //do not used,remove by hhl
     private TextView mAccountTypeTextView;
     private TextView mAccountNameTextView;
 
@@ -101,18 +101,18 @@ public class RawContactReadOnlyEditorView extends BaseRawContactEditorView
         mGeneral = (ViewGroup)findViewById(R.id.sect_general);
 
         mAccountContainer = findViewById(R.id.account_container);
-        mAccountIcon = (ImageView) findViewById(R.id.account_icon);
+        //mAccountIcon = (ImageView) findViewById(R.id.account_icon);
         mAccountTypeTextView = (TextView) findViewById(R.id.account_type);
         mAccountNameTextView = (TextView) findViewById(R.id.account_name);
     }
 
     /**
      * Set the internal state for this view, given a current
-     * {@link RawContactDelta} state and the {@link AccountType} that
+     * {@link EntityDelta} state and the {@link AccountType} that
      * apply to that state.
      */
     @Override
-    public void setState(RawContactDelta state, AccountType type, ViewIdGenerator vig,
+    public void setState(EntityDelta state, AccountType type, ViewIdGenerator vig,
             boolean isProfile) {
         // Remove any existing sections
         mGeneral.removeAllViews();
@@ -121,12 +121,13 @@ public class RawContactReadOnlyEditorView extends BaseRawContactEditorView
         if (state == null || type == null) return;
 
         // Make sure we have StructuredName
-        RawContactModifier.ensureKindExists(state, type, StructuredName.CONTENT_ITEM_TYPE);
+        EntityModifier.ensureKindExists(state, type, StructuredName.CONTENT_ITEM_TYPE);
 
         // Fill in the header info
-        mAccountName = state.getAccountName();
-        mAccountType = state.getAccountType();
-        mDataSet = state.getDataSet();
+        ValuesDelta values = state.getValues();
+        mAccountName = values.getAsString(RawContacts.ACCOUNT_NAME);
+        mAccountType = values.getAsString(RawContacts.ACCOUNT_TYPE);
+        mDataSet = values.getAsString(RawContacts.DATA_SET);
 
         if (isProfile) {
             if (TextUtils.isEmpty(mAccountName)) {
@@ -159,16 +160,16 @@ public class RawContactReadOnlyEditorView extends BaseRawContactEditorView
 
         // TODO: Expose data set in the UI somehow?
 
-        mAccountIcon.setImageDrawable(type.getDisplayIcon(mContext));
+        //mAccountIcon.setImageDrawable(type.getDisplayIcon(mContext));
 
-        mRawContactId = state.getRawContactId();
+        mRawContactId = values.getAsLong(RawContacts._ID);
 
         ValuesDelta primary;
 
         // Photo
         DataKind kind = type.getKindForMimetype(Photo.CONTENT_ITEM_TYPE);
         if (kind != null) {
-            RawContactModifier.ensureKindExists(state, type, Photo.CONTENT_ITEM_TYPE);
+            EntityModifier.ensureKindExists(state, type, Photo.CONTENT_ITEM_TYPE);
             boolean hasPhotoEditor = type.getKindForMimetype(Photo.CONTENT_ITEM_TYPE) != null;
             setHasPhotoEditor(hasPhotoEditor);
             primary = state.getPrimaryEntry(Photo.CONTENT_ITEM_TYPE);
@@ -202,13 +203,13 @@ public class RawContactReadOnlyEditorView extends BaseRawContactEditorView
             for (int i = 0; i < phones.size(); i++) {
                 ValuesDelta phone = phones.get(i);
                 final String phoneNumber = PhoneNumberUtils.formatNumber(
-                        phone.getPhoneNumber(),
-                        phone.getPhoneNormalizedNumber(),
+                        phone.getAsString(Phone.NUMBER),
+                        phone.getAsString(Phone.NORMALIZED_NUMBER),
                         ContactsUtils.getCurrentCountryIso(getContext()));
                 final CharSequence phoneType;
-                if (phone.phoneHasType()) {
+                if (phone.containsKey(Phone.TYPE)) {
                     phoneType = Phone.getTypeLabel(
-                            res, phone.getPhoneType(), phone.getPhoneLabel());
+                            res, phone.getAsInteger(Phone.TYPE), phone.getAsString(Phone.LABEL));
                 } else {
                     phoneType = null;
                 }
@@ -222,11 +223,11 @@ public class RawContactReadOnlyEditorView extends BaseRawContactEditorView
         if (emails != null) {
             for (int i = 0; i < emails.size(); i++) {
                 ValuesDelta email = emails.get(i);
-                final String emailAddress = email.getEmailData();
+                final String emailAddress = email.getAsString(Email.DATA);
                 final CharSequence emailType;
-                if (email.emailHasType()) {
+                if (email.containsKey(Email.TYPE)) {
                     emailType = Email.getTypeLabel(
-                            res, email.getEmailType(), email.getEmailLabel());
+                            res, email.getAsInteger(Email.TYPE), email.getAsString(Email.LABEL));
                 } else {
                     emailType = null;
                 }

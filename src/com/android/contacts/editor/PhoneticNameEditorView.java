@@ -16,15 +16,15 @@
 
 package com.android.contacts.editor;
 
+import com.android.contacts.model.DataKind;
+import com.android.contacts.model.EntityDelta;
+import com.android.contacts.model.EntityDelta.ValuesDelta;
+
+import android.content.ContentValues;
 import android.content.Context;
 import android.provider.ContactsContract.CommonDataKinds.StructuredName;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-
-import com.android.contacts.model.RawContactDelta;
-import com.android.contacts.model.RawContactDelta.ValuesDelta;
-import com.android.contacts.model.dataitem.DataKind;
-import com.android.contacts.model.dataitem.StructuredNameDataItem;
 
 /**
  * A dedicated editor for phonetic name. It is similar to {@link StructuredNameEditorView}.
@@ -61,16 +61,19 @@ public class PhoneticNameEditorView extends TextFieldsEditorView {
         }
 
         private void parsePhoneticName(String value) {
-            StructuredNameDataItem dataItem = PhoneticNameEditorView.parsePhoneticName(value, null);
-            mValues.setPhoneticFamilyName(dataItem.getPhoneticFamilyName());
-            mValues.setPhoneticMiddleName(dataItem.getPhoneticMiddleName());
-            mValues.setPhoneticGivenName(dataItem.getPhoneticGivenName());
+            ContentValues values = PhoneticNameEditorView.parsePhoneticName(value, null);
+            mValues.put(StructuredName.PHONETIC_FAMILY_NAME,
+                    values.getAsString(StructuredName.PHONETIC_FAMILY_NAME));
+            mValues.put(StructuredName.PHONETIC_MIDDLE_NAME,
+                    values.getAsString(StructuredName.PHONETIC_MIDDLE_NAME));
+            mValues.put(StructuredName.PHONETIC_GIVEN_NAME,
+                    values.getAsString(StructuredName.PHONETIC_GIVEN_NAME));
         }
 
         private void buildPhoneticName() {
-            String family = mValues.getPhoneticFamilyName();
-            String middle = mValues.getPhoneticMiddleName();
-            String given = mValues.getPhoneticGivenName();
+            String family = mValues.getAsString(StructuredName.PHONETIC_FAMILY_NAME);
+            String middle = mValues.getAsString(StructuredName.PHONETIC_MIDDLE_NAME);
+            String given = mValues.getAsString(StructuredName.PHONETIC_GIVEN_NAME);
             mPhoneticName = PhoneticNameEditorView.buildPhoneticName(family, middle, given);
         }
 
@@ -97,8 +100,7 @@ public class PhoneticNameEditorView extends TextFieldsEditorView {
      * created.
      * @return ContentValues with parsed data. Those data can be null.
      */
-    public static StructuredNameDataItem parsePhoneticName(String phoneticName,
-            StructuredNameDataItem item) {
+    public static ContentValues parsePhoneticName(String phoneticName, ContentValues values) {
         String family = null;
         String middle = null;
         String given = null;
@@ -121,13 +123,13 @@ public class PhoneticNameEditorView extends TextFieldsEditorView {
             }
         }
 
-        if (item == null) {
-            item = new StructuredNameDataItem();
+        if (values == null) {
+            values = new ContentValues();
         }
-        item.setPhoneticFamilyName(family);
-        item.setPhoneticMiddleName(middle);
-        item.setPhoneticGivenName(given);
-        return item;
+        values.put(StructuredName.PHONETIC_FAMILY_NAME, family);
+        values.put(StructuredName.PHONETIC_MIDDLE_NAME, middle);
+        values.put(StructuredName.PHONETIC_GIVEN_NAME, given);
+        return values;
     }
 
     /**
@@ -170,7 +172,7 @@ public class PhoneticNameEditorView extends TextFieldsEditorView {
     }
 
     @Override
-    public void setValues(DataKind kind, ValuesDelta entry, RawContactDelta state, boolean readOnly,
+    public void setValues(DataKind kind, ValuesDelta entry, EntityDelta state, boolean readOnly,
             ViewIdGenerator vig) {
         if (!(entry instanceof PhoneticValuesDelta)) {
             entry = new PhoneticValuesDelta(entry);
@@ -211,9 +213,9 @@ public class PhoneticNameEditorView extends TextFieldsEditorView {
     public boolean hasData() {
         ValuesDelta entry = getEntry();
 
-        String family = entry.getPhoneticFamilyName();
-        String middle = entry.getPhoneticMiddleName();
-        String given = entry.getPhoneticGivenName();
+        String family = entry.getAsString(StructuredName.PHONETIC_FAMILY_NAME);
+        String middle = entry.getAsString(StructuredName.PHONETIC_MIDDLE_NAME);
+        String given = entry.getAsString(StructuredName.PHONETIC_GIVEN_NAME);
 
         return !TextUtils.isEmpty(family) || !TextUtils.isEmpty(middle)
                 || !TextUtils.isEmpty(given);

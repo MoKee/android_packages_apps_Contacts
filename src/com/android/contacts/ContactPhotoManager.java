@@ -16,6 +16,14 @@
 
 package com.android.contacts;
 
+import com.android.contacts.model.AccountTypeManager;
+import com.android.contacts.util.BitmapUtil;
+import com.android.contacts.util.MemoryUtils;
+import com.android.contacts.util.NameAvatarUtils;
+import com.android.contacts.util.UriUtils;
+import com.google.android.collect.Lists;
+import com.google.android.collect.Sets;
+
 import android.content.ComponentCallbacks2;
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -47,13 +55,6 @@ import android.util.Log;
 import android.util.LruCache;
 import android.util.TypedValue;
 import android.widget.ImageView;
-
-import com.android.contacts.model.AccountTypeManager;
-import com.android.contacts.util.BitmapUtil;
-import com.android.contacts.util.MemoryUtils;
-import com.android.contacts.util.UriUtils;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -125,8 +126,12 @@ public abstract class ContactPhotoManager implements ComponentCallbacks2 {
         public void applyDefaultImage(ImageView view, int extent, boolean darkTheme) {
             if (sDrawable == null) {
                 Context context = view.getContext();
+                //Wang:
+//                sDrawable = new ColorDrawable(context.getResources().getColor(
+//                        R.color.image_placeholder));
                 sDrawable = new ColorDrawable(context.getResources().getColor(
-                        R.color.image_placeholder));
+                        R.color.shendu_name_avatar_background));
+                
             }
             view.setImageDrawable(sDrawable);
         }
@@ -170,6 +175,13 @@ public abstract class ContactPhotoManager implements ComponentCallbacks2 {
     public final void loadThumbnail(ImageView view, long photoId, boolean darkTheme) {
         loadThumbnail(view, photoId, darkTheme, DEFAULT_AVATAR);
     }
+    
+    /**
+     * @author Wang
+     * @date 2012-11-14
+     * */
+    public abstract void loadThumbnail(ImageView view, long photoId, boolean darkTheme,
+            DefaultImageProvider defaultProvider, String displayName, long contactId);
 
     /**
      * Load photo into the supplied image view. If the photo is already cached,
@@ -187,6 +199,22 @@ public abstract class ContactPhotoManager implements ComponentCallbacks2 {
      */
     public abstract void loadPhoto(ImageView view, Uri photoUri, int requestedExtent,
             boolean darkTheme, DefaultImageProvider defaultProvider);
+    /**
+     * @hide
+     * @author Wang
+     * @date 2012-11-12
+     */
+    public abstract void loadPhoto(ImageView view, Uri photoUri, int requestedExtent,
+            boolean darkTheme, DefaultImageProvider defaultProvider, String displayName, long contactID);
+    
+    /**
+     * @hide
+     * @author Wang
+     * @date 2012-11-12
+     */
+    public final void loadThumbnail(ImageView view, long photoId, boolean darkTheme, String displayName, long contactID) {
+        loadThumbnail(view, photoId, darkTheme, DEFAULT_AVATAR, displayName, contactID);
+    }
 
     /**
      * Calls {@link #loadPhoto(ImageView, Uri, boolean, boolean, DefaultImageProvider)} with
@@ -196,6 +224,18 @@ public abstract class ContactPhotoManager implements ComponentCallbacks2 {
             boolean darkTheme) {
         loadPhoto(view, photoUri, requestedExtent, darkTheme, DEFAULT_AVATAR);
     }
+    
+    /**
+     * Fill with character avatar if there is no photo to load
+     * @author Wang
+     * @date 2012-11-12
+     * @date 2012-11-14
+     * @hide
+     */
+    public final void loadPhoto(ImageView view, Uri photoUri, int requestedExtent,
+            boolean darkTheme, String displayName, long contactID) {
+        loadPhoto(view, photoUri, requestedExtent, darkTheme, DEFAULT_BLANK, displayName, contactID);
+    }
 
     /**
      * Calls {@link #loadPhoto(ImageView, Uri, boolean, boolean, DefaultImageProvider)} with
@@ -203,6 +243,14 @@ public abstract class ContactPhotoManager implements ComponentCallbacks2 {
      */
     public final void loadDirectoryPhoto(ImageView view, Uri photoUri, boolean darkTheme) {
         loadPhoto(view, photoUri, -1, darkTheme, DEFAULT_AVATAR);
+    }
+    /**
+     * Wang:
+     * @hide
+     * @date 2012-11-12
+     * */
+    public final void loadDirectoryPhoto(ImageView view, Uri photoUri, boolean darkTheme, String name, long contactID) {
+        loadPhoto(view, photoUri, -1, darkTheme, DEFAULT_BLANK, name, -1);
     }
 
     /**
@@ -472,31 +520,56 @@ class ContactPhotoManagerImpl extends ContactPhotoManager implements Callback {
     @Override
     public void loadThumbnail(ImageView view, long photoId, boolean darkTheme,
             DefaultImageProvider defaultProvider) {
-        if (photoId == 0) {
-            // No photo is needed
-            defaultProvider.applyDefaultImage(view, -1, darkTheme);
+    	//Wang:2012-11-14
+    	loadThumbnail(view, photoId, darkTheme, defaultProvider, null, -1);
+    }
+    //Wang:
+    @Override
+	public void loadThumbnail(ImageView view, long photoId, boolean darkTheme,
+			DefaultImageProvider defaultProvider, String displayname,
+			long contactId) {
+		if (photoId == 0) {
+			  //Wang:
+            boolean succeed = NameAvatarUtils.setupNameAvatar(view, contactId, displayname);
+            if(!succeed){
+            	// No photo is needed
+              defaultProvider.applyDefaultImage(view, -1, darkTheme);
+              }
             mPendingRequests.remove(view);
         } else {
             if (DEBUG) Log.d(TAG, "loadPhoto request: " + photoId);
             loadPhotoByIdOrUri(view, Request.createFromThumbnailId(photoId, darkTheme,
                     defaultProvider));
         }
-    }
+		
+	}
 
     @Override
     public void loadPhoto(ImageView view, Uri photoUri, int requestedExtent, boolean darkTheme,
             DefaultImageProvider defaultProvider) {
+        //Wang : 2012-11-12
+        loadPhoto(view, photoUri, requestedExtent, darkTheme, defaultProvider, null, -1);
+    }
+   //Wang:
+    @Override 
+    public void loadPhoto(ImageView view, Uri photoUri, int requestedExtent, boolean darkTheme,
+            DefaultImageProvider defaultProvider, String displayName,long contactID) {
+        log("=====>loadPhoto>>>photoUri="+photoUri+" ,displayName="+displayName);
         if (photoUri == null) {
-            // No photo is needed
-            defaultProvider.applyDefaultImage(view, requestedExtent, darkTheme);
+        	 boolean succeed = NameAvatarUtils.setupNameAvatar(view, contactID, displayName);
+            if(!succeed){
+            	// No photo is needed
+              defaultProvider.applyDefaultImage(view, -1, darkTheme);
+              };
             mPendingRequests.remove(view);
         } else {
             if (DEBUG) Log.d(TAG, "loadPhoto request: " + photoUri);
             loadPhotoByIdOrUri(view, Request.createFromUri(photoUri, requestedExtent, darkTheme,
                     defaultProvider));
         }
+        
     }
-
+    
     private void loadPhotoByIdOrUri(ImageView view, Request request) {
         boolean loaded = loadCachedPhoto(view, request, false);
         if (loaded) {
@@ -1219,5 +1292,9 @@ class ContactPhotoManagerImpl extends ContactPhotoManager implements Callback {
         public void applyDefaultImage(ImageView view) {
             mDefaultProvider.applyDefaultImage(view, mRequestedExtent, mDarkTheme);
         }
+    }
+    private static boolean debug = false;
+    public static void log(String msg){
+        if(debug) Log.i("photo", msg);
     }
 }

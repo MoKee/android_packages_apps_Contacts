@@ -8,7 +8,7 @@ import android.util.Log;
  * This will change Hangul character to number by Choseong(Korean word of initial character).
  */
 public class NameToNumberKorean extends NameToNumber {
-    // Hangul Chosung (Initial letters of Hangul).
+    // Hangul Chosung (Initial letters of Hangul). 
     // Note : Don't change order of initial alphabets. index will be used to calculate.
     private static final String HANGUL_INITIALS = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ";
     private static final int UNICODE_HANGUL_START = 0xAC00;
@@ -17,6 +17,7 @@ public class NameToNumberKorean extends NameToNumber {
 
     public NameToNumberKorean(String t9Chars, String t9Digits) {
         super(t9Chars, t9Digits);
+        // TODO Auto-generated constructor stub
     }
 
     @Override

@@ -16,9 +16,9 @@
 
 package com.android.contacts.util;
 
-import android.util.LruCache;
-
 import com.android.contacts.test.NeededForTesting;
+
+import android.util.LruCache;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

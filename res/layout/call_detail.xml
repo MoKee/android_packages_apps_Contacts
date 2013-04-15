@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2009 The Android Open Source Project
+<!--
+     Copyright (C) 2009 The Android Open Source Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -19,200 +20,183 @@
     android:id="@+id/call_detail"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:visibility="gone"
-    android:background="@color/call_detail_background"
->
-    <!--
-      The list view is under everything.
-      It contains a first header element which is hidden under the controls UI.
-      When scrolling, the controls move up until the name bar hits the top.
-      -->
-    <ListView
-        android:id="@+id/history"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-    />
+    android:background="@drawable/shendu_background_bg"
+    android:visibility="gone" >
 
     <!-- All the controls which are part of the pinned header are in this layout. -->
+
     <RelativeLayout
         android:id="@+id/controls"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-    >
+        android:layout_alignParentTop="true" >
+
         <FrameLayout
             android:id="@+id/voicemail_status"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:visibility="gone"
-        >
-            <include layout="@layout/call_log_voicemail_status"/>
+            android:visibility="gone" >
+
+            <include layout="@layout/call_log_voicemail_status" />
         </FrameLayout>
 
         <view
-            class="com.android.contacts.widget.ProportionalLayout"
             android:id="@+id/contact_background_sizer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_below="@id/voicemail_status"
-            ex:ratio="0.5"
+            class="com.android.contacts.widget.ProportionalLayout"
+            android:visibility="gone"
             ex:direction="widthToHeight"
-        >
+            ex:ratio="0.5" >
+
             <ImageView
-                android:id="@+id/contact_background"
+                android:id="@+id/contact_background_1"
                 android:layout_width="match_parent"
                 android:layout_height="0dip"
                 android:adjustViewBounds="true"
-                android:scaleType="centerCrop"
-            />
+                android:scaleType="centerCrop" />
         </view>
-        <LinearLayout
-            android:id="@+id/blue_separator"
-            android:layout_width="match_parent"
-            android:layout_height="1dip"
-            android:background="@color/call_detail_separator"
-            android:layout_below="@+id/contact_background_sizer"
-        />
-        <View
-            android:id="@+id/photo_text_bar"
-            android:layout_width="match_parent"
-            android:layout_height="42dip"
-            android:background="@color/call_detail_photo_bg"
-            android:layout_alignParentLeft="true"
-            android:layout_alignBottom="@id/contact_background_sizer"
-        />
-        <ImageView
-            android:id="@+id/main_action"
-            android:layout_width="wrap_content"
-            android:layout_height="0dip"
-            android:scaleType="center"
-            android:layout_alignRight="@id/photo_text_bar"
-            android:layout_alignBottom="@id/photo_text_bar"
-            android:layout_alignTop="@id/photo_text_bar"
-            android:layout_marginRight="@dimen/call_log_outer_margin"
-        />
-        <TextView
-            android:id="@+id/header_text"
-            android:layout_width="wrap_content"
-            android:layout_height="0dip"
-            android:layout_alignLeft="@id/photo_text_bar"
-            android:layout_toLeftOf="@id/main_action"
-            android:layout_alignTop="@id/photo_text_bar"
-            android:layout_alignBottom="@id/photo_text_bar"
-            android:layout_marginRight="@dimen/call_log_inner_margin"
-            android:layout_marginLeft="@dimen/call_detail_contact_name_margin"
-            android:gravity="center_vertical"
-            android:textColor="?attr/call_log_primary_text_color"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:singleLine="true"
-        />
-        <ImageButton
-            android:id="@+id/main_action_push_layer"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignLeft="@id/contact_background_sizer"
-            android:layout_alignTop="@id/contact_background_sizer"
-            android:layout_alignRight="@id/contact_background_sizer"
-            android:layout_alignBottom="@id/contact_background_sizer"
-            android:background="?android:attr/selectableItemBackground"
-        />
-        <LinearLayout
-            android:id="@+id/voicemail_container"
+
+       <LinearLayout
+            android:id="@+id/shendu_calllog_data_linear"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="@dimen/call_detail_button_spacing"
-            android:layout_below="@id/blue_separator"
-        >
-            <!-- The voicemail fragment will be put here. -->
-        </LinearLayout>
-        <FrameLayout
-            android:id="@+id/call_and_sms"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/call_log_list_item_height"
-            android:layout_marginBottom="@dimen/call_detail_button_spacing"
-            android:layout_below="@id/voicemail_container"
-            android:gravity="center_vertical"
-            android:background="@drawable/dialpad_background"
-        >
-            <LinearLayout
-                android:id="@+id/call_and_sms_main_action"
+            android:orientation="vertical" >
+
+            <View
+                android:id="@+id/photo_text_bar"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:focusable="true"
-                android:background="?android:attr/selectableItemBackground"
-                >
+                android:layout_height="@dimen/call_log_outer_margin" />
 
-                <LinearLayout
-                    android:layout_width="0dip"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:paddingLeft="@dimen/call_log_indent_margin"
-                    android:orientation="vertical"
+            <RelativeLayout
+                android:id="@+id/shendu_calllog_data_relative"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <ImageButton
+                    android:id="@+id/main_action_push_layer"
+                    android:layout_width="match_parent"
+                    android:layout_height="64dp"
+                    android:layout_marginLeft="@dimen/call_detail_contact_name_margin"
+                    android:layout_marginRight="@dimen/call_log_outer_margin"
+                    android:background="?android:attr/selectableItemBackground" />
+
+                <ImageView
+                    android:id="@+id/contact_background"
+                    android:layout_width="56dip"
+                    android:layout_height="56dip"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="@dimen/call_detail_contact_name_margin"
+                    android:adjustViewBounds="true"
+                    android:scaleType="centerCrop" />
+
+                <ImageView
+                    android:id="@+id/main_action"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="@dimen/call_detail_contact_name_margin"
+                    android:scaleType="center" />
+
+                <TextView
+                    android:id="@+id/header_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="@dimen/call_log_outer_margin"
+                    android:layout_marginRight="@dimen/call_log_inner_margin"
+                    android:layout_toRightOf="@id/contact_background"
                     android:gravity="center_vertical"
-                >
+                    android:ellipsize="end"
+                    android:maxWidth="150dp"
+                    android:singleLine="true"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#ff434446" />
+            </RelativeLayout>
 
-                    <TextView android:id="@+id/call_and_sms_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingRight="@dimen/call_log_icon_margin"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:textColor="?attr/call_log_primary_text_color"
-                        android:singleLine="true"
-                        android:ellipsize="end"
-                    />
+            <View
+                android:id="@+id/shendu_photo_text_bar"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/call_log_outer_margin" />
 
-                    <TextView android:id="@+id/call_and_sms_label"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingRight="@dimen/call_log_icon_margin"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:textColor="?attr/call_log_primary_text_color"
-                        android:textAllCaps="true"
-                        android:singleLine="true"
-                        android:ellipsize="end"
-                    />
-                </LinearLayout>
+            <LinearLayout
+                android:id="@+id/voicemail_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/black"
+                android:paddingBottom="@dimen/call_detail_button_spacing" >
 
-                <View android:id="@+id/call_and_sms_divider"
-                    android:layout_width="1px"
-                    android:layout_height="32dip"
-                    android:background="@drawable/ic_divider_dashed_holo_dark"
-                    android:layout_gravity="center_vertical"
-                />
-
-                <ImageView android:id="@+id/call_and_sms_icon"
-                    android:layout_width="@color/call_log_voicemail_highlight_color"
-                    android:layout_height="match_parent"
-                    android:paddingLeft="@dimen/call_log_inner_margin"
-                    android:paddingRight="@dimen/call_log_outer_margin"
-                    android:gravity="center"
-                    android:scaleType="centerInside"
-                    android:focusable="true"
-                    android:background="?android:attr/selectableItemBackground"
-                />
+                <!-- The voicemail fragment will be put here. -->
             </LinearLayout>
-        </FrameLayout>
+
+            <LinearLayout
+                android:id="@+id/blue_separator"
+                android:layout_width="match_parent"
+                android:layout_height="1dip"
+                android:layout_marginLeft="@dimen/call_log_outer_margin"
+                android:layout_marginRight="@dimen/call_log_outer_margin"
+                 />
+
+            <TextView
+                android:id="@+id/shendu_calllog_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/call_log_icon_margin"
+                android:layout_marginLeft="@dimen/call_detail_contact_name_margin"
+                android:layout_marginTop="@dimen/call_log_icon_margin"
+                android:text="@string/recentCallsIconLabel"
+                android:textSize="@dimen/shendu_call_detail_date_text_size"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/shendu_calldetail_blue_text_color" />
+
+            <View
+                android:id="@+id/shendu_view_blue_separator"
+                android:layout_width="match_parent"
+                android:layout_height="1.5dip"
+                android:layout_marginLeft="@dimen/call_log_outer_margin"
+                android:layout_marginRight="@dimen/call_log_outer_margin"
+                android:background="@color/shendu_calldetail_blue_text_color" />
+        </LinearLayout>
     </RelativeLayout>
+
+    <!--
+      The list view is under everything.
+      It contains a first header element which is hidden under the controls UI.
+      When scrolling, the controls move up until the name bar hits the top.
+    -->
+
+    <ListView
+        android:id="@+id/history"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/controls"
+        android:layout_marginLeft="@dimen/call_log_outer_margin"
+        android:layout_marginRight="@dimen/call_log_outer_margin"
+        android:divider="@drawable/shendu_selected_bottom_divider"
+        android:fadingEdge="none"
+        android:dividerHeight="0.5dp"
+        android:scrollbarStyle="outsideOverlay" />
 
     <!--
          Used to hide the UI when playing a voicemail and the proximity sensor
          is detecting something near the screen.
-      -->
+    -->
+
     <View
         android:id="@+id/blank"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:background="@color/call_detail_background"
-        android:visibility="gone"
+        android:background="#000000"
         android:clickable="true"
-    />
+        android:visibility="gone" />
+
 </RelativeLayout>

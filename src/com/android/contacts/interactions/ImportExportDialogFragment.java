@@ -16,6 +16,15 @@
 
 package com.android.contacts.interactions;
 
+import com.android.contacts.R;
+import com.android.contacts.editor.SelectAccountDialogFragment;
+import com.android.contacts.model.AccountTypeManager;
+import com.android.contacts.model.AccountWithDataSet;
+import com.android.contacts.util.ADNUtil;
+import com.android.contacts.util.AccountSelectionUtil;
+import com.android.contacts.util.AccountsListAdapter.AccountListFilter;
+import com.android.contacts.vcard.ExportVCardActivity;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -36,14 +45,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.android.contacts.R;
-import com.android.contacts.editor.SelectAccountDialogFragment;
-import com.android.contacts.model.AccountTypeManager;
-import com.android.contacts.model.account.AccountWithDataSet;
-import com.android.contacts.util.AccountSelectionUtil;
-import com.android.contacts.util.AccountsListAdapter.AccountListFilter;
-import com.android.contacts.vcard.ExportVCardActivity;
 
 import java.util.List;
 
@@ -99,6 +100,15 @@ public class ImportExportDialogFragment extends DialogFragment
         if (res.getBoolean(R.bool.config_allow_import_from_sdcard)) {
             adapter.add(R.string.import_from_sdcard);
         }
+        
+        //============================
+        // Wang: 2012-11-9
+//        if (TelephonyManager.getDefault().hasIccCard()
+//                && res.getBoolean(R.bool.config_allow_sim_import)&&ADNUtil.isIccCardSupported(getActivity())) {
+//            adapter.add(R.string.export_to_sim);
+//        }
+        //============================
+        
         if (res.getBoolean(R.bool.config_allow_export_to_sdcard)) {
             if (contactsAreAvailable) {
                 adapter.add(R.string.export_to_sdcard);
@@ -133,6 +143,14 @@ public class ImportExportDialogFragment extends DialogFragment
                         doShareVisibleContacts();
                         break;
                     }
+                    //============================
+                    //Wang: 2012-11-9
+                    case R.string.export_to_sim:{
+//                        dismissDialog = true;
+//                        Toast.makeText(getActivity(), "export_to_sim", 200).show();
+//                        break;
+                    }
+                    //============================
                     default: {
                         dismissDialog = true;
                         Log.e(TAG, "Unexpected resource: "

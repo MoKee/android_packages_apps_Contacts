@@ -26,9 +26,9 @@ import android.view.View.OnClickListener;
 import android.widget.ImageView;
 
 import com.android.contacts.ContactPhotoManager;
+import com.android.contacts.ContactLoader.Result;
 import com.android.contacts.activities.PhotoSelectionActivity;
-import com.android.contacts.model.Contact;
-import com.android.contacts.model.RawContactDeltaList;
+import com.android.contacts.model.EntityDeltaList;
 import com.android.contacts.util.ImageViewDrawableSetter;
 
 /**
@@ -36,22 +36,24 @@ import com.android.contacts.util.ImageViewDrawableSetter;
  * photo.
  */
 public class ContactDetailPhotoSetter extends ImageViewDrawableSetter {
-    public OnClickListener setupContactPhotoForClick(Context context, Contact contactData,
+    public OnClickListener setupContactPhotoForClick(Context context, Result contactData,
             ImageView photoView, boolean expandPhotoOnClick) {
         setTarget(photoView);
-        Bitmap bitmap = setCompressedImage(contactData.getPhotoBinaryData());
+        /*Wang:2012-11-15*/
+//        Bitmap bitmap = setCompressedImage(contactData.getPhotoBinaryData());
+        Bitmap bitmap = setCompressedImage(context, contactData);
         return setupClickListener(context, contactData, bitmap, expandPhotoOnClick);
     }
 
     private static final class PhotoClickListener implements OnClickListener {
 
         private final Context mContext;
-        private final Contact mContactData;
+        private final Result mContactData;
         private final Bitmap mPhotoBitmap;
         private final byte[] mPhotoBytes;
         private final boolean mExpandPhotoOnClick;
 
-        public PhotoClickListener(Context context, Contact contactData, Bitmap photoBitmap,
+        public PhotoClickListener(Context context, Result contactData, Bitmap photoBitmap,
                 byte[] photoBytes, boolean expandPhotoOnClick) {
             mContext = context;
             mContactData = contactData;
@@ -63,7 +65,7 @@ public class ContactDetailPhotoSetter extends ImageViewDrawableSetter {
         @Override
         public void onClick(View v) {
             // Assemble the intent.
-            RawContactDeltaList delta = mContactData.createRawContactDeltaList();
+            EntityDeltaList delta = mContactData.createEntityDeltaList();
 
             // Find location and bounds of target view, adjusting based on the
             // assumed local density.
@@ -96,7 +98,7 @@ public class ContactDetailPhotoSetter extends ImageViewDrawableSetter {
         }
     }
 
-    private OnClickListener setupClickListener(Context context, Contact contactData, Bitmap bitmap,
+    private OnClickListener setupClickListener(Context context, Result contactData, Bitmap bitmap,
             boolean expandPhotoOnClick) {
         final ImageView target = getTarget();
         if (target == null) return null;

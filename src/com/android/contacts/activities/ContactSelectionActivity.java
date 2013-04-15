@@ -16,6 +16,23 @@
 
 package com.android.contacts.activities;
 
+import com.android.contacts.ContactsActivity;
+import com.android.contacts.R;
+import com.android.contacts.list.ContactEntryListFragment;
+import com.android.contacts.list.ContactPickerFragment;
+import com.android.contacts.list.ContactsIntentResolver;
+import com.android.contacts.list.ContactsRequest;
+import com.android.contacts.list.DirectoryListLoader;
+import com.android.contacts.list.EmailAddressPickerFragment;
+import com.android.contacts.list.OnContactPickerActionListener;
+import com.android.contacts.list.OnEmailAddressPickerActionListener;
+import com.android.contacts.list.OnPhoneNumberPickerActionListener;
+import com.android.contacts.list.OnPostalAddressPickerActionListener;
+import com.android.contacts.list.PhoneNumberPickerFragment;
+import com.android.contacts.list.PostalAddressPickerFragment;
+import com.android.contacts.widget.ContextMenuAdapter;
+import com.google.android.collect.Sets;
+
 import android.app.ActionBar;
 import android.app.ActionBar.LayoutParams;
 import android.app.Activity;
@@ -36,26 +53,10 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.SearchView;
 import android.widget.SearchView.OnCloseListener;
 import android.widget.SearchView.OnQueryTextListener;
-
-import com.android.contacts.ContactsActivity;
-import com.android.contacts.R;
-import com.android.contacts.list.ContactEntryListFragment;
-import com.android.contacts.list.ContactPickerFragment;
-import com.android.contacts.list.ContactsIntentResolver;
-import com.android.contacts.list.ContactsRequest;
-import com.android.contacts.list.DirectoryListLoader;
-import com.android.contacts.list.EmailAddressPickerFragment;
-import com.android.contacts.list.OnContactPickerActionListener;
-import com.android.contacts.list.OnEmailAddressPickerActionListener;
-import com.android.contacts.list.OnPhoneNumberPickerActionListener;
-import com.android.contacts.list.OnPostalAddressPickerActionListener;
-import com.android.contacts.list.PhoneNumberPickerFragment;
-import com.android.contacts.list.PostalAddressPickerFragment;
-import com.android.contacts.widget.ContextMenuAdapter;
-import com.google.common.collect.Sets;
 
 import java.util.Set;
 
@@ -190,11 +191,15 @@ public class ContactSelectionActivity extends ContactsActivity
             mSearchView.setOnCloseListener(this);
             mSearchView.setOnQueryTextFocusChangeListener(this);
 
+            actionBar.setDisplayOptions(
+            		ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_HOME_AS_UP,
+            		ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_HOME_AS_UP);
             actionBar.setCustomView(searchViewContainer,
                     new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-            actionBar.setDisplayShowCustomEnabled(true);
+            actionBar.setDisplayHomeAsUpEnabled(true); 
             actionBar.setDisplayShowHomeEnabled(true);
-            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowHomeEnabled(false);
+            actionBar.setDisplayShowCustomEnabled(true);
         } else {
             mSearchView = (SearchView) findViewById(R.id.search_view);
             mSearchView.setQueryHint(getString(R.string.hint_findContacts));
@@ -250,7 +255,7 @@ public class ContactSelectionActivity extends ContactsActivity
     }
 
     private void configureActivityTitle() {
-        if (!TextUtils.isEmpty(mRequest.getActivityTitle())) {
+        if (mRequest.getActivityTitle() != null) {
             setTitle(mRequest.getActivityTitle());
             return;
         }

@@ -15,6 +15,11 @@
  */
 package com.android.contacts.list;
 
+import com.android.common.widget.CompositeCursorAdapter.Partition;
+import com.android.contacts.R;
+import com.android.contacts.util.ContactLoaderUtils;
+import com.android.contacts.widget.AutoScrollListView;
+
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -33,11 +38,6 @@ import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.Directory;
 import android.text.TextUtils;
 import android.util.Log;
-
-import com.android.common.widget.CompositeCursorAdapter.Partition;
-import com.android.contacts.R;
-import com.android.contacts.util.ContactLoaderUtils;
-import com.android.contacts.widget.AutoScrollListView;
 
 import java.util.List;
 
@@ -308,6 +308,12 @@ public abstract class ContactBrowseListFragment extends
         mDelaySelection = delaySelection;
         super.setQueryString(queryString, delaySelection);
     }
+    
+    /**Wang:*/
+    public void onFastSearchStopped(){
+    	mDelaySelection = true;
+    	super.setQueryStringForFastSearch(null);
+    }
 
     /**
      * Sets whether or not a contact selection must be made.
@@ -490,15 +496,8 @@ public abstract class ContactBrowseListFragment extends
                 mSelectionRequired = false;
 
                 // If we were looking at a different specific contact, just reload
-                // FILTER_TYPE_ALL_ACCOUNTS is needed for the case where a new contact is added
-                // on a tablet and the loader is returning a stale list.  In this case, the contact
-                // will not be found until the next load. b/7621855 This will only fix the most
-                // common case where all accounts are shown. It will not fix the one account case.
-                // TODO: we may want to add more FILTER_TYPEs or relax this check to fix all other
-                // FILTER_TYPE cases.
                 if (mFilter != null
-                        && (mFilter.filterType == ContactListFilter.FILTER_TYPE_SINGLE_CONTACT
-                        || mFilter.filterType == ContactListFilter.FILTER_TYPE_ALL_ACCOUNTS)) {
+                        && mFilter.filterType == ContactListFilter.FILTER_TYPE_SINGLE_CONTACT) {
                     reloadData();
                 } else {
                     // Otherwise, call the listener, which will adjust the filter.

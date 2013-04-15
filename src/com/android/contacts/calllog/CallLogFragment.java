@@ -16,6 +16,18 @@
 
 package com.android.contacts.calllog;
 
+import com.android.common.io.MoreCloseables;
+import com.android.contacts.ContactsUtils;
+import com.android.contacts.R;
+import com.android.contacts.util.Constants;
+import com.android.contacts.util.EmptyLoader;
+import com.android.contacts.voicemail.VoicemailStatusHelper;
+import com.android.contacts.voicemail.VoicemailStatusHelper.StatusMessage;
+import com.android.contacts.voicemail.VoicemailStatusHelperImpl;
+import com.android.internal.telephony.CallerInfo;
+import com.android.internal.telephony.ITelephony;
+import com.google.common.annotations.VisibleForTesting;
+
 import android.app.Activity;
 import android.app.KeyguardManager;
 import android.app.ListFragment;
@@ -29,11 +41,9 @@ import android.os.Handler;
 import android.os.RemoteException;
 import android.os.ServiceManager;
 import android.provider.CallLog;
-import android.provider.CallLog.Calls;
 import android.provider.ContactsContract;
+import android.provider.CallLog.Calls;
 import android.telephony.PhoneNumberUtils;
-import android.telephony.PhoneStateListener;
-import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -45,25 +55,13 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.android.common.io.MoreCloseables;
-import com.android.contacts.ContactsUtils;
-import com.android.contacts.R;
-import com.android.contacts.util.Constants;
-import com.android.contacts.util.EmptyLoader;
-import com.android.contacts.voicemail.VoicemailStatusHelper;
-import com.android.contacts.voicemail.VoicemailStatusHelper.StatusMessage;
-import com.android.contacts.voicemail.VoicemailStatusHelperImpl;
-import com.android.internal.telephony.CallerInfo;
-import com.android.internal.telephony.ITelephony;
-import com.google.common.annotations.VisibleForTesting;
-
 import java.util.List;
 
 /**
  * Displays a list of call log entries.
  */
 public class CallLogFragment extends ListFragment
-        implements CallLogQueryHandler.Listener, CallLogAdapter.CallFetcher {
+        implements CallLogQueryHandler.Listener, ShenduCallLogAdapter.CallFetcher {
     private static final String TAG = "CallLogFragment";
 
     /**
@@ -71,18 +69,20 @@ public class CallLogFragment extends ListFragment
      */
     private static final int EMPTY_LOADER_ID = 0;
 
-    private CallLogAdapter mAdapter;
+//    private CallLogAdapter mAdapter;
+    private ShenduCallLogAdapter mAdapter;
     private CallLogQueryHandler mCallLogQueryHandler;
     private boolean mScrollToTop;
 
     /** Whether there is at least one voicemail source installed. */
     private boolean mVoicemailSourcesAvailable = false;
+    /** Whether we are currently filtering over voicemail. */
+    private boolean mShowingVoicemailOnly = false;
 
     private VoicemailStatusHelper mVoicemailStatusHelper;
     private View mStatusMessageView;
     private TextView mStatusMessageText;
     private TextView mStatusMessageAction;
-    private TextView mFilterStatusView;
     private KeyguardManager mKeyguardManager;
 
     private boolean mEmptyLoaderRunning;
@@ -91,12 +91,10 @@ public class CallLogFragment extends ListFragment
 
     private final Handler mHandler = new Handler();
 
-    private TelephonyManager mTelephonyManager;
-    private PhoneStateListener mPhoneStateListener;
-
     private class CustomContentObserver extends ContentObserver {
         public CustomContentObserver() {
             super(mHandler);
+
         }
         @Override
         public void onChange(boolean selfChange) {
@@ -111,9 +109,6 @@ public class CallLogFragment extends ListFragment
 
     // Exactly same variable is in Fragment as a package private.
     private boolean mMenuVisible = true;
-
-    // Default to all calls.
-    private int mCallTypeFilter = CallLogQueryHandler.CALL_TYPE_ALL;
 
     @Override
     public void onCreate(Bundle state) {
@@ -155,9 +150,7 @@ public class CallLogFragment extends ListFragment
             mHandler.post(new Runnable() {
                @Override
                public void run() {
-                   if (getActivity() == null || getActivity().isFinishing()) {
-                       return;
-                   }
+                   if (getActivity() == null || getActivity().isFinishing()) return;
                    listView.smoothScrollToPosition(0);
                }
             });
@@ -211,7 +204,6 @@ public class CallLogFragment extends ListFragment
         mStatusMessageView = view.findViewById(R.id.voicemail_status);
         mStatusMessageText = (TextView) view.findViewById(R.id.voicemail_status_message);
         mStatusMessageAction = (TextView) view.findViewById(R.id.voicemail_status_action);
-        mFilterStatusView = (TextView) view.findViewById(R.id.filter_status);
         return view;
     }
 
@@ -219,8 +211,10 @@ public class CallLogFragment extends ListFragment
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         String currentCountryIso = ContactsUtils.getCurrentCountryIso(getActivity());
-        mAdapter = new CallLogAdapter(getActivity(), this,
-                new ContactInfoHelper(getActivity(), currentCountryIso));
+//        mAdapter = new CallLogAdapter(getActivity(), this,
+//                new ContactInfoHelper(getActivity(), currentCountryIso));
+        mAdapter = new ShenduCallLogAdapter(getActivity(), this,
+        		new ContactInfoHelper(getActivity(), currentCountryIso));
         setListAdapter(mAdapter);
         getListView().setItemsCanFocus(true);
     }
@@ -252,7 +246,7 @@ public class CallLogFragment extends ListFragment
     @Override
     public void onResume() {
         super.onResume();
-        refreshData();
+//        refreshData();
     }
 
     private void updateVoicemailStatusMessage(Cursor statusCursor) {
@@ -304,17 +298,24 @@ public class CallLogFragment extends ListFragment
         mAdapter.changeCursor(null);
         getActivity().getContentResolver().unregisterContentObserver(mCallLogObserver);
         getActivity().getContentResolver().unregisterContentObserver(mContactsObserver);
-        unregisterPhoneCallReceiver();
     }
 
     @Override
     public void fetchCalls() {
-        mCallLogQueryHandler.fetchCalls(mCallTypeFilter);
+        if (mShowingVoicemailOnly) {
+            mCallLogQueryHandler.fetchVoicemailOnly();
+        } else {
+            mCallLogQueryHandler.fetchAllCalls();
+        }
     }
 
     public void startCallsQuery() {
         mAdapter.setLoading(true);
-        mCallLogQueryHandler.fetchCalls(mCallTypeFilter);
+        mCallLogQueryHandler.fetchAllCalls();
+        if (mShowingVoicemailOnly) {
+            mShowingVoicemailOnly = false;
+            getActivity().invalidateOptionsMenu();
+        }
     }
 
     private void startVoicemailStatusQuery() {
@@ -334,119 +335,33 @@ public class CallLogFragment extends ListFragment
         // menu items are ready if the first item is non-null.
         if (itemDeleteAll != null) {
             itemDeleteAll.setEnabled(mAdapter != null && !mAdapter.isEmpty());
-
-            showAllFilterMenuOptions(menu);
-            hideCurrentFilterMenuOption(menu);
-
-            // Only hide if not available.  Let the above calls handle showing.
-            if (!mVoicemailSourcesAvailable) {
-                menu.findItem(R.id.show_voicemails_only).setVisible(false);
-            }
+            menu.findItem(R.id.show_voicemails_only).setVisible(
+                    mVoicemailSourcesAvailable && !mShowingVoicemailOnly);
+            menu.findItem(R.id.show_all_calls).setVisible(
+                    mVoicemailSourcesAvailable && mShowingVoicemailOnly);
         }
-    }
-
-    private void hideCurrentFilterMenuOption(Menu menu) {
-        MenuItem item = null;
-        switch (mCallTypeFilter) {
-            case CallLogQueryHandler.CALL_TYPE_ALL:
-                item = menu.findItem(R.id.show_all_calls);
-                break;
-            case Calls.INCOMING_TYPE:
-                item = menu.findItem(R.id.show_incoming_only);
-                break;
-            case Calls.OUTGOING_TYPE:
-                item = menu.findItem(R.id.show_outgoing_only);
-                break;
-            case Calls.MISSED_TYPE:
-                item = menu.findItem(R.id.show_missed_only);
-                break;
-            case Calls.VOICEMAIL_TYPE:
-                menu.findItem(R.id.show_voicemails_only);
-                break;
-        }
-        if (item != null) {
-            item.setVisible(false);
-        }
-    }
-
-    private void showAllFilterMenuOptions(Menu menu) {
-        menu.findItem(R.id.show_all_calls).setVisible(true);
-        menu.findItem(R.id.show_incoming_only).setVisible(true);
-        menu.findItem(R.id.show_outgoing_only).setVisible(true);
-        menu.findItem(R.id.show_missed_only).setVisible(true);
-        menu.findItem(R.id.show_voicemails_only).setVisible(true);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.delete_all:
-                ClearCallLogDialog.show(getFragmentManager());
-                return true;
-
-            case R.id.show_outgoing_only:
-                // We only need the phone call receiver when there is an active call type filter.
-                // Not many people may use the filters so don't register the receiver until now .
-                registerPhoneCallReceiver();
-                mCallLogQueryHandler.fetchCalls(Calls.OUTGOING_TYPE);
-                updateFilterTypeAndHeader(Calls.OUTGOING_TYPE);
-                return true;
-
-            case R.id.show_incoming_only:
-                registerPhoneCallReceiver();
-                mCallLogQueryHandler.fetchCalls(Calls.INCOMING_TYPE);
-                updateFilterTypeAndHeader(Calls.INCOMING_TYPE);
-                return true;
-
-            case R.id.show_missed_only:
-                registerPhoneCallReceiver();
-                mCallLogQueryHandler.fetchCalls(Calls.MISSED_TYPE);
-                updateFilterTypeAndHeader(Calls.MISSED_TYPE);
+                ClearCallLogDialog.show(getFragmentManager(),CallLogFragment.this.getActivity());
                 return true;
 
             case R.id.show_voicemails_only:
-                registerPhoneCallReceiver();
-                mCallLogQueryHandler.fetchCalls(Calls.VOICEMAIL_TYPE);
-                updateFilterTypeAndHeader(Calls.VOICEMAIL_TYPE);
+                mCallLogQueryHandler.fetchVoicemailOnly();
+                mShowingVoicemailOnly = true;
                 return true;
 
             case R.id.show_all_calls:
-                // Filter is being turned off, receiver no longer needed.
-                unregisterPhoneCallReceiver();
-                mCallLogQueryHandler.fetchCalls(CallLogQueryHandler.CALL_TYPE_ALL);
-                updateFilterTypeAndHeader(CallLogQueryHandler.CALL_TYPE_ALL);
+                mCallLogQueryHandler.fetchAllCalls();
+                mShowingVoicemailOnly = false;
                 return true;
 
             default:
                 return false;
         }
-    }
-
-    private void updateFilterTypeAndHeader(int filterType) {
-        mCallTypeFilter = filterType;
-
-        switch (filterType) {
-            case CallLogQueryHandler.CALL_TYPE_ALL:
-                mFilterStatusView.setVisibility(View.GONE);
-                break;
-            case Calls.INCOMING_TYPE:
-                showFilterStatus(R.string.call_log_incoming_header);
-                break;
-            case Calls.OUTGOING_TYPE:
-                showFilterStatus(R.string.call_log_outgoing_header);
-                break;
-            case Calls.MISSED_TYPE:
-                showFilterStatus(R.string.call_log_missed_header);
-                break;
-            case Calls.VOICEMAIL_TYPE:
-                showFilterStatus(R.string.call_log_voicemail_header);
-                break;
-        }
-    }
-
-    private void showFilterStatus(int resId) {
-        mFilterStatusView.setText(resId);
-        mFilterStatusView.setVisibility(View.VISIBLE);
     }
 
     public void callSelectedEntry() {
@@ -492,8 +407,8 @@ public class CallLogFragment extends ListFragment
         }
     }
 
-    @VisibleForTesting
-    CallLogAdapter getAdapter() {
+
+    public ShenduCallLogAdapter getAdapter() {
         return mAdapter;
     }
 
@@ -508,10 +423,17 @@ public class CallLogFragment extends ListFragment
                 refreshData();
             }
         }
+        if(menuVisible){
+        	mAdapter.startRequestProcessing();
+        }else{
+        	mAdapter.stopRequestProcessing();
+        }
     }
+    
+    
 
     /** Requests updates to the data to be shown. */
-    private void refreshData() {
+    public void refreshData() {
         // Prevent unnecessary refresh.
         if (mRefreshDataRequired) {
             // Mark all entries in the contact info cache as out of date, so they will be looked up
@@ -571,45 +493,5 @@ public class CallLogFragment extends ListFragment
         Intent serviceIntent = new Intent(getActivity(), CallLogNotificationsService.class);
         serviceIntent.setAction(CallLogNotificationsService.ACTION_UPDATE_NOTIFICATIONS);
         getActivity().startService(serviceIntent);
-    }
-
-    /**
-     * Register a phone call filter to reset the call type when a phone call is place.
-     */
-    private void registerPhoneCallReceiver() {
-        if (mPhoneStateListener != null) {
-            return; // Already registered.
-        }
-        mTelephonyManager = (TelephonyManager) getActivity().getSystemService(
-                Context.TELEPHONY_SERVICE);
-        mPhoneStateListener = new PhoneStateListener() {
-            @Override
-            public void onCallStateChanged(int state, String incomingNumber) {
-                if (state != TelephonyManager.CALL_STATE_OFFHOOK &&
-                        state != TelephonyManager.CALL_STATE_RINGING) {
-                    return;
-                }
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (getActivity() == null || getActivity().isFinishing()) {
-                            return;
-                        }
-                        updateFilterTypeAndHeader(CallLogQueryHandler.CALL_TYPE_ALL);
-                    }
-                 });
-            }
-        };
-        mTelephonyManager.listen(mPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
-    }
-
-    /**
-     * Un-registers the phone call receiver.
-     */
-    private void unregisterPhoneCallReceiver() {
-        if (mPhoneStateListener != null) {
-            mTelephonyManager.listen(mPhoneStateListener, PhoneStateListener.LISTEN_NONE);
-            mPhoneStateListener = null;
-        }
     }
 }
