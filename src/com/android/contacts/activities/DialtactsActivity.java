@@ -16,6 +16,21 @@
 
 package com.android.contacts.activities;
 
+import com.android.contacts.ContactsUtils;
+import com.android.contacts.R;
+import com.android.contacts.calllog.CallLogFragment;
+import com.android.contacts.dialpad.DialpadFragment;
+import com.android.contacts.interactions.PhoneNumberInteraction;
+import com.android.contacts.list.ContactListFilterController;
+import com.android.contacts.list.ContactListFilterController.ContactListFilterListener;
+import com.android.contacts.list.ContactListItemView;
+import com.android.contacts.list.OnPhoneNumberPickerActionListener;
+import com.android.contacts.list.PhoneFavoriteFragment;
+import com.android.contacts.list.PhoneNumberPickerFragment;
+import com.android.contacts.util.AccountFilterUtil;
+import com.android.contacts.util.Constants;
+import com.android.internal.telephony.ITelephony;
+
 import android.app.ActionBar;
 import android.app.ActionBar.LayoutParams;
 import android.app.ActionBar.Tab;
@@ -58,21 +73,6 @@ import android.widget.SearchView;
 import android.widget.SearchView.OnCloseListener;
 import android.widget.SearchView.OnQueryTextListener;
 
-import com.android.contacts.ContactsUtils;
-import com.android.contacts.R;
-import com.android.contacts.calllog.CallLogFragment;
-import com.android.contacts.dialpad.DialpadFragment;
-import com.android.contacts.interactions.PhoneNumberInteraction;
-import com.android.contacts.list.ContactListFilterController;
-import com.android.contacts.list.ContactListFilterController.ContactListFilterListener;
-import com.android.contacts.list.ContactListItemView;
-import com.android.contacts.list.OnPhoneNumberPickerActionListener;
-import com.android.contacts.list.PhoneFavoriteFragment;
-import com.android.contacts.list.PhoneNumberPickerFragment;
-import com.android.contacts.util.AccountFilterUtil;
-import com.android.contacts.util.Constants;
-import com.android.internal.telephony.ITelephony;
-
 /**
  * The dialer activity that has one tab with the virtual 12key
  * dialer, a tab with recent calls in it, a tab with the contacts and
@@ -90,10 +90,6 @@ public class DialtactsActivity extends TransactionSafeActivity
     private static final String PHONE_PACKAGE = "com.android.phone";
     private static final String CALL_SETTINGS_CLASS_NAME =
             "com.android.phone.CallFeaturesSetting";
-
-    private static final String CONTACTS_PACKAGE = "com.android.contacts";
-    private static final String CALL_STATS_CLASS_NAME =
-            "com.android.contacts.callstats.CallStatsActivity";
 
     /**
      * Copied from PhoneApp. See comments in Phone app for more detail.
@@ -113,7 +109,7 @@ public class DialtactsActivity extends TransactionSafeActivity
     private static final int TAB_INDEX_CALL_LOG = 1;
     private static final int TAB_INDEX_FAVORITES = 2;
 
-    private static final int TAB_INDEX_COUNT = 3;
+    private static final int TAB_INDEX_COUNT = 1;
 
     private SharedPreferences mPrefs;
 
@@ -134,10 +130,10 @@ public class DialtactsActivity extends TransactionSafeActivity
             switch (position) {
                 case TAB_INDEX_DIALER:
                     return new DialpadFragment();
-                case TAB_INDEX_CALL_LOG:
-                    return new CallLogFragment();
-                case TAB_INDEX_FAVORITES:
-                    return new PhoneFavoriteFragment();
+//                case TAB_INDEX_CALL_LOG:
+//                    return new CallLogFragment();
+//                case TAB_INDEX_FAVORITES:
+//                    return new PhoneFavoriteFragment();
             }
             throw new IllegalStateException("No fragment at position " + position);
         }
@@ -491,7 +487,7 @@ public class DialtactsActivity extends TransactionSafeActivity
         fixIntent(intent);
 
         setContentView(R.layout.dialtacts_activity);
-
+        getActionBar().hide();
         mContactListFilterController = ContactListFilterController.getInstance(this);
         mContactListFilterController.addListener(mContactListFilterListener);
 
@@ -499,7 +495,7 @@ public class DialtactsActivity extends TransactionSafeActivity
 
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(new ViewPagerAdapter(getFragmentManager()));
-        mViewPager.setOnPageChangeListener(mPageChangeListener);
+//        mViewPager.setOnPageChangeListener(mPageChangeListener);
         mViewPager.setOffscreenPageLimit(2);
 
         // Do same width calculation as ActionBar does
@@ -511,15 +507,15 @@ public class DialtactsActivity extends TransactionSafeActivity
 
         // Soft menu button should appear only when there's no hardware menu button.
         mMenuButton = findViewById(R.id.overflow_menu);
-        if (mMenuButton != null) {
-            mMenuButton.setMinimumWidth(fakeMenuItemWidth);
-            if (ViewConfiguration.get(this).hasPermanentMenuKey()) {
-                // This is required for dialpad button's layout, so must not use GONE here.
-                mMenuButton.setVisibility(View.INVISIBLE);
-            } else {
-                mMenuButton.setOnClickListener(this);
-            }
-        }
+//        if (mMenuButton != null) {
+//            mMenuButton.setMinimumWidth(fakeMenuItemWidth);
+//            if (ViewConfiguration.get(this).hasPermanentMenuKey()) {
+//                // This is required for dialpad button's layout, so must not use GONE here.
+//                mMenuButton.setVisibility(View.INVISIBLE);
+//            } else {
+//                mMenuButton.setOnClickListener(this);
+//            }
+//        }
         mSearchButton = findViewById(R.id.searchButton);
         if (mSearchButton != null) {
             mSearchButton.setMinimumWidth(fakeMenuItemWidth);
@@ -527,12 +523,13 @@ public class DialtactsActivity extends TransactionSafeActivity
         }
 
         // Setup the ActionBar tabs (the order matches the tab-index contants TAB_INDEX_*)
-        setupDialer();
-        setupCallLog();
-        setupFavorites();
-        getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        getActionBar().setDisplayShowTitleEnabled(false);
-        getActionBar().setDisplayShowHomeEnabled(false);
+//        setupDialer();
+//        setupCallLog();
+//        setupFavorites();
+//        getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+//        getActionBar().setDisplayShowTitleEnabled(false);
+//        getActionBar().setDisplayShowHomeEnabled(false);
+
 
         // Load the last manually loaded tab
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -716,12 +713,12 @@ public class DialtactsActivity extends TransactionSafeActivity
     @Override
     protected void onResume() {
         super.onResume();
-        if(mPrefs.getBoolean("misc_sensor_rotation", true)) {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
-        }
-        else {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
-        }
+//        if(mPrefs.getBoolean("misc_sensor_rotation", true)) {
+//            this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+//        }
+//        else {
+//            this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
+//        }
     }
 
     @Override
@@ -761,15 +758,14 @@ public class DialtactsActivity extends TransactionSafeActivity
 
     private void setupFavorites() {
         final Tab tab = getActionBar().newTab();
-        tab.setContentDescription(R.string.dialerAllContactsLabel);
+        tab.setContentDescription(R.string.contactsFavoritesLabel);
         tab.setIcon(R.drawable.ic_tab_all);
         tab.setTabListener(mTabListener);
         getActionBar().addTab(tab);
     }
 
     /**
-     * Returns true if the intent is due to hitting the green send key (hardware call button:
-     * KEYCODE_CALL) while in a call.
+     * Returns true if the intent is due to hitting the green send key while in a call.
      *
      * @param intent the intent that launched this activity
      * @param recentCallsRequest true if the intent is requesting to view recent calls
@@ -801,8 +797,7 @@ public class DialtactsActivity extends TransactionSafeActivity
      */
     private void setCurrentTab(Intent intent) {
         // If we got here by hitting send and we're in call forward along to the in-call activity
-        boolean recentCallsRequest = Calls.CONTENT_TYPE.equals(intent.resolveType(
-            getContentResolver()));
+        final boolean recentCallsRequest = Calls.CONTENT_TYPE.equals(intent.getType());
         if (isSendKeyWhileInCall(intent, recentCallsRequest)) {
             finish();
             return;
@@ -850,7 +845,7 @@ public class DialtactsActivity extends TransactionSafeActivity
 
         if (mViewPager.getCurrentItem() == TAB_INDEX_DIALER) {
             if (mDialpadFragment != null) {
-                mDialpadFragment.setStartedFromNewIntent(true);
+                mDialpadFragment.configureScreenFromIntent(newIntent);
             } else {
                 Log.e(TAG, "DialpadFragment isn't ready yet when the tab is already selected.");
             }
@@ -930,6 +925,8 @@ public class DialtactsActivity extends TransactionSafeActivity
             // This is only done when running at the top of the stack;
             // otherwise, we have been launched by someone else so need to
             // allow the user to go back to the caller.
+        	/**shutao 2012-10-26*/
+        	  mDialpadFragment.clearDigits();
             moveTaskToBack(false);
         } else {
             super.onBackPressed();
@@ -958,13 +955,11 @@ public class DialtactsActivity extends TransactionSafeActivity
 
         // set up intents and onClick listeners
         final MenuItem callSettingsMenuItem = menu.findItem(R.id.menu_call_settings);
-        final MenuItem callStatsMenuItem = menu.findItem(R.id.menu_call_stats);
         final MenuItem searchMenuItem = menu.findItem(R.id.search_on_action_bar);
         final MenuItem filterOptionMenuItem = menu.findItem(R.id.filter_option);
         final MenuItem addContactOptionMenuItem = menu.findItem(R.id.add_contact);
 
         callSettingsMenuItem.setIntent(DialtactsActivity.getCallSettingsIntent());
-        callStatsMenuItem.setIntent(DialtactsActivity.getCallStatsIntent());
         searchMenuItem.setOnMenuItemClickListener(mSearchMenuItemClickListener);
         filterOptionMenuItem.setOnMenuItemClickListener(mFilterOptionsMenuItemClickListener);
         addContactOptionMenuItem.setIntent(
@@ -1004,7 +999,6 @@ public class DialtactsActivity extends TransactionSafeActivity
         final MenuItem addContactOptionMenuItem = menu.findItem(R.id.add_contact);
         final MenuItem callSettingsMenuItem = menu.findItem(R.id.menu_call_settings);
         final MenuItem emptyRightMenuItem = menu.findItem(R.id.empty_right_menu_item);
-        final MenuItem callStatsMenuItem = menu.findItem(R.id.menu_call_stats);
 
         // prepare the menu items
         searchMenuItem.setVisible(false);
@@ -1012,7 +1006,6 @@ public class DialtactsActivity extends TransactionSafeActivity
         addContactOptionMenuItem.setVisible(false);
         callSettingsMenuItem.setVisible(false);
         emptyRightMenuItem.setVisible(false);
-        callStatsMenuItem.setVisible(false);
     }
 
     private void prepareOptionsMenuForDialerTab(Menu menu) {
@@ -1027,12 +1020,10 @@ public class DialtactsActivity extends TransactionSafeActivity
         final MenuItem addContactOptionMenuItem = menu.findItem(R.id.add_contact);
         final MenuItem callSettingsMenuItem = menu.findItem(R.id.menu_call_settings);
         final MenuItem emptyRightMenuItem = menu.findItem(R.id.empty_right_menu_item);
-        final MenuItem callStatsMenuItem = menu.findItem(R.id.menu_call_stats);
 
         // prepare the menu items
         filterOptionMenuItem.setVisible(false);
         addContactOptionMenuItem.setVisible(false);
-        callStatsMenuItem.setVisible(false);
         if (mDuringSwipe || mUserTabClick) {
             // During horizontal movement, the real ActionBar menu items are shown
             searchMenuItem.setVisible(true);
@@ -1044,12 +1035,17 @@ public class DialtactsActivity extends TransactionSafeActivity
         } else {
             // This is when the user is looking at the dialer pad.  In this case, the real
             // ActionBar is hidden and fake menu items are shown.
-            // Except in landscape, in which case the real search menu item is shown.
-            searchMenuItem.setVisible(ContactsUtils.isLandscape(this));
+            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+               searchMenuItem.setVisible(false);
+               emptyRightMenuItem.setVisible(false);
+            } else {
+                searchMenuItem.setVisible(true);
+                searchMenuItem.setOnMenuItemClickListener(mSearchMenuItemClickListener);
+                updateFakeMenuButtonsVisibility(ViewConfiguration.get(this).hasPermanentMenuKey());
+            }
             // If a permanent menu key is available, then we need to show the call settings item
             // so that the call settings item can be invoked by the permanent menu key.
             callSettingsMenuItem.setVisible(ViewConfiguration.get(this).hasPermanentMenuKey());
-            emptyRightMenuItem.setVisible(false);
         }
     }
 
@@ -1060,14 +1056,12 @@ public class DialtactsActivity extends TransactionSafeActivity
         final MenuItem addContactOptionMenuItem = menu.findItem(R.id.add_contact);
         final MenuItem callSettingsMenuItem = menu.findItem(R.id.menu_call_settings);
         final MenuItem emptyRightMenuItem = menu.findItem(R.id.empty_right_menu_item);
-        final MenuItem callStatsMenuItem = menu.findItem(R.id.menu_call_stats);
 
         // prepare the menu items
         searchMenuItem.setVisible(true);
         filterOptionMenuItem.setVisible(false);
         addContactOptionMenuItem.setVisible(false);
         callSettingsMenuItem.setVisible(true);
-        callStatsMenuItem.setVisible(true);
         emptyRightMenuItem.setVisible(ViewConfiguration.get(this).hasPermanentMenuKey());
     }
 
@@ -1078,14 +1072,12 @@ public class DialtactsActivity extends TransactionSafeActivity
         final MenuItem addContactOptionMenuItem = menu.findItem(R.id.add_contact);
         final MenuItem callSettingsMenuItem = menu.findItem(R.id.menu_call_settings);
         final MenuItem emptyRightMenuItem = menu.findItem(R.id.empty_right_menu_item);
-        final MenuItem callStatsMenuItem = menu.findItem(R.id.menu_call_stats);
 
         // prepare the menu items
         searchMenuItem.setVisible(true);
         filterOptionMenuItem.setVisible(true);
         addContactOptionMenuItem.setVisible(true);
         callSettingsMenuItem.setVisible(true);
-        callStatsMenuItem.setVisible(true);
         emptyRightMenuItem.setVisible(false);
     }
 
@@ -1135,10 +1127,10 @@ public class DialtactsActivity extends TransactionSafeActivity
 
         mSearchView.setQuery(null, true);
 
-        actionBar.setDisplayShowCustomEnabled(true);
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        actionBar.setDisplayShowHomeEnabled(true);
-        actionBar.setDisplayHomeAsUpEnabled(true);
+//        actionBar.setDisplayShowCustomEnabled(true);
+//        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+//        actionBar.setDisplayShowHomeEnabled(true);
+//        actionBar.setDisplayHomeAsUpEnabled(true);
 
         updateFakeMenuButtonsVisibility(false);
 
@@ -1157,6 +1149,7 @@ public class DialtactsActivity extends TransactionSafeActivity
         // layout instead of asking the search menu item to take care of SearchView.
         mSearchView.onActionViewExpanded();
         mInSearchUi = true;
+        actionBar.show();
     }
 
     private void showInputMethod(View view) {
@@ -1195,7 +1188,7 @@ public class DialtactsActivity extends TransactionSafeActivity
         actionBar.setDisplayShowCustomEnabled(false);
         actionBar.setDisplayShowHomeEnabled(false);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-
+        actionBar.hide();
         for (int i = 0; i < TAB_INDEX_COUNT; i++) {
             sendFragmentVisibilityChange(i, i == mViewPager.getCurrentItem());
         }
@@ -1252,38 +1245,30 @@ public class DialtactsActivity extends TransactionSafeActivity
      * @param visible True when visible.
      */
     private void updateFakeMenuButtonsVisibility(boolean visible) {
-        // Note: Landscape mode does not have the fake menu and search buttons.
         if (DEBUG) {
             Log.d(TAG, "updateFakeMenuButtonVisibility(" + visible + ")");
         }
 
-        if (mSearchButton != null) {
-            if (visible) {
-                mSearchButton.setVisibility(View.VISIBLE);
-            } else {
-                mSearchButton.setVisibility(View.INVISIBLE);
-            }
-        }
-        if (mMenuButton != null) {
-            if (visible && !ViewConfiguration.get(this).hasPermanentMenuKey()) {
-                mMenuButton.setVisibility(View.VISIBLE);
-            } else {
-                mMenuButton.setVisibility(View.INVISIBLE);
-            }
-        }
+//        if (mSearchButton != null) {
+//            if (visible) {
+//                mSearchButton.setVisibility(View.VISIBLE);
+//            } else {
+//                mSearchButton.setVisibility(View.INVISIBLE);
+//            }
+//        }
+//        if (mMenuButton != null) {
+//            if (visible && !ViewConfiguration.get(this).hasPermanentMenuKey()) {
+//                mMenuButton.setVisibility(View.VISIBLE);
+//            } else {
+//                mMenuButton.setVisibility(View.INVISIBLE);
+//            }
+//        }
     }
 
     /** Returns an Intent to launch Call Settings screen */
     public static Intent getCallSettingsIntent() {
         final Intent intent = new Intent(Intent.ACTION_MAIN);
         intent.setClassName(PHONE_PACKAGE, CALL_SETTINGS_CLASS_NAME);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        return intent;
-    }
-
-    public static Intent getCallStatsIntent() {
-        final Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setClassName(CONTACTS_PACKAGE, CALL_STATS_CLASS_NAME);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         return intent;
     }

@@ -16,8 +16,15 @@
 
 package com.android.contacts.activities;
 
+import com.android.contacts.ContactsActivity;
+import com.android.contacts.R;
+import com.android.contacts.group.GroupEditorFragment;
+import com.android.contacts.util.DialogManager;
+import com.android.contacts.util.PhoneCapabilityTester;
+
 import android.app.ActionBar;
 import android.app.Dialog;
+import android.app.ActionBar.LayoutParams;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -26,12 +33,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-
-import com.android.contacts.ContactsActivity;
-import com.android.contacts.R;
-import com.android.contacts.group.GroupEditorFragment;
-import com.android.contacts.util.DialogManager;
-import com.android.contacts.util.PhoneCapabilityTester;
 
 public class GroupEditorActivity extends ContactsActivity
         implements DialogManager.DialogShowingViewActivity {
@@ -73,11 +74,26 @@ public class GroupEditorActivity extends ContactsActivity
                     mFragment.onDoneClicked();
                 }
             });
+            
+            //add by hhl
+            View cancelMenuItem = customActionBarView.findViewById(R.id.cancel_menu_item);
+            cancelMenuItem.setVisibility(View.VISIBLE);
+            cancelMenuItem.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mFragment.revert();
+                }
+            });
+            //add for cancel and save menu dividing line
+            View cancelSaveMenuDividing = customActionBarView.findViewById(R.id.cancel_save_menu_dividing_id);
+            cancelSaveMenuDividing.setVisibility(View.VISIBLE);
             // Show the custom action bar but hide the home icon and title
             actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM,
                     ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME |
                     ActionBar.DISPLAY_SHOW_TITLE);
-            actionBar.setCustomView(customActionBarView);
+            //moditify bh hhl
+            actionBar.setCustomView(customActionBarView,
+            		new ActionBar.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
         }
 
         mFragment = (GroupEditorFragment) getFragmentManager().findFragmentById(
@@ -140,7 +156,10 @@ public class GroupEditorActivity extends ContactsActivity
 
         @Override
         public void onAccountsNotFound() {
-            finish();
+            /*Wang : AccountsNotFound don't finish activity*/
+//            log("close : AccountsNotFound");
+//            finish();
+            log("Accounts Not Found");
         }
 
         @Override
@@ -165,5 +184,11 @@ public class GroupEditorActivity extends ContactsActivity
     @Override
     public DialogManager getDialogManager() {
         return mDialogManager;
+    }
+    
+    private static final boolean debug = false;
+    private static void log(String msg){
+        msg ="Editor -> " + msg;
+        if(debug)  Log.i("shenduGroup", msg);
     }
 }

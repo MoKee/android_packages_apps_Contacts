@@ -13,36 +13,34 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-
+<!--  
+    android:background="@color/account_container"
+    android:gravity="center_vertical"
+    android:paddingTop="8dip"
+    android:paddingBottom="8dip"
+    android:paddingRight="28dip"
+-->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/account_container"
     android:layout_height="wrap_content"
     android:layout_width="match_parent"
     android:minHeight="48dip"
-    android:background="@color/account_container"
     android:orientation="horizontal"
-    android:paddingTop="8dip"
-    android:paddingBottom="8dip"
-    android:gravity="center_vertical"
+    android:gravity="bottom"
     android:paddingLeft="@dimen/account_container_left_padding"
-    android:paddingRight="28dip">
-
+    android:paddingRight="@dimen/account_container_left_padding"
+    >
+	<!--  
+        android:layout_width="0dip"
+        android:layout_weight="1"
+        android:background="?android:attr/selectableItemBackground"
+	-->
     <LinearLayout
         android:id="@+id/account"
         android:layout_height="wrap_content"
-        android:layout_width="0dip"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        android:background="?android:attr/selectableItemBackground">
-
-        <TextView
-            android:id="@+id/account_type"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:singleLine="true"
-            android:ellipsize="end" />
+        android:layout_width="match_parent"
+        android:orientation="vertical">
 
         <TextView
              android:id="@+id/account_name"
@@ -51,10 +49,27 @@
              android:textAppearance="?android:attr/textAppearanceSmall"
              android:textColor="?android:attr/textColorTertiary"
              android:singleLine="true"
-             android:ellipsize="end" />
+             android:ellipsize="end" 
+             />
+        
+        <TextView
+            android:id="@+id/account_type"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:singleLine="true"
+            android:ellipsize="end" 
+            />
+
+        
+        <View 
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/contacts_dividing_line_height"
+            android:background="@drawable/contacts_dividing_line"
+            />
 
     </LinearLayout>
-
+<!--  do not used,remove by hhl
     <FrameLayout
         android:layout_width="wrap_content"
         android:layout_height="match_parent">
@@ -66,5 +81,5 @@
              android:layout_gravity="center_vertical" />
 
     </FrameLayout>
-
+-->
 </LinearLayout>

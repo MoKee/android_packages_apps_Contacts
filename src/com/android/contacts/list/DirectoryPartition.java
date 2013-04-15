@@ -15,9 +15,9 @@
  */
 package com.android.contacts.list;
 
-import android.provider.ContactsContract.Directory;
-
 import com.android.common.widget.CompositeCursorAdapter;
+
+import android.provider.ContactsContract.Directory;
 
 /**
  * Model object for a {@link Directory} row.

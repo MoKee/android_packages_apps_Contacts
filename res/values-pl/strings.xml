@@ -53,8 +53,8 @@
     <string name="menu_splitAggregate" msgid="8368636463748691868">"Podziel"</string>
     <string name="menu_editGroup" msgid="5062005185370983720">"Edytuj"</string>
     <string name="menu_deleteGroup" msgid="3486380004411482874">"Usuń"</string>
-    <string name="menu_new_contact_action_bar" msgid="7263362129442119188">"Dodaj kontakt"</string>
-    <string name="menu_new_group_action_bar" msgid="3520232877587377175">"Dodaj grupę"</string>
+    <string name="menu_new_contact_action_bar" msgid="8887818026717394343">"Nowy"</string>
+    <string name="menu_new_group_action_bar" msgid="5055346725617932394">"Nowa"</string>
     <string name="splitConfirmation_title" msgid="633640935430370530">"Podzielić kontakt?"</string>
     <string name="splitConfirmation" msgid="740190210499587175">"Ten kontakt zostanie podzielony na wiele wpisów."</string>
     <string name="menu_joinAggregate" msgid="5027981918265667970">"Połącz"</string>
@@ -137,7 +137,6 @@
     <string name="contactsAllLabel" msgid="6479708629170672169">"Wszystkie kontakty"</string>
     <string name="contactsGroupsLabel" msgid="2841971472518003524">"Grupy"</string>
     <string name="contactsFavoritesLabel" msgid="8417039765586853670">"Ulubione"</string>
-    <string name="dialerAllContactsLabel" msgid="1025920923112988336">"Ulubione i wszystkie kontakty"</string>
     <string name="dialerIconLabel" msgid="6500826552823403796">"Telefon"</string>
     <string name="recentCallsIconLabel" msgid="1419116422359067949">"Rejestr"</string>
     <string name="menu_sendTextMessage" msgid="6937343460284499306">"Wyślij wiadomość tekstową"</string>
@@ -211,7 +210,7 @@
     <string name="description_delete_button" msgid="6263102114033407382">"backspace"</string>
     <string name="description_digits_edittext" msgid="8760207516497016437">"numer do wybrania"</string>
     <string name="description_contact_photo" msgid="3387458082667894062">"zdjęcie kontaktu"</string>
-    <string name="description_minus_button" msgid="6908099247930477551">"usuń"</string>
+    <string name="description_minus_button" msgid="387136707700230172">"minus"</string>
     <string name="description_plus_button" msgid="515164827856229880">"plus"</string>
     <string name="description_view_contact_detail" msgid="9133251213656414807">"Wyświetl kontakt"</string>
     <string name="no_sdcard_message" product="nosdcard" msgid="5242558018442357189">"Nie znaleziono nośnika."</string>
@@ -511,10 +510,6 @@
     <string name="voicemail_fetching_timout" msgid="6691792377574905201">"Nie można pobrać poczty głosowej."</string>
     <string name="call_log_new_header" msgid="846546437517724715">"Nowe"</string>
     <string name="call_log_old_header" msgid="6262205894314263629">"Starsze"</string>
-    <string name="call_log_voicemail_header" msgid="3945407886667089173">"Tylko połączenia z pocztą głosową"</string>
-    <string name="call_log_incoming_header" msgid="2787722299753674684">"Tylko połączenia przychodzące"</string>
-    <string name="call_log_outgoing_header" msgid="761009180766735769">"Tylko połączenia wychodzące"</string>
-    <string name="call_log_missed_header" msgid="8017148056610855956">"Tylko połączenia nieodebrane"</string>
     <string name="voicemail_status_voicemail_not_available" msgid="3021980206152528883">"Nie można połączyć z serwerem poczty głosowej."</string>
     <string name="voicemail_status_messages_waiting" msgid="7113421459602803605">"Nie można połączyć z pocztą głosową. Masz nowe wiadomości."</string>
     <string name="voicemail_status_configure_voicemail" msgid="3738537770636895689">"Skonfiguruj pocztę głosową."</string>
@@ -529,9 +524,6 @@
     <string name="call_log_item_count_and_date" msgid="7641933305703520787">"(<xliff:g id="COUNT">%1$d</xliff:g>) <xliff:g id="DATE">%2$s</xliff:g>"</string>
     <string name="group_name_hint" msgid="238359485263401293">"Nazwa grupy"</string>
     <string name="nfc_vcard_file_name" msgid="2823095213265993609">"Odebrane przez NFC"</string>
-    <string name="menu_show_outgoing_only" msgid="1965570298133301970">"Pokaż tylko wychodzące"</string>
-    <string name="menu_show_incoming_only" msgid="7534206815238877417">"Pokaż tylko przychodzące"</string>
-    <string name="menu_show_missed_only" msgid="154473166059743996">"Pokaż tylko nieodebrane"</string>
     <string name="menu_show_voicemails_only" msgid="1898421289561435703">"Pokaż tylko pocztę głosową"</string>
     <string name="menu_show_all_calls" msgid="7560347482073345885">"Pokaż wszystkie połączenia"</string>
     <string name="status_available" msgid="5586870015822828392">"Dostępny"</string>
@@ -567,18 +559,9 @@
     <string name="dialog_phone_call_prohibited_message" msgid="6554711866586660441">"Połączenie nie zostało zrealizowane"</string>
     <string name="dialog_voicemail_not_ready_message" msgid="4384716252789515378">"Aby skonfigurować pocztę głosową, przejdź do Menu &gt; Ustawienia."</string>
     <string name="dialog_voicemail_airplane_mode_message" msgid="530922773669546093">"Aby połączyć się z pocztą głosową, najpierw wyłącz tryb samolotowy."</string>
-    <string name="menu_export_database" msgid="2659719297530170820">"Eksportuj pliki bazy danych"</string>
     <string name="action_menu_overflow_description" msgid="2303272250613084574">"Więcej opcji"</string>
-    <string name="expand_collapse_name_fields_description" msgid="8682630859539604311">"Rozwiń lub zwiń pola imion i nazwisk"</string>
 
-    <!-- CYANOGENMOD ADDITIONS -->
-
-    <!-- Dialer UI Settings -->
-    <string name="dialer_ui_title">Wybieranie numeru</string>
-    <string name="dialer_ui_orientation_title">Autoobracanie ekranu</string>
-    <string name="dialer_ui_orientation_summary">Pozwól na automatyczny obrót ekranu</string>
-
-    <string name="t9_loading">Wczytywanie\u2026</string>
+    <!-- **** CYANOGENMOD EDITS START **** -->
     <string name="t9_sort_title">Tryb sortowania T9</string>
     <string name="t9_sort_summary">Wybierz, jak filtrować wyniki</string>
     <string name="t9_sort_name">Najpierw nazwa</string>
@@ -597,77 +580,9 @@
     <string name="t9_map_row_8">8tuvúùüûű</string>
     <string name="t9_map_row_9">9wxyzýẃźż</string>
 
-    <!-- Title bar for call stat detail screen -->
-    <string name="callStatsDetailTitle">Szczegółowe statystyki połączeń</string>
-
-    <string name="call_stats">Statystyki połączeń</string>
-    <string name="call_stats_refresh">Odśwież</string>
-    <string name="activity_title_call_stats">Statystyki połączeń</string>
-
-    <string name="call_stats_nav_all">Wszystkie</string>
-    <string name="call_stats_nav_incoming">Przychodzące</string>
-    <string name="call_stats_nav_outgoing">Wychodzące</string>
-    <string name="call_stats_nav_missed">Nieodebrane</string>
-    <string name="call_stats_incoming">Przychodzące: <xliff:g id="percent">%d</xliff:g>%%</string>
-    <string name="call_stats_outgoing">Wychodzące: <xliff:g id="percent">%d</xliff:g>%%</string>
-    <string name="call_stats_missed">Nieodebrane</string>
-    <string name="call_stats_missed_percent">Nieodebrane: <xliff:g id="percent">%d</xliff:g>%%</string>
-    <string name="call_stats_header_total">Łącznie: <xliff:g id="call_count">%s</xliff:g>, <xliff:g id="duration">%s</xliff:g></string>
-    <string name="call_stats_header_total_callsonly">Łącznie: <xliff:g id="call_count">%s</xliff:g></string>
-    <string name="call_stats_filter_from">Data początkowa</string>
-    <string name="call_stats_filter_to">Data końcowa</string>
-    <string name="call_stats_filter_picker_title">Zakres filtrowania</string>
-
-    <string name="date_quick_selection">Szybki wybór</string>
-    <string name="date_qs_currentmonth">Bieżący miesiąc</string>
-    <string name="date_qs_currentquarter">Bieżący kwartał</string>
-    <string name="date_qs_currentyear">Bieżący rok</string>
-    <string name="date_qs_lastweek">Ostatni tydzień</string>
-    <string name="date_qs_lastmonth">Ostatni miesiąc</string>
-    <string name="date_qs_lastquarter">Ostatni kwartał</string>
-    <string name="date_qs_lastyear">Ostatni rok</string>
-
-    <string name="call_stats_date_filter">Ustaw zakres czasu</string>
-    <string name="call_stats_reset_filter">Zresetuj zakres czasu</string>
-    <string name="call_stats_sort_by_duration">Sortuj wg czasu trwania</string>
-    <string name="call_stats_sort_by_count">Sortuj wg liczby połączeń</string>
-
-    <!-- 0:           sec
-         1:      min
-         2:      min  sec
-         3: hour
-         4: hour      sec
-         5: hour min
-         6: hour min  sec -->
-
-    <string-array name="call_stats_duration">
-        <item><xliff:g id="seconds" example="2 secs">%3$s</xliff:g></item>
-        <item><xliff:g id="minutes" example="2 mins">%2$s</xliff:g></item>
-        <item><xliff:g id="minutes" example="2 mins">%2$s</xliff:g> <xliff:g id="seconds" example="2 secs">%3$s</xliff:g></item>
-        <item><xliff:g id="hours" example="2 hrs">%1$s</xliff:g></item>
-        <item><xliff:g id="hours" example="2 hrs">%1$s</xliff:g> <xliff:g id="seconds" example="2 secs">%3$s</xliff:g></item>
-        <item><xliff:g id="hours" example="2 hrs">%1$s</xliff:g> <xliff:g id="minutes" example="2 mins">%2$s</xliff:g></item>
-        <item><xliff:g id="hours" example="2 hrs">%1$s</xliff:g> <xliff:g id="minutes" example="2 mins">%2$s</xliff:g> <xliff:g id="seconds" example="2 secs">%3$s</xliff:g></item>
-    </string-array>
-
-    <plurals name="hour">
-        <item quantity="one">1 godz.</item>
-        <item quantity="other">%d godz.</item>
-    </plurals>
-    <plurals name="minute">
-        <item quantity="one">1 min</item>
-        <item quantity="other">%d min</item>
-    </plurals>
-    <plurals name="second">
-        <item quantity="one">1 sek.</item>
-        <item quantity="other">%d sek.</item>
-    </plurals>
-
-    <plurals name="call">
-        <item quantity="one">1 poł.</item>
-        <item quantity="other">%d poł.</item>
-    </plurals>
-
-    <string name="menu_add_to_blacklist">Dodaj do czarnej listy</string>
-    <string name="toast_added_to_blacklist">Dodano %s do czarnej listy.</string>
+    <!-- Dialer UI Settings -->
+    <string name="dialer_ui_title">Wybieranie numeru</string>
+    <string name="dialer_ui_orientation_title">Autoobracanie ekranu</string>
+    <string name="dialer_ui_orientation_summary">Pozwól na automatyczny obrót ekranu</string>
+    <!-- **** CYANOGENMOD EDITS END **** -->
 </resources>

@@ -36,16 +36,21 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dip"
-        android:layout_weight="1" >
+        android:layout_weight="1" 
+        android:layout_marginLeft="?attr/contact_browser_list_padding_left"
+		android:layout_marginRight="?attr/contact_browser_list_padding_right"
+        >
+        <!-- 
+            android:layout_marginLeft="?attr/contact_browser_list_padding_left"
+            android:layout_marginRight="?attr/contact_browser_list_padding_right"
+        -->
         <view
             class="com.android.contacts.widget.PinnedHeaderListView"
             android:id="@android:id/list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginLeft="?attr/contact_browser_list_padding_left"
-            android:layout_marginRight="?attr/contact_browser_list_padding_right"
             android:fastScrollEnabled="true"
-            android:fadingEdge="none" />
+            android:fadingEdge="horizontal" />
         <ProgressBar
             android:id="@+id/search_progress"
             style="?android:attr/progressBarStyleLarge"

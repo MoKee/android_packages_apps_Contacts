@@ -17,31 +17,41 @@
  */
 -->
 
-<!-- Note: padding might be controlled programatically -->
+<!-- Note: padding might be controlled programatically 
+    android:paddingLeft="16dip"
+-->
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingLeft="16dip">
+    >
 
+    <!--  
+        android:background="?android:attr/selectableItemBackground"
+        android:minHeight="@dimen/detail_min_line_item_height"
+        android:nextFocusRight="@+id/secondary_action_view_container"
+    -->
     <com.android.contacts.detail.ActionsViewContainer
         android:id="@+id/actions_view_container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/contact_detail_list_item_height"
         android:orientation="horizontal"
+    	android:layout_marginLeft="@dimen/account_container_left_padding"
+   		android:layout_marginRight="@dimen/account_container_left_padding"
+   		android:padding="@dimen/account_container_left_padding"
         android:focusable="true"
-        android:background="?android:attr/selectableItemBackground"
-        android:nextFocusRight="@+id/secondary_action_view_container"
-        android:minHeight="@dimen/detail_min_line_item_height">
+        >
 
-        <!-- Note: padding might be controlled programatically -->
+        <!-- Note: padding might be controlled programatically 
+            android:paddingLeft="8dip"
+            -->
         <LinearLayout
             android:id="@+id/primary_action_view"
             android:layout_width="0dip"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:paddingLeft="8dip"
+            android:paddingLeft="@dimen/account_container_left_padding"
             android:gravity="center_vertical">
 
             <TextView
@@ -83,7 +93,8 @@
             </LinearLayout>
 
         </LinearLayout>
-
+        
+		<!--  
         <View
             android:id="@+id/vertical_divider"
             android:layout_width="1dip"
@@ -91,6 +102,7 @@
             android:layout_marginTop="@dimen/detail_vertical_divider_vertical_margin"
             android:layout_marginBottom="@dimen/detail_vertical_divider_vertical_margin"
             android:background="?android:attr/dividerVertical" />
+		-->
 
         <!-- Note: padding might be controlled programatically -->
         <FrameLayout

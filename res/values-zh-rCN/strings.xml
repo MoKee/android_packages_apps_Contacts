@@ -18,7 +18,6 @@
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="launcherDialer" msgid="8636288196618486553">"拨号"</string>
     <string name="people" msgid="1048457247435785074">"联系人"</string>
-    <string name="t9_loading">载入中\u2026</string>
     <string name="t9_sort_title">T9 排序模式</string>
     <string name="t9_sort_summary">选择如何过滤 T9 结果</string>
     <string name="t9_sort_name">姓名匹配优先</string>
@@ -63,8 +62,8 @@
     <string name="menu_splitAggregate" msgid="8368636463748691868">"拆分"</string>
     <string name="menu_editGroup" msgid="5062005185370983720">"修改"</string>
     <string name="menu_deleteGroup" msgid="3486380004411482874">"删除"</string>
-    <string name="menu_new_contact_action_bar" msgid="7263362129442119188">"添加联系人"</string>
-    <string name="menu_new_group_action_bar" msgid="3520232877587377175">"添加群组"</string>
+    <string name="menu_new_contact_action_bar" msgid="8887818026717394343">"新建"</string>
+    <string name="menu_new_group_action_bar" msgid="5055346725617932394">"新建群组"</string>
     <string name="splitConfirmation_title" msgid="633640935430370530">"要拆分联系人吗？"</string>
     <string name="splitConfirmation" msgid="740190210499587175">"系统会将此联系人拆分成多个联系人。"</string>
     <string name="menu_joinAggregate" msgid="5027981918265667970">"合并"</string>
@@ -84,16 +83,16 @@
     <string name="menu_doNotSave" msgid="58593876893538465">"取消"</string>
     <string name="menu_discard" msgid="6456087569315685632">"舍弃"</string>
     <string name="label_notes" msgid="8337354953278341042">"备注"</string>
-    <string name="label_sip_address" msgid="124073911714324974">"互联网电话"</string>
+    <string name="label_sip_address" msgid="124073911714324974">"互联网通话"</string>
     <string name="ghostData_company" msgid="5414421120553765775">"公司"</string>
     <string name="ghostData_title" msgid="7496735200318496110">"职位"</string>
     <string name="invalidContactMessage" msgid="8215051456181842274">"该联系人不存在。"</string>
-    <string name="createContactShortcutSuccessful" msgid="7874133287558150877">"联系人小部件已添加到主屏幕。"</string>
+    <string name="createContactShortcutSuccessful" msgid="7874133287558150877">"“联系人”窗口小部件已添加到主屏幕。"</string>
     <string name="pickerNewContactHeader" msgid="7750705279843568147">"新建联系人"</string>
     <string name="pickerNewContactText" msgid="6166997164401048211">"创建新联系人"</string>
     <string name="phoneLabelsGroup" msgid="6468091477851199285">"电话"</string>
-    <string name="emailLabelsGroup" msgid="8389931313045344406">"电子邮件"</string>
-    <string name="imLabelsGroup" msgid="3898238486262614027">"即时聊天工具"</string>
+    <string name="emailLabelsGroup" msgid="8389931313045344406">"发送电子邮件"</string>
+    <string name="imLabelsGroup" msgid="3898238486262614027">"即时消息"</string>
     <string name="postalLabelsGroup" msgid="3487738141112589324">"地址"</string>
   <string-array name="otherLabels">
     <item msgid="8287841928119937597">"组织"</item>
@@ -144,10 +143,9 @@
     <item quantity="one" msgid="4826918429708286628">"找到 1 个联系人"</item>
     <item quantity="other" msgid="7988132539476575389">"找到 <xliff:g id="COUNT">%d</xliff:g> 个联系人"</item>
   </plurals>
-    <string name="contactsAllLabel" msgid="6479708629170672169">"所有联系人"</string>
+    <string name="contactsAllLabel" msgid="6479708629170672169">"联系人"</string>
     <string name="contactsGroupsLabel" msgid="2841971472518003524">"群组"</string>
     <string name="contactsFavoritesLabel" msgid="8417039765586853670">"收藏"</string>
-    <string name="dialerAllContactsLabel" msgid="1025920923112988336">"收藏和所有联系人"</string>
     <string name="dialerIconLabel" msgid="6500826552823403796">"拨号"</string>
     <string name="dialer_ui_title">拨号器设置</string>
     <string name="dialer_ui_orientation_title">开启传感器定向</string>
@@ -193,14 +191,10 @@
     <string name="dialer_returnToInCallScreen" msgid="3719386377550913067">"返回正在进行的通话"</string>
     <string name="dialer_addAnotherCall" msgid="4205688819890074468">"添加通话"</string>
     <string name="callDetailTitle" msgid="5340227785196217938">"通话详情"</string>
-
-    <!-- Title bar for call stat detail screen -->
-    <string name="callStatsDetailTitle">通话统计数据详情</string>
-
     <string name="toast_call_detail_error" msgid="7200975244804730096">"无法读取所请求呼叫的详细信息。"</string>
     <string name="type_incoming" msgid="6502076603836088532">"来电"</string>
-    <string name="type_outgoing" msgid="343108709599392641">"外拨电话"</string>
-    <string name="type_missed" msgid="2720502601640509542">"未接电话"</string>
+    <string name="type_outgoing" msgid="343108709599392641">"外拨"</string>
+    <string name="type_missed" msgid="2720502601640509542">"未接"</string>
     <string name="type_voicemail" msgid="5153139450668549908">"语音信箱"</string>
     <string name="actionIncomingCall" msgid="6028930669817038600">"来电"</string>
     <string name="callBack" msgid="5498224409038809224">"回电"</string>
@@ -228,7 +222,7 @@
     <string name="description_delete_button" msgid="6263102114033407382">"退格"</string>
     <string name="description_digits_edittext" msgid="8760207516497016437">"要拨打的号码"</string>
     <string name="description_contact_photo" msgid="3387458082667894062">"联系人照片"</string>
-    <string name="description_minus_button" msgid="6908099247930477551">"删除"</string>
+    <string name="description_minus_button" msgid="387136707700230172">"删除"</string>
     <string name="description_plus_button" msgid="515164827856229880">"添加"</string>
     <string name="description_view_contact_detail" msgid="9133251213656414807">"查看联系人"</string>
     <string name="no_sdcard_message" product="nosdcard" msgid="5242558018442357189">"未找到任何存储设备。"</string>
@@ -298,8 +292,6 @@
     <string name="add_wait" msgid="3360818652790319634">"延长等待时间"</string>
     <string name="call_disambig_title" msgid="4392886850104795739">"选择号码"</string>
     <string name="call_settings" msgid="7666474782093693667">"设置"</string>
-    <string name="call_stats">通话统计数据</string>
-    <string name="call_stats_refresh">刷新</string>
     <string name="sms_disambig_title" msgid="5846266399240630846">"选择号码"</string>
     <string name="make_primary" msgid="5829291915305113983">"记住此选择"</string>
     <string name="quickcontact_missing_app" msgid="358168575340921552">"未找到可处理此操作的应用。"</string>
@@ -317,7 +309,7 @@
     <string name="nicknameLabelsGroup" msgid="2891682101053358010">"昵称"</string>
     <string name="organizationLabelsGroup" msgid="2478611760751832035">"组织"</string>
     <string name="websiteLabelsGroup" msgid="4202998982804009261">"网站"</string>
-    <string name="eventLabelsGroup" msgid="3695433812142818803">"重要日子"</string>
+    <string name="eventLabelsGroup" msgid="3695433812142818803">"活动"</string>
     <string name="relationLabelsGroup" msgid="1854373894284572781">"关系"</string>
     <string name="groupsLabel" msgid="8573535366319059326">"群组"</string>
     <string name="dialog_new_contact_account" msgid="9044704073286262197">"在帐户下创建联系人"</string>
@@ -405,15 +397,15 @@
     <string name="full_name" msgid="6602579550613988977">"姓名"</string>
     <string name="name_given" msgid="1687286314106019813">"名字"</string>
     <string name="name_family" msgid="3416695586119999058">"姓氏"</string>
-    <string name="name_prefix" msgid="59756378548779822">"姓名前缀"</string>
+    <string name="name_prefix" msgid="59756378548779822">"名称前缀"</string>
     <string name="name_middle" msgid="8467433655992690326">"中间名"</string>
-    <string name="name_suffix" msgid="3855278445375651441">"姓名后缀"</string>
+    <string name="name_suffix" msgid="3855278445375651441">"名称后缀"</string>
     <string name="name_phonetic_given" msgid="6853570431394449191">"名字拼音"</string>
     <string name="name_phonetic_middle" msgid="8643721493320405200">"中间名拼音"</string>
     <string name="name_phonetic_family" msgid="462095502140180305">"姓氏拼音"</string>
     <string name="name_phonetic" msgid="4259595234312430484">"姓名拼音"</string>
-    <string name="connections" msgid="8098440723172028350">"社交网络"</string>
-    <string name="add_connection_button" msgid="4861308615789601727">"添加社交网络"</string>
+    <string name="connections" msgid="8098440723172028350">"联系"</string>
+    <string name="add_connection_button" msgid="4861308615789601727">"加强联系"</string>
     <string name="recent" msgid="2659189233141493004">"最新"</string>
     <string name="recent_updates" msgid="4267258535615860710">"最新动态"</string>
     <string name="account_type_format" msgid="718948015590343010">"<xliff:g id="SOURCE">%1$s</xliff:g> 联系人"</string>
@@ -475,7 +467,6 @@
     <string name="custom_list_filter" msgid="7836035257402013957">"定义自定义视图"</string>
     <string name="contact_list_loading" msgid="5488620820563977329">"正在加载..."</string>
     <string name="activity_title_settings" msgid="5464130076132770781">"设置"</string>
-    <string name="activity_title_call_stats">通话统计数据</string>
     <string name="activity_title_contacts_filter" msgid="8275542497615516969">"要显示的联系人"</string>
     <string name="menu_settings" msgid="377929915873428211">"设置"</string>
     <string name="menu_help" msgid="5123887102216637725">"帮助"</string>
@@ -531,10 +522,6 @@
     <string name="voicemail_fetching_timout" msgid="6691792377574905201">"无法抓取语音邮件。"</string>
     <string name="call_log_new_header" msgid="846546437517724715">"新记录"</string>
     <string name="call_log_old_header" msgid="6262205894314263629">"旧记录"</string>
-    <string name="call_log_voicemail_header" msgid="3945407886667089173">"只显示语音信箱留言"</string>
-    <string name="call_log_incoming_header" msgid="2787722299753674684">"只显示来电"</string>
-    <string name="call_log_outgoing_header" msgid="761009180766735769">"只显示外拨电话"</string>
-    <string name="call_log_missed_header" msgid="8017148056610855956">"只显示未接来电"</string>
     <string name="voicemail_status_voicemail_not_available" msgid="3021980206152528883">"无法连接到语音信箱服务器。"</string>
     <string name="voicemail_status_messages_waiting" msgid="7113421459602803605">"无法连接到语音信箱服务器。新的语音邮件正在等待接收。"</string>
     <string name="voicemail_status_configure_voicemail" msgid="3738537770636895689">"设置您的语音信箱。"</string>
@@ -549,9 +536,6 @@
     <string name="call_log_item_count_and_date" msgid="7641933305703520787">"(<xliff:g id="COUNT">%1$d</xliff:g>) <xliff:g id="DATE">%2$s</xliff:g>"</string>
     <string name="group_name_hint" msgid="238359485263401293">"群组名称"</string>
     <string name="nfc_vcard_file_name" msgid="2823095213265993609">"已通过 NFC 收到联系人信息"</string>
-    <string name="menu_show_outgoing_only" msgid="1965570298133301970">"仅显示外拨电话"</string>
-    <string name="menu_show_incoming_only" msgid="7534206815238877417">"仅显示来电"</string>
-    <string name="menu_show_missed_only" msgid="154473166059743996">"仅显示未接来电"</string>
     <string name="menu_show_voicemails_only" msgid="1898421289561435703">"只显示语音邮件"</string>
     <string name="menu_show_all_calls" msgid="7560347482073345885">"显示所有通话"</string>
     <string name="status_available" msgid="5586870015822828392">"在线"</string>
@@ -587,64 +571,49 @@
     <string name="dialog_phone_call_prohibited_message" msgid="6554711866586660441">"电话未拨出"</string>
     <string name="dialog_voicemail_not_ready_message" msgid="4384716252789515378">"要设置语音信箱，请转到“菜单”&gt;“设置”。"</string>
     <string name="dialog_voicemail_airplane_mode_message" msgid="530922773669546093">"要呼叫语音信箱，请先关闭飞行模式。"</string>
-    <string name="menu_export_database" msgid="2659719297530170820">"导出数据库文件"</string>
     <string name="action_menu_overflow_description" msgid="2303272250613084574">"更多选项"</string>
-    <string name="expand_collapse_name_fields_description" msgid="8682630859539604311">"展开或折叠姓名字段"</string>
-
-    <string name="call_stats_nav_all">全部</string>
-    <string name="call_stats_nav_incoming">来电</string>
-    <string name="call_stats_nav_outgoing">呼出</string>
-    <string name="call_stats_nav_missed">未接</string>
-    <string name="call_stats_incoming">来电: <xliff:g id="percent">%d</xliff:g>%%</string>
-    <string name="call_stats_outgoing">呼出: <xliff:g id="percent">%d</xliff:g>%%</string>
-    <string name="call_stats_missed">未接</string>
-    <string name="call_stats_missed_percent">未接: <xliff:g id="percent">%d</xliff:g>%%</string>
-    <string name="call_stats_header_total">总计: <xliff:g id="call_count">%s</xliff:g>, <xliff:g id="duration">%s</xliff:g></string>
-    <string name="call_stats_header_total_callsonly">总计: <xliff:g id="call_count">%s</xliff:g></string>
-    <string name="call_stats_filter_from">开始日期</string>
-    <string name="call_stats_filter_to">结束日期</string>
-    <string name="call_stats_filter_picker_title">过滤范围</string>
-
-    <string name="date_quick_selection">快速选择</string>
-    <string name="date_qs_currentmonth">本月</string>
-    <string name="date_qs_currentquarter">本季度</string>
-    <string name="date_qs_currentyear">本年</string>
-    <string name="date_qs_lastweek">上周</string>
-    <string name="date_qs_lastmonth">上个月</string>
-    <string name="date_qs_lastquarter">上个季度</string>
-    <string name="date_qs_lastyear">去年</string>
-
-    <string name="call_stats_date_filter">调整时间范围</string>
-    <string name="call_stats_reset_filter">重置时间范围</string>
-    <string name="call_stats_sort_by_duration">以通话时间排序</string>
-    <string name="call_stats_sort_by_count">以通话次数排序</string>
-
-    <plurals name="hour">
-        <item quantity="one">1 小时</item>
-        <item quantity="other">%d 小时</item>
-    </plurals>
-    <plurals name="minute">
-        <item quantity="one">1 分钟</item>
-        <item quantity="other">%d 分钟</item>
-    </plurals>
-    <plurals name="second">
-        <item quantity="one">1 秒</item>
-        <item quantity="other">%d 秒</item>
-    </plurals>
-
-    <plurals name="call">
-        <item quantity="one">1 个通话</item>
-        <item quantity="other">%d 个通话</item>
-    </plurals>
-
-    <string name="menu_add_to_blacklist">加入黑名单</string>
-    <string name="toast_added_to_blacklist">%s 已加入到黑名单</string>
-
-    <!-- MOKEE ADDITIONS START -->
-    <!-- IP Call -->
-    <string name="dialer_ip_call_prefix_title">IP拨号前缀</string>
-    <string name="dialer_ip_call_prefix_summary">点击设置IP拨号前缀</string>
-    <string name="dialer_ipcall_title">IP拨号</string>
-    <string name="dialer_ipcall_msg">尚未设置IP拨号前缀。您想直接拨打此号码吗？</string>
-    <!-- MOKEE ADDITIONS END -->
+    
+      <!-- shendu 2012-10-15 text -->
+    <string name="shendu_call_dialer_show_text">拨号键盘</string>
+    <string name="shendu_group_editor_name_title">群组名称</string>
+    <string name="shendu_group_editor_members_title">群组成员</string>
+    <string name="shendu_group_editor_add_members">添加成员</string>
+    <string name="menu_to_dialer">"拨号"</string>
+    
+    <string name="shendu_context_menu_edit">"编辑联系人"</string>
+    <string name="shendu_context_menu_delete">"删除联系人"</string>
+    <string name="shendu_context_menu_share">"分享联系人"</string>
+    
+    <string name="shendu_add_blacklist">加入黑名单</string>
+    <string name="shendu_send_sms">发送短信</string>
+    
+    <string name="number_of_items_selected">选中%1$d 项</string>
+    <string name="select_all">全选</string>
+    <string name="deselect_all">取消全选</string>
+    <string name="group_insert_members_message">已添加%1$d/%2$d</string>
+    <string name="message_prepare">操作中，请等待</string>
+    <string name="message_using_number">呼叫号码</string>
+    
+    <string name="default_group_friend">朋友</string>
+    <string name="default_group_family">家人</string>
+    <string name="default_group_colleague">同事</string>
+    
+    <!--Wang: Sim export infor-->
+    <string name="export_to_sim" product="default">"导出到 SIM 卡"</string>
+    
+    <!--Wang: Ringtone setting string-->
+     <string name="default_ringtone" >默认铃声</string>
+     <string name="ringtone_title" >铃声</string>
+     <!--Wang: SMS share -->
+     <string name="share_name" >姓名:%1$s</string>
+     <string name="share_number" >号码:%1$s</string>
+     
+         <!-- add ringtone options -->
+    <string name="sound_ringtones">铃声</string>
+    <string name="sound_music">本地音乐</string>
+    
+    <string name="file_not_find">"该媒体文件格式不支持或不存在...."</string>
+    <string name="sdcard_not_find">"SDCard 未安装...."</string>
+     
+     <string name="cancel">取消</string>
 </resources>

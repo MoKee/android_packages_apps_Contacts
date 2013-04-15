@@ -16,27 +16,7 @@
 
 package com.android.contacts.activities;
 
-import android.app.ActionBar;
-import android.app.Fragment;
-import android.content.ActivityNotFoundException;
-import android.content.ContentValues;
-import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Bundle;
-import android.os.Handler;
-import android.text.TextUtils;
-import android.util.Log;
-import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.MenuItem.OnMenuItemClickListener;
-import android.view.View;
-import android.view.accessibility.AccessibilityEvent;
-import android.view.accessibility.AccessibilityManager;
-import android.widget.Toast;
-
+import com.android.contacts.ContactLoader;
 import com.android.contacts.ContactSaveService;
 import com.android.contacts.ContactsActivity;
 import com.android.contacts.R;
@@ -46,10 +26,47 @@ import com.android.contacts.detail.ContactDetailLayoutController;
 import com.android.contacts.detail.ContactLoaderFragment;
 import com.android.contacts.detail.ContactLoaderFragment.ContactLoaderFragmentListener;
 import com.android.contacts.interactions.ContactDeletionInteraction;
-import com.android.contacts.model.Contact;
-import com.android.contacts.model.account.AccountWithDataSet;
+import com.android.contacts.model.AccountWithDataSet;
+import com.android.contacts.util.ContactBadgeUtil;
+import com.android.contacts.util.ImageViewDrawableSetter;
+import com.android.contacts.util.NameAvatarUtils;
 import com.android.contacts.util.PhoneCapabilityTester;
 
+import android.app.ActionBar;
+import android.app.Fragment;
+import android.content.ActivityNotFoundException;
+import android.content.ContentResolver;
+import android.content.ContentUris;
+import android.content.ContentValues;
+import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Handler;
+import android.provider.ContactsContract;
+import android.text.TextUtils;
+import android.util.Log;
+import android.view.Gravity;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.MenuItem.OnMenuItemClickListener;
+import android.view.View;
+import android.view.accessibility.AccessibilityEvent;
+import android.view.accessibility.AccessibilityManager;
+import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
+import android.widget.RadioGroup.LayoutParams;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import java.io.InputStream;
 import java.util.ArrayList;
 
 public class ContactDetailActivity extends ContactsActivity {
@@ -58,17 +75,19 @@ public class ContactDetailActivity extends ContactsActivity {
     /** Shows a toogle button for hiding/showing updates. Don't submit with true */
     private static final boolean DEBUG_TRANSITIONS = false;
 
-    private Contact mContactData;
+    private ContactLoader.Result mContactData;
     private Uri mLookupUri;
 
     private ContactDetailLayoutController mContactDetailLayoutController;
     private ContactLoaderFragment mLoaderFragment;
 
     private Handler mHandler = new Handler();
-
+    private Context mContext;
+    
     @Override
     protected void onCreate(Bundle savedState) {
         super.onCreate(savedState);
+        mContext = this;
         if (PhoneCapabilityTester.isUsingTwoPanes(this)) {
             // This activity must not be shown. We have to select the contact in the
             // PeopleActivity instead ==> Create a forward intent and finish
@@ -94,22 +113,28 @@ public class ContactDetailActivity extends ContactsActivity {
             finish();
             return;
         }
-
+        getActionBar().hide();
         setContentView(R.layout.contact_detail_activity);
 
         mContactDetailLayoutController = new ContactDetailLayoutController(this, savedState,
                 getFragmentManager(), null, findViewById(R.id.contact_detail_container),
                 mContactDetailFragmentListener);
+        
 
         // We want the UP affordance but no app icon.
         // Setting HOME_AS_UP, SHOW_TITLE and clearing SHOW_HOME does the trick.
-        ActionBar actionBar = getActionBar();
+       /* ActionBar actionBar = getActionBar();
         if (actionBar != null) {
-            actionBar.setDisplayOptions(ActionBar.DISPLAY_HOME_AS_UP | ActionBar.DISPLAY_SHOW_TITLE,
-                    ActionBar.DISPLAY_HOME_AS_UP | ActionBar.DISPLAY_SHOW_TITLE
-                    | ActionBar.DISPLAY_SHOW_HOME);
+            actionBar.setDisplayOptions(
+            		ActionBar.DISPLAY_HOME_AS_UP | ActionBar.DISPLAY_SHOW_TITLE,
+            		ActionBar.DISPLAY_HOME_AS_UP | ActionBar.DISPLAY_SHOW_TITLE | ActionBar.DISPLAY_SHOW_HOME);
+            actionBar.setDisplayOptions(
+            		ActionBar.DISPLAY_USE_LOGO,
+                    ActionBar.DISPLAY_USE_LOGO
+                    );
+
             actionBar.setTitle("");
-        }
+        }*/
 
         Log.i(TAG, getIntent().getData().toString());
     }
@@ -125,7 +150,7 @@ public class ContactDetailActivity extends ContactsActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
+        //super.onCreateOptionsMenu(menu);
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.star, menu);
         if (DEBUG_TRANSITIONS) {
@@ -209,7 +234,7 @@ public class ContactDetailActivity extends ContactsActivity {
         }
 
         @Override
-        public void onDetailsLoaded(final Contact result) {
+        public void onDetailsLoaded(final ContactLoader.Result result) {
             if (result == null) {
                 return;
             }
@@ -256,18 +281,41 @@ public class ContactDetailActivity extends ContactsActivity {
         CharSequence displayName = ContactDetailDisplayUtils.getDisplayName(this, mContactData);
         String company =  ContactDetailDisplayUtils.getCompany(this, mContactData);
 
+        byte[] photo = mContactData.getPhotoBinaryData(); //loading photo image
+        Bitmap bitmap;
+        if(photo==null){
+        	//loading photo form name 
+        	bitmap = NameAvatarUtils.makeNameAvatarBitmap(mContext, displayName.toString());
+        	if(bitmap==null){
+        		//loading photo form default 
+            	bitmap = ContactBadgeUtil.loadDefaultAvatarPhoto(this, false, false);
+        	}
+        }else{
+        	//loading photo image
+        	bitmap = BitmapFactory.decodeByteArray(photo, 0, photo.length);
+        }
+        
+        View photoParent = LayoutInflater.from(mContext).inflate(
+        		R.layout.contact_detail_activity_actionbar, null);
+        ImageView photoView = (ImageView)photoParent.findViewById(R.id.contact_detail_activity_photo_id);
+        photoView.setImageBitmap(bitmap);
+        ActionBar.LayoutParams actionParams = new ActionBar.LayoutParams(
+        		LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT,Gravity.CENTER_VERTICAL|Gravity.RIGHT);
         ActionBar actionBar = getActionBar();
+        actionBar.setDisplayShowHomeEnabled(false);
+        actionBar.setDisplayOptions(
+        		ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_TITLE,
+        		ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_TITLE);
         actionBar.setTitle(displayName);
         actionBar.setSubtitle(company);
+        actionBar.setCustomView(photoParent,actionParams);
+        actionBar.show();
 
-        if (!TextUtils.isEmpty(displayName)) {
-            AccessibilityManager accessibilityManager =
-                    (AccessibilityManager) this.getSystemService(Context.ACCESSIBILITY_SERVICE);
-            if (accessibilityManager.isEnabled()) {
-                View decorView = getWindow().getDecorView();
-                decorView.setContentDescription(displayName);
-                decorView.sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED);
-            }
+        if (!TextUtils.isEmpty(displayName) &&
+                AccessibilityManager.getInstance(this).isEnabled()) {
+            View decorView = getWindow().getDecorView();
+            decorView.setContentDescription(displayName);
+            decorView.sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED);
         }
     }
 

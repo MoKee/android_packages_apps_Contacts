@@ -16,6 +16,12 @@
 
 package com.android.contacts.list;
 
+import com.android.contacts.R;
+import com.android.contacts.editor.ContactEditorFragment;
+import com.android.contacts.model.AccountType;
+import com.android.contacts.model.AccountTypeManager;
+import com.android.contacts.util.ThemeUtils;
+
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -24,10 +30,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
-
-import com.android.contacts.R;
-import com.android.contacts.model.AccountTypeManager;
-import com.android.contacts.model.account.AccountType;
 
 /**
  * Contact list filter parameters.

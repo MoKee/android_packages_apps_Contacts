@@ -16,12 +16,10 @@
 
 package com.android.contacts.test;
 
-import android.os.Bundle;
-import android.view.Window;
-import android.view.WindowManager;
-
 import com.android.contacts.ContactsActivity;
 import com.android.contacts.R;
+
+import android.os.Bundle;
 
 /**
  * An activity that is used for testing fragments.  A unit test starts this
@@ -32,13 +30,6 @@ public class FragmentTestActivity extends ContactsActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // Normally fragment/activity onStart() methods will not be called when screen is locked.
-        // Use the following flags to ensure that activities can be show for testing.
-        Window window = getWindow();
-        window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
-                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
-
         setContentView(R.layout.fragment_test);
     }
 }

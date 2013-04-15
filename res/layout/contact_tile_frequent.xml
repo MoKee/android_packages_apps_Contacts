@@ -17,40 +17,61 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     class="com.android.contacts.list.ContactTileFrequentView"
     android:focusable="true"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    >
+  
+    <!--  
     android:background="?android:attr/selectableItemBackground"
-    android:nextFocusRight="@+id/contact_tile_quick">
-
+    android:nextFocusRight="@+id/contact_tile_quick"
+    
+        android:paddingLeft="8dip"
+        android:layout_margin="10dip"
+        android:padding="10dip"
+    -->
     <RelativeLayout
+        android:id="@+id/contact_title_frequent_item_parent_id"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-
+        android:layout_height="wrap_content" 
+        >
+        <!--  
+            android:layout_marginTop="8dip"
+            android:layout_marginBottom="8dip"
+        -->
         <com.android.contacts.widget.LayoutSuppressingQuickContactBadge
             android:id="@+id/contact_tile_quick"
-            android:layout_width="64dip"
-            android:layout_height="64dip"
-            android:layout_alignParentRight="true"
+            android:layout_width="@dimen/contacts_view_photo_height"
+            android:layout_height="@dimen/contacts_view_photo_height"
+            android:layout_alignParentLeft="true"
+        	android:layout_margin="@dimen/account_container_left_padding"
             android:scaleType="centerCrop"
-            android:focusable="true" />
-
+            android:focusable="true" 
+            />
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="64dip"
+            android:layout_height="@dimen/contacts_view_person_data_height"
             android:orientation="vertical"
-            android:layout_alignParentBottom="true"
+            android:layout_centerVertical="true"
             android:gravity="center_vertical"
-            android:paddingRight="80dip"
-            android:paddingLeft="8dip">
-
+        	android:layout_marginRight="@dimen/account_container_left_padding"
+            android:layout_toRightOf="@id/contact_tile_quick"
+            >
+		<!-- 
+            android:paddingRight="8dip"
+            android:paddingLeft="80dip"
+		-->
             <TextView
                 android:id="@+id/contact_tile_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/primary_text_color"
-                android:textSize="18sp"
+                android:textSize="@dimen/group_editor_actionbar_text_size"
                 android:singleLine="true"
+            	android:gravity="center_vertical"
                 android:fadingEdge="horizontal"
                 android:fadingEdgeLength="3dip"
-                android:ellipsize="marquee" />
+                android:ellipsize="marquee" 
+                />
 
             <TextView
                 android:id="@+id/contact_tile_status"
@@ -59,19 +80,27 @@
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="?android:attr/textColorSecondary"
                 android:singleLine="true"
+            	android:gravity="center_vertical"
                 android:drawablePadding="4dip"
                 android:fadingEdge="horizontal"
                 android:fadingEdgeLength="3dip"
-                android:ellipsize="marquee" />
+                android:ellipsize="marquee" 
+                />
 
         </LinearLayout>
 
+        <!--  
+            android:layout_height="1px"
+            android:background="?android:attr/listDivider"
+            android:layout_marginTop="10dp"
+        -->
         <View
             android:id="@+id/contact_tile_horizontal_divider"
             android:layout_width="match_parent"
-            android:layout_height="1px"
-            android:background="?android:attr/listDivider"
-            android:layout_below="@id/contact_tile_quick" />
+            android:layout_height="@dimen/contacts_dividing_line_height"
+            android:background="@drawable/contacts_dividing_line"
+            android:layout_below="@id/contact_tile_quick" 
+            />
 
     </RelativeLayout>
 

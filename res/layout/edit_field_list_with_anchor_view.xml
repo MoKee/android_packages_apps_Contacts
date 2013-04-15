@@ -15,13 +15,15 @@
 -->
 
 <!-- Layout that behaves similarly to edit_field_list.xml,
-     but also has an anchor view for ListPopupWindow -->
+     but also has an anchor view for ListPopupWindow 
+    android:paddingLeft="@dimen/editor_field_left_padding"
+    android:paddingLeft="@dimen/contacts_padding_middle"
+    -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="0dip"
     android:layout_height="wrap_content"
     android:layout_weight="1"
-    android:paddingLeft="@dimen/editor_field_left_padding"
     android:orientation="vertical">
     <LinearLayout
          android:id="@+id/editors"
