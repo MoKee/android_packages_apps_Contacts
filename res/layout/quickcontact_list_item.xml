@@ -13,12 +13,82 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
+<!-- 
+    android:nextFocusRight="@+id/secondary_action_button"
+    style="@style/QuickContactListItemStyle"
 <LinearLayout
+	android:layout_marginLeft="10dp"
+	android:layout_marginRight="10dp"
+	android:layout_marginTop="10dp"
+	android:layout_marginBottom="10dp"
+-->
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/actions_view_container"
-    android:nextFocusRight="@+id/secondary_action_button"
-    style="@style/QuickContactListItemStyle">
-    <LinearLayout style="@style/QuickContactListItemTextWrapperStyle">
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/quickcontent_itemview_height"
+    android:gravity="center_vertical"
+    >
+    <!--  
+    <RelativeLayout 
+    	xmlns:android="http://schemas.android.com/apk/res/android"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginLeft="10dp"
+		android:layout_marginRight="10dp"
+            android:src="@drawable/shendu_ic_mms"
+		>
+            android:paddingLeft="10dip"
+    -->
+		<ImageView
+            android:id="@+id/secondary_action_button"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+			android:layout_margin="@dimen/account_container_left_padding"
+            android:background="?android:attr/selectableItemBackground"
+            android:duplicateParentState="false"
+            />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+			android:layout_margin="@dimen/account_container_left_padding"
+            android:layout_toLeftOf="@id/secondary_action_button"
+            android:orientation="vertical" >
+			<!--  
+                android:layout_height="0dp"
+                android:layout_weight="1"
+			-->
+            <TextView
+                android:id="@android:id/text2"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+            	android:gravity="bottom"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:textAllCaps="true"
+                android:textSize="@dimen/contacts_view_box_number_size"
+                android:textColor="@color/contacts_view_box_name_color"
+                />
+
+            <TextView
+                android:id="@android:id/text1"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+            	android:gravity="top"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:textSize="@dimen/contacts_view_box_number_size"
+                android:textColor="@color/contacts_view_box_number_color" 
+                />
+        </LinearLayout>
+  <!--   
+  </RelativeLayout>
+  <LinearLayout style="@style/QuickContactListItemTextWrapperStyle">
         <TextView
             android:id="@android:id/text1"
             android:layout_width="wrap_content"
@@ -31,6 +101,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
+             
             <ImageView
                 android:id="@+id/presence_icon"
                 android:layout_width="wrap_content"
@@ -40,6 +111,7 @@
                 android:layout_gravity="center_vertical"
                 android:gravity="center"
                 android:scaleType="centerInside" />
+               
             <TextView
                 android:id="@android:id/text2"
                 android:layout_width="wrap_content"
@@ -50,4 +122,5 @@
         </LinearLayout>
     </LinearLayout>
     <include layout="@layout/quickcontact_list_item_base"/>
-</LinearLayout>
+</LinearLayout> -->
+</RelativeLayout>

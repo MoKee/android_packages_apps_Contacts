@@ -16,6 +16,13 @@
 
 package com.android.contacts.interactions;
 
+import com.android.contacts.ContactSaveService;
+import com.android.contacts.R;
+import com.android.contacts.model.AccountType;
+import com.android.contacts.model.AccountTypeManager;
+import com.google.android.collect.Sets;
+import com.google.common.annotations.VisibleForTesting;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
@@ -32,13 +39,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.Contacts.Entity;
-
-import com.android.contacts.ContactSaveService;
-import com.android.contacts.R;
-import com.android.contacts.model.AccountTypeManager;
-import com.android.contacts.model.account.AccountType;
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Sets;
+import android.util.Log;
 
 import java.util.HashSet;
 

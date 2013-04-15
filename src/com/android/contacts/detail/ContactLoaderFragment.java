@@ -16,6 +16,15 @@
 
 package com.android.contacts.detail;
 
+import com.android.contacts.ContactLoader;
+import com.android.contacts.ContactSaveService;
+import com.android.contacts.R;
+import com.android.contacts.activities.ContactDetailActivity.FragmentKeyListener;
+import com.android.contacts.list.ShortcutIntentBuilder;
+import com.android.contacts.list.ShortcutIntentBuilder.OnShortcutIntentCreatedListener;
+import com.android.contacts.util.PhoneCapabilityTester;
+import com.android.internal.util.Objects;
+
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.LoaderManager;
@@ -38,16 +47,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
-
-import com.android.contacts.ContactSaveService;
-import com.android.contacts.R;
-import com.android.contacts.activities.ContactDetailActivity.FragmentKeyListener;
-import com.android.contacts.list.ShortcutIntentBuilder;
-import com.android.contacts.list.ShortcutIntentBuilder.OnShortcutIntentCreatedListener;
-import com.android.contacts.model.Contact;
-import com.android.contacts.model.ContactLoader;
-import com.android.contacts.util.PhoneCapabilityTester;
-import com.android.internal.util.Objects;
 
 /**
  * This is an invisible worker {@link Fragment} that loads the contact details for the contact card.
@@ -85,7 +84,7 @@ public class ContactLoaderFragment extends Fragment implements FragmentKeyListen
         /**
          * Contact details have finished loading.
          */
-        public void onDetailsLoaded(Contact result);
+        public void onDetailsLoaded(ContactLoader.Result result);
 
         /**
          * User decided to go to Edit-Mode
@@ -108,7 +107,7 @@ public class ContactLoaderFragment extends Fragment implements FragmentKeyListen
     private Uri mLookupUri;
     private ContactLoaderFragmentListener mListener;
 
-    private Contact mContactData;
+    private ContactLoader.Result mContactData;
 
     public ContactLoaderFragment() {
     }
@@ -180,18 +179,18 @@ public class ContactLoaderFragment extends Fragment implements FragmentKeyListen
     /**
      * The listener for the detail loader
      */
-    private final LoaderManager.LoaderCallbacks<Contact> mDetailLoaderListener =
-            new LoaderCallbacks<Contact>() {
+    private final LoaderManager.LoaderCallbacks<ContactLoader.Result> mDetailLoaderListener =
+            new LoaderCallbacks<ContactLoader.Result>() {
         @Override
-        public Loader<Contact> onCreateLoader(int id, Bundle args) {
+        public Loader<ContactLoader.Result> onCreateLoader(int id, Bundle args) {
             Uri lookupUri = args.getParcelable(LOADER_ARG_CONTACT_URI);
             return new ContactLoader(mContext, lookupUri, true /* loadGroupMetaData */,
                     true /* loadStreamItems */, true /* load invitable account types */,
-                    true /* postViewNotification */, true /* computeFormattedPhoneNumber */);
+                    true /* postViewNotification */);
         }
 
         @Override
-        public void onLoadFinished(Loader<Contact> loader, Contact data) {
+        public void onLoadFinished(Loader<ContactLoader.Result> loader, ContactLoader.Result data) {
             if (!mLookupUri.equals(data.getRequestedUri())) {
                 Log.e(TAG, "Different URI: requested=" + mLookupUri + "  actual=" + data);
                 return;
@@ -216,11 +215,11 @@ public class ContactLoaderFragment extends Fragment implements FragmentKeyListen
                 }
             }
             // Make sure the options menu is setup correctly with the loaded data.
-            if (getActivity() != null) getActivity().invalidateOptionsMenu();
+            getActivity().invalidateOptionsMenu();
         }
 
         @Override
-        public void onLoaderReset(Loader<Contact> loader) {}
+        public void onLoaderReset(Loader<ContactLoader.Result> loader) {}
     };
 
     @Override
@@ -320,7 +319,6 @@ public class ContactLoaderFragment extends Fragment implements FragmentKeyListen
                 final Intent intent = new Intent(Intent.ACTION_SEND);
                 intent.setType(Contacts.CONTENT_VCARD_TYPE);
                 intent.putExtra(Intent.EXTRA_STREAM, shareUri);
-
                 // Launch chooser to share contact via
                 final CharSequence chooseTitle = mContext.getText(R.string.share_via);
                 final Intent chooseIntent = Intent.createChooser(intent, chooseTitle);
@@ -462,14 +460,14 @@ public class ContactLoaderFragment extends Fragment implements FragmentKeyListen
 
     /** Toggles whether to load stream items. Just for debugging */
     public void toggleLoadStreamItems() {
-        Loader<Contact> loaderObj = getLoaderManager().getLoader(LOADER_DETAILS);
+        Loader<ContactLoader.Result> loaderObj = getLoaderManager().getLoader(LOADER_DETAILS);
         ContactLoader loader = (ContactLoader) loaderObj;
         loader.setLoadStreamItems(!loader.getLoadStreamItems());
     }
 
     /** Returns whether to load stream items. Just for debugging */
     public boolean getLoadStreamItems() {
-        Loader<Contact> loaderObj = getLoaderManager().getLoader(LOADER_DETAILS);
+        Loader<ContactLoader.Result> loaderObj = getLoaderManager().getLoader(LOADER_DETAILS);
         ContactLoader loader = (ContactLoader) loaderObj;
         return loader != null && loader.getLoadStreamItems();
     }

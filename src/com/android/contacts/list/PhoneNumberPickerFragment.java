@@ -15,6 +15,10 @@
  */
 package com.android.contacts.list;
 
+import com.android.contacts.R;
+import com.android.contacts.list.ShortcutIntentBuilder.OnShortcutIntentCreatedListener;
+import com.android.contacts.util.AccountFilterUtil;
+
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
@@ -26,10 +30,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-
-import com.android.contacts.R;
-import com.android.contacts.list.ShortcutIntentBuilder.OnShortcutIntentCreatedListener;
-import com.android.contacts.util.AccountFilterUtil;
+import android.widget.TextView;
 
 /**
  * Fragment containing a phone number list for picking.

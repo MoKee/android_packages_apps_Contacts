@@ -16,7 +16,18 @@
 
 package com.android.contacts.activities;
 
+import com.android.contacts.ContactSaveService;
+import com.android.contacts.ContactsActivity;
+import com.android.contacts.R;
+import com.android.contacts.editor.ContactEditorFragment;
+import com.android.contacts.editor.ContactEditorFragment.SaveMode;
+import com.android.contacts.model.AccountType;
+import com.android.contacts.model.AccountTypeManager;
+import com.android.contacts.model.AccountWithDataSet;
+import com.android.contacts.util.DialogManager;
+
 import android.app.ActionBar;
+import android.app.ActionBar.LayoutParams;
 import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.Context;
@@ -30,16 +41,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-
-import com.android.contacts.ContactSaveService;
-import com.android.contacts.ContactsActivity;
-import com.android.contacts.R;
-import com.android.contacts.editor.ContactEditorFragment;
-import com.android.contacts.editor.ContactEditorFragment.SaveMode;
-import com.android.contacts.model.AccountTypeManager;
-import com.android.contacts.model.account.AccountType;
-import com.android.contacts.model.account.AccountWithDataSet;
-import com.android.contacts.util.DialogManager;
 
 import java.util.ArrayList;
 
@@ -105,11 +106,27 @@ public class ContactEditorActivity extends ContactsActivity
                     mFragment.doSaveAction();
                 }
             });
+            
+            /*Wang:*/
+            View cancelMenuItem = customActionBarView.findViewById(R.id.cancel_menu_item);
+            cancelMenuItem.setVisibility(View.VISIBLE);
+            cancelMenuItem.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mFragment.revert();
+                }
+            });
+             //add for cancel and save menu dividing line
+            View cancelSaveMenuDividing = customActionBarView.findViewById(R.id.cancel_save_menu_dividing_id);
+            cancelSaveMenuDividing.setVisibility(View.VISIBLE);
+            
             // Show the custom action bar but hide the home icon and title
             actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM,
                     ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME |
                     ActionBar.DISPLAY_SHOW_TITLE);
-            actionBar.setCustomView(customActionBarView);
+            //moditify by hhl
+            actionBar.setCustomView(customActionBarView,
+            		new ActionBar.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
         }
 
         mFragment = (ContactEditorFragment) getFragmentManager().findFragmentById(

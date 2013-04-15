@@ -16,6 +16,8 @@
 
 package com.android.contacts.widget;
 
+import com.android.contacts.R;
+
 import android.app.ListActivity;
 import android.content.Context;
 import android.database.Cursor;
@@ -26,8 +28,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
-import com.android.contacts.R;
 
 /**
  * An activity that demonstrates various use cases for the {@link PinnedHeaderListView}.

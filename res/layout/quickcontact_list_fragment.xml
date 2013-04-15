@@ -13,22 +13,31 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-
+<!--
+    android:background="@android:color/holo_green_light"
+-->
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    >
+	<!--
+        android:background="@android:color/holo_red_dark"
+        android:layout_centerInParent="true"
+	-->
+	    
     <ListView
         android:id="@+id/list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
         android:divider="@drawable/quickcontact_list_item_divider"
         android:dividerHeight="1dip"
-        android:background="@color/quickcontact_list_background"
         android:cacheColorHint="@null"
-        android:layout_alignParentTop="true"
     />
-    <View
-        android:layout_alignBottom="@+id/list"
-        style="@style/QuickContactListBottomStyle"/>
+    <!--  
+        android:layout_alignParentTop="true"
+        android:background="@color/quickcontact_list_background"
+    <include layout="@layout/quickcontact_list_fragment_bottom"/>
+    -->
 </RelativeLayout>

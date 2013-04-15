@@ -15,6 +15,8 @@
  */
 package com.android.contacts.vcard;
 
+import com.android.contacts.R;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -26,9 +28,10 @@ import android.content.ServiceConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.util.Log;
-
-import com.android.contacts.R;
 
 /**
  * The Activity for canceling vCard import/export.

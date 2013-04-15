@@ -16,6 +16,10 @@
 
 package com.android.contacts.editor;
 
+import com.android.contacts.model.AccountWithDataSet;
+import com.android.contacts.util.AccountsListAdapter;
+import com.android.contacts.util.AccountsListAdapter.AccountListFilter;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -23,10 +27,6 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.os.Bundle;
-
-import com.android.contacts.model.account.AccountWithDataSet;
-import com.android.contacts.util.AccountsListAdapter;
-import com.android.contacts.util.AccountsListAdapter.AccountListFilter;
 
 /**
  * Shows a dialog asking the user which account to chose.

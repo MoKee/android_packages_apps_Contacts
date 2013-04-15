@@ -16,14 +16,16 @@
  * limitations under the License.
  */
 -->
-
+<!-- Wang: 
+    android:background="@android:color/holo_orange_dark"-->
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingLeft="8dip"
     android:paddingRight="8dip"
-    android:focusable="false">
+    android:focusable="false"
+    >
     <TextView
         android:id="@+id/kind_title"
         style="@style/ContactListSeparatorTextViewStyle"

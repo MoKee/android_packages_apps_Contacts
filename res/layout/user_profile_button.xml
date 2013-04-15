@@ -13,18 +13,51 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-
-<Button
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<!--
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:minHeight="@dimen/contact_browser_list_item_photo_size"
     android:layout_marginLeft="?attr/list_item_padding_left"
-    android:layout_marginRight="?attr/list_item_padding_right"
-    android:paddingLeft="?attr/list_item_header_text_indent"
+    android:layout_marginRight="?attr/list_item_padding_right" 
+    android:paddingLeft="?attr/list_item_header_text_indent" 
     android:background="?android:attr/selectableItemBackground"
+    android:textAppearance="?android:attr/textAppearanceMedium"
+-->
+ 
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/contacts_view_person_data_height" >
+
+    <Button
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/user_profile_button_id"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/shendu_listview_item_overall"
+        android:ellipsize="end"
+        android:gravity="left|center_vertical"
+        android:paddingLeft="@dimen/account_container_left_padding"
+        android:paddingRight="@dimen/account_container_left_padding"
+        android:singleLine="true"
+        android:text="@string/profile_display_name"
+        android:textColor="@color/contacts_view_header_name_color"
+        android:textSize="@dimen/group_editor_actionbar_text_size" />
+
+</FrameLayout>
+
+<!-- <Button
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="64dp"
+    android:layout_marginLeft="10dp"
+    android:layout_marginRight="10dp"
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp"
+    android:background="@drawable/shendu_listview_item_overall"
     android:singleLine="true"
     android:text="@string/profile_display_name"
+    android:textColor="@color/contacts_view_header_name_color"
+    android:textSize="@dimen/favorites_item_view_title_size"
     android:ellipsize="end"
     android:gravity="left|center_vertical"
-    android:textAppearance="?android:attr/textAppearanceMedium" />
+    /> -->

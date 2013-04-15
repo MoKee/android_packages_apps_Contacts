@@ -15,19 +15,6 @@
  */
 package com.android.contacts.list;
 
-import android.content.ContentUris;
-import android.content.Context;
-import android.content.res.Resources;
-import android.database.Cursor;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
-import android.provider.ContactsContract.CommonDataKinds.Phone;
-import android.provider.ContactsContract.Contacts;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.FrameLayout;
-
 import com.android.contacts.ContactPhotoManager;
 import com.android.contacts.ContactPresenceIconUtil;
 import com.android.contacts.ContactStatusUtil;
@@ -36,6 +23,20 @@ import com.android.contacts.ContactsUtils;
 import com.android.contacts.GroupMemberLoader;
 import com.android.contacts.GroupMemberLoader.GroupDetailQuery;
 import com.android.contacts.R;
+
+import android.content.ContentUris;
+import android.content.Context;
+import android.content.res.Resources;
+import android.database.Cursor;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.provider.ContactsContract.CommonDataKinds.Phone;
+import android.provider.ContactsContract.Contacts;
+import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.FrameLayout;
 
 import java.util.ArrayList;
 
@@ -78,6 +79,8 @@ public class ContactTileAdapter extends BaseAdapter {
 
     private boolean mIsQuickContactEnabled = false;
     private final int mPaddingInPixels;
+    
+    private int mIsStartFirst = 1; //add
 
     /**
      * Configures the adapter to filter and display contacts using different view types.
@@ -123,8 +126,9 @@ public class ContactTileAdapter extends BaseAdapter {
         mNumFrequents = 0;
 
         // Converting padding in dips to padding in pixels
+        /* Wang: */
         mPaddingInPixels = mContext.getResources()
-                .getDimensionPixelSize(R.dimen.contact_tile_divider_padding);
+                .getDimensionPixelSize(R.dimen.account_container_left_padding);
 
         bindColumnIndices();
     }
@@ -411,6 +415,13 @@ public class ContactTileAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         int itemViewType = getItemViewType(position);
 
+        if(position==0){
+        	if(itemViewType == ViewTypes.STARRED){
+            	mIsStartFirst = 2;
+        	}else{
+        		mIsStartFirst = 1;
+        	}
+        }
         if (itemViewType == ViewTypes.DIVIDER) {
             // Checking For Divider First so not to cast convertView
             return convertView == null ? getDivider() : convertView;
@@ -423,8 +434,8 @@ public class ContactTileAdapter extends BaseAdapter {
             // Creating new row if needed
             contactTileRowView = new ContactTileRow(mContext, itemViewType);
         }
-
-        contactTileRowView.configureRow(contactList, position == getCount() - 1);
+        
+        contactTileRowView.configureRow(contactList, position == getCount() - 1 ,position);
         return contactTileRowView;
     }
 
@@ -439,6 +450,7 @@ public class ContactTileAdapter extends BaseAdapter {
     }
 
     private int getLayoutResourceId(int viewType) {
+        log("TileRow : viewType =" + viewType);
         switch (viewType) {
             case ViewTypes.STARRED:
                 return mIsQuickContactEnabled ?
@@ -515,26 +527,23 @@ public class ContactTileAdapter extends BaseAdapter {
             super(context);
             mItemViewType = itemViewType;
             mLayoutResId = getLayoutResourceId(mItemViewType);
-
-            // Remove row (but not children) from accessibility node tree.
-            setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
         }
 
         /**
          * Configures the row to add {@link ContactEntry}s information to the views
          */
-        public void configureRow(ArrayList<ContactEntry> list, boolean isLastRow) {
+        public void configureRow(ArrayList<ContactEntry> list, boolean isLastRow, int position) {
             int columnCount = mItemViewType == ViewTypes.FREQUENT ? 1 : mColumnCount;
 
             // Adding tiles to row and filling in contact information
             for (int columnCounter = 0; columnCounter < columnCount; columnCounter++) {
                 ContactEntry entry =
                         columnCounter < list.size() ? list.get(columnCounter) : null;
-                addTileFromEntry(entry, columnCounter, isLastRow);
+                addTileFromEntry(entry, columnCounter, isLastRow, position);
             }
         }
 
-        private void addTileFromEntry(ContactEntry entry, int childIndex, boolean isLastRow) {
+        private void addTileFromEntry(ContactEntry entry, int childIndex, boolean isLastRow ,int position) {
             final ContactTileView contactTile;
 
             if (getChildCount() <= childIndex) {
@@ -543,13 +552,16 @@ public class ContactTileAdapter extends BaseAdapter {
                 // We override onMeasure() for STARRED and we don't care the layout param there.
                 Resources resources = mContext.getResources();
                 FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT);
-                params.setMargins(
-                        resources.getDimensionPixelSize(R.dimen.detail_item_side_margin),
-                        0,
-                        resources.getDimensionPixelSize(R.dimen.detail_item_side_margin),
-                        0);
+
+                /* Wang: */
+                 params.setMargins(
+                 resources.getDimensionPixelSize(R.dimen.account_container_left_padding),
+                 0,
+                 resources.getDimensionPixelSize(R.dimen.account_container_left_padding),
+                 0);
+
                 contactTile.setLayoutParams(params);
                 contactTile.setPhotoManager(mPhotoManager);
                 contactTile.setListener(mListener);
@@ -558,14 +570,39 @@ public class ContactTileAdapter extends BaseAdapter {
                 contactTile = (ContactTileView) getChildAt(childIndex);
             }
             contactTile.loadFromContact(entry);
-
+            //add by hhl, for rounder background
+            if(mItemViewType == ViewTypes.FREQUENT){
+            	int rounderSize = getCount()-mIsStartFirst;
+            	int rounderPosition = position-mIsStartFirst;
+            	if(rounderSize==1){
+            		contactTile.setItemParentBackground(R.drawable.shendu_listview_item_overall);
+            	}else{
+            		if(isLastRow){
+                		contactTile.setItemParentBackground(R.drawable.shendu_listview_item_bottom);
+                	}else if(rounderPosition == 0){
+                		contactTile.setItemParentBackground(R.drawable.shendu_listview_item_top);
+                	}else{
+                		contactTile.setItemParentBackground(R.drawable.shendu_listview_item_middle);
+                	}
+            	}
+            }
+            
             switch (mItemViewType) {
                 case ViewTypes.STARRED_PHONE:
                 case ViewTypes.STARRED:
                     // Setting divider visibilities
-                    contactTile.setPadding(0, 0,
-                            childIndex >= mColumnCount - 1 ? 0 : mPaddingInPixels,
-                            isLastRow ? 0 : mPaddingInPixels);
+                    // Wang:
+                    // contactTile.setPadding(0, 0,
+                    // childIndex >= mColumnCount - 1 ? 0 : mPaddingInPixels,
+                    // isLastRow ? 0 : mPaddingInPixels);
+                    // contactTile.setPadding(childIndex == 0 ? mPaddingInPixels
+                    // : 0,
+                    // mPaddingInPixels, mPaddingInPixels, 0);
+                    contactTile.setPadding(
+                    		childIndex == 0 ? mPaddingInPixels  : 0,
+                            mPaddingInPixels, 
+                            mPaddingInPixels, 
+                            0);
                     break;
                 case ViewTypes.FREQUENT:
                     contactTile.setHorizontalDividerVisibility(
@@ -626,6 +663,26 @@ public class ContactTileAdapter extends BaseAdapter {
                 setMeasuredDimension(width, 0);
                 return;
             }
+            
+            /*Wang: Re-Layout 2012-10-20 */
+            if (mItemViewType == ViewTypes.STARRED  || mItemViewType ==ViewTypes.STARRED_PHONE) {
+                final int totalPaddingsInPixels = (mColumnCount + 1) * mPaddingInPixels;
+                final int imageSize = (width - totalPaddingsInPixels) / mColumnCount;
+                final int remainder = width - (imageSize * mColumnCount) - totalPaddingsInPixels;
+                for (int i = 0; i < childCount; i++) {
+                    final View child = getChildAt(i);
+                    final int childWidth = imageSize + child.getPaddingRight() + child.getPaddingLeft()/*Wang*/
+                            + (i < remainder ? 1 : 0);
+                    final int childHeight = imageSize + child.getPaddingTop()/*Wang*/;
+                    child.measure(
+                            MeasureSpec.makeMeasureSpec(childWidth, MeasureSpec.EXACTLY),
+                            MeasureSpec.makeMeasureSpec(childHeight, MeasureSpec.EXACTLY)
+                            );
+                }
+                setMeasuredDimension(width, imageSize + getChildAt(0).getPaddingTop()/*Wang*/);
+                return;
+            }
+            
 
             // 1. Calculate image size.
             //      = ([total width] - [total padding]) / [child count]
@@ -657,6 +714,14 @@ public class ContactTileAdapter extends BaseAdapter {
             }
             setMeasuredDimension(width, imageSize + getChildAt(0).getPaddingBottom());
         }
+
+        @Override
+        public void sendAccessibilityEvent(int eventType) {
+            // This method is called when the child tile is INVISIBLE (meaning "empty"), and the
+            // Accessibility Manager needs to find alternative content description to speak.
+            // Here, we ignore the default behavior, since we don't want to let the manager speak
+            // a contact name for the tile next to the INVISIBLE tile.
+        }
     }
 
     /**
@@ -678,5 +743,12 @@ public class ContactTileAdapter extends BaseAdapter {
         public static final int DIVIDER = 1;
         public static final int FREQUENT = 2;
         public static final int STARRED_PHONE = 3;
+    }
+    private static final boolean debug = false;
+
+    private static void log(String msg) {
+        msg = "TileFragment -> " + msg;
+        if (debug)
+            Log.i("ShenduTile", msg);
     }
 }

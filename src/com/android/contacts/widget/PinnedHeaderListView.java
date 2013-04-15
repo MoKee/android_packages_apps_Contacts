@@ -308,7 +308,11 @@ public class PinnedHeaderListView extends AutoScrollListView
         if (child == null) return;
 
         PinnedHeader header = mHeaders[viewIndex];
-        header.visible = true;
+        if(position==0){
+        	header.visible = false;
+        }else{
+        	header.visible = true;
+        }
         header.state = FADING;
         header.alpha = MAX_ALPHA;
         header.animating = false;

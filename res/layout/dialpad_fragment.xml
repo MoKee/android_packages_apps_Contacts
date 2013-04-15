@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2011 The Android Open Source Project
+<!--
+     Copyright (C) 2011 The Android Open Source Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -14,128 +15,257 @@
      limitations under the License.
 -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/top"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/dialpad_fragnebt_main_framelayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:paddingLeft="@dimen/dialpad_horizontal_margin"
-    android:paddingRight="@dimen/dialpad_horizontal_margin">
+    android:layout_height="match_parent" >
 
-    <!-- Text field and possibly soft menu button above the keypad where
-         the digits are displayed. -->
-    <LinearLayout
-        android:id="@+id/digits_container"
+    <fragment
+        android:id="@+id/dialpad_CallLogFragment"
+        android:name="com.android.contacts.calllog.CallLogFragment"
         android:layout_width="match_parent"
-        android:layout_height="0px"
-        android:layout_weight="0.1"
-        android:layout_marginTop="@dimen/dialpad_vertical_margin"
-        android:gravity="center"
-        android:background="@drawable/dialpad_background" >
-
-        <com.android.contacts.dialpad.DigitsEditText
-            android:id="@+id/digits"
-            android:layout_width="0dip"
-            android:layout_weight="1"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:textAppearance="@style/DialtactsDigitsTextAppearance"
-            android:textColor="?android:attr/textColorPrimary"
-            android:nextFocusRight="@+id/overflow_menu"
-            android:background="@android:color/transparent" />
-
-        <ImageButton
-            android:id="@+id/deleteButton"
-            android:layout_width="56dip"
-            android:layout_height="match_parent"
-            android:layout_gravity="center_vertical"
-            android:gravity="center"
-            android:state_enabled="false"
-            android:background="?android:attr/selectableItemBackground"
-            android:contentDescription="@string/description_delete_button"
-            android:src="@drawable/ic_dial_action_delete" />
-    </LinearLayout>
+        android:layout_height="match_parent" />
 
     <LinearLayout
+        android:id="@+id/top"
         android:layout_width="match_parent"
-        android:layout_height="0px"
-        android:id="@+id/t9topbar"
-        android:background="@drawable/dialpad_background"
-        android:gravity="center_vertical"
-        android:layout_weight="0.1">
-        <ListView
-            android:id="@+id/t9listtop"
-            android:visibility="invisible"
-            android:divider="@null"
-            android:gravity="center_vertical"
-            android:layout_gravity="center_vertical"
-            android:overScrollMode="never"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="40dp" />
-        <ToggleButton
-            android:id="@+id/t9toggle"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:visibility="invisible"
-            android:scaleType="centerInside"
-            android:textOn=""
-            android:textOff=""
-            android:background="@drawable/t9toggle_state"
-            android:layout_gravity="center"/>
-    </LinearLayout>
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/dialpad_horizontal_margin"
+        android:paddingRight="@dimen/dialpad_horizontal_margin" >
 
-    <ViewSwitcher
-        android:id="@+id/t9flipper"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.65">
-        <!-- Keypad section -->
-        <include  layout="@layout/dialpad" />
-        <ListView
+        <!--
+             <LinearLayout
+            android:id="@+id/t9topbar"
             android:layout_width="match_parent"
-            android:id="@+id/t9list"
-            android:visibility="gone"
+            android:layout_height="wrap_content"
             android:background="@drawable/dialpad_background"
-            android:scrollingCache="true"
-            android:layout_height="match_parent" />
-    </ViewSwitcher>
+            android:gravity="center_vertical"
+            android:visibility="gone" >
 
-    <View
-       android:layout_width="match_parent"
-       android:layout_height="@dimen/dialpad_vertical_margin"
-       android:background="@color/dialpad_switch_bg"/>
+            <ListView
+                android:id="@+id/t9listtop"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:divider="@null"
+                android:gravity="center_vertical"
+                android:overScrollMode="never"
+                android:visibility="invisible" />
+        </LinearLayout>
+        -->
 
-    <!-- left and right paddings will be modified by the code. See DialpadFragment. -->
-    <FrameLayout
-        android:id="@+id/dialButtonContainer"
-        android:layout_width="match_parent"
-        android:layout_height="0px"
-        android:layout_weight="0.150"
-        android:layout_gravity="center_horizontal"
-        android:background="@drawable/dialpad_background"
-        android:orientation="horizontal">
-
-        <ImageButton
-            android:id="@+id/dialButton"
+        <LinearLayout
+            android:id="@+id/search_list_linear"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="center_vertical"
-            android:state_enabled="false"
-            android:background="@drawable/btn_call"
-            android:contentDescription="@string/description_dial_button"
-            android:src="@drawable/ic_dial_action_call" />
+            android:layout_marginBottom="@dimen/shendu_dialpad_bottom_height"
+            android:orientation="vertical" >
 
-    </FrameLayout>
+            <LinearLayout
+                android:id="@+id/digits_container"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/shendu_dialpad_list_height"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:gravity="center" >
 
-    <!-- "Dialpad chooser" UI, shown only when the user brings up the
+                <com.android.contacts.dialpad.DigitsEditText
+                    android:id="@+id/digits"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/shendu_dialpad_list_height"
+                    android:background="@android:color/transparent"
+                    android:gravity="left|center_vertical"
+                    android:nextFocusRight="@+id/overflow_menu"
+                    android:paddingLeft="5dp"
+                    android:singleLine="true"
+                    android:layout_marginLeft="@dimen/shendu_dialpad_list_marginleft"
+                    android:layout_marginRight="@dimen/shendu_dialpad_list_marginright"
+                    android:textAppearance="@style/DialtactsDigitsTextAppearance"
+                    android:textColor="@color/shendu_dialpad_input_number_color" />
+                <View 
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:layout_marginLeft="@dimen/shendu_dialpad_list_marginleft"
+                    android:layout_marginRight="@dimen/shendu_dialpad_list_marginright"
+                    android:background="@drawable/shendu_dial_number_divider"/>
+            </LinearLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
+
+                <ListView
+                    android:id="@+id/t9list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:dividerHeight="0.5dp"
+                    android:layout_marginLeft="@dimen/shendu_dialpad_list_marginleft"
+                    android:layout_marginRight="@dimen/shendu_dialpad_list_marginright"
+                    android:background="@drawable/shendu_background_bg"
+                    android:divider="@drawable/shendu_selected_bottom_divider"
+                    android:scrollingCache="true" />
+
+                <ListView
+                    android:id="@+id/newContactList"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="@dimen/shendu_dialpad_list_marginleft"
+                    android:layout_marginRight="@dimen/shendu_dialpad_list_marginright"
+                    android:background="@drawable/shendu_background_bg"
+                    android:divider="@drawable/shendu_selected_bottom_divider"
+                    android:dividerHeight="0.5dp"
+                    android:scrollingCache="true"
+                    android:visibility="gone" >
+                </ListView>
+            </FrameLayout>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dialpad_vertical_margin"
+            android:background="@color/dialpad_switch_bg"
+            android:visibility="gone" />
+
+        <!-- left and right paddings will be modified by the code. See DialpadFragment. -->
+
+
+        <!--
+         "Dialpad chooser" UI, shown only when the user brings up the
          Dialer while a call is already in progress.
          When this UI is visible, the other Dialer elements
-         (the textfield/button and the dialpad) are hidden. -->
-    <ListView android:id="@+id/dialpadChooser"
-        android:layout_width="match_parent"
-        android:layout_height="1dip"
-        android:layout_weight="1"
-    />
+         (the textfield/button and the dialpad) are hidden.
+        -->
 
-</LinearLayout>
+
+        <!--
+             <ListView
+            android:id="@+id/dialpadChooser"
+            android:layout_width="match_parent"
+            android:layout_height="1dip"
+            android:layout_weight="1"
+            android:visibility="gone" />
+        -->
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="bottom"
+        android:orientation="vertical" >
+
+        <ViewSwitcher
+            android:id="@+id/t9flipper"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="@dimen/shendu_dialpad_bootem_height" >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <!--
+         Text field and possibly soft menu button above the keypad where
+         the digits are displayed.
+                -->
+
+
+                <!-- Keypad section -->
+
+                <include layout="@layout/dialpad" />
+            </LinearLayout>
+        </ViewSwitcher>
+
+        <LinearLayout
+            android:id="@+id/dialButtonContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:background="@drawable/shendu_btn_call_bg"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal" >
+
+            <ImageButton
+                android:id="@+id/shendu_toContactsButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/shendu_to_contact_button_selector"
+                android:contentDescription="@string/description_search_button"
+                android:state_enabled="false" />
+
+            <ViewFlipper
+                android:id="@+id/shendu_call_view_flipper"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" >
+
+                <LinearLayout
+                    android:id="@+id/shendu_call_linear"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" >
+
+                    <Button
+                        android:id="@+id/dialButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:background="@drawable/shendu_btn_call_selector"
+                        android:state_enabled="false"
+                        android:textColor="@color/shendu_dialpad_fragment_dial_text_color"
+                        android:textSize="20sp" />
+
+                    <!--
+                android:text="@string/call_other"
+                 <ImageButton
+                android:id="@+id/overflow_menu"
+                android:layout_width="wrap_content"
+                android:layout_height="?android:attr/actionBarSize"
+                android:layout_gravity="center_vertical"
+                android:background="?android:attr/selectableItemBackground"
+                android:contentDescription="@*android:string/action_menu_overflow_description"
+                android:nextFocusLeft="@id/digits"
+                android:src="@drawable/ic_menu_overflow" />
+                    -->
+
+                    <ToggleButton
+                        android:id="@+id/t9toggle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:background="?android:attr/selectableItemBackground"
+                        android:gravity="left|center_vertical"
+                        android:scaleType="centerInside"
+                        android:textOff=""
+                        android:textOn=""
+                        android:visibility="gone" />
+
+                    <ImageButton
+                        android:id="@+id/deleteButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:background="@drawable/shendu_dial_keyboard_hide_selector"
+                        android:contentDescription="@string/description_delete_button"
+                        android:gravity="center"
+                        android:state_enabled="false" />
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/shendu_call_show_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="@drawable/shendu_dial_keyboar_show_selector"
+                    android:gravity="left|center_vertical"
+                    android:paddingLeft="@dimen/shendu_dialpad_call_show_Left"
+                    android:text="@string/shendu_call_dialer_show_text"
+                    android:textColor="@color/shendu_dialpad_fragment_dial_text_color"
+                    android:textSize="20sp" />
+            </ViewFlipper>
+        </LinearLayout>
+    </RelativeLayout>
+
+</FrameLayout>

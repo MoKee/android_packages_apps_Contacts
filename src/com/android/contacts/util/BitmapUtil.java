@@ -52,14 +52,10 @@ public class BitmapUtil {
         if (targetExtent < 1) return 1;
         if (originalSmallerExtent < 1) return 1;
 
-        // Test what the best sample size is. To do that, we find the sample size that gives us
-        // the best trade-off between resulting image size and memory requirement. We allow
-        // the down-sampled image to be 20% smaller than the target size. That way we can get around
-        // unfortunate cases where e.g. a 720 picture is requested for 362 and not down-sampled at
-        // all. Why 20%? Why not. Prove me wrong.
+        // test what the best sample size is
         int extent = originalSmallerExtent;
         int sampleSize = 1;
-        while ((extent >> 1) >= targetExtent * 0.8f) {
+        while ((extent >> 1) >= targetExtent) {
             sampleSize <<= 1;
             extent >>= 1;
         }

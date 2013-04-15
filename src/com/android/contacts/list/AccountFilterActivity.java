@@ -16,6 +16,13 @@
 
 package com.android.contacts.list;
 
+import com.android.contacts.ContactsActivity;
+import com.android.contacts.R;
+import com.android.contacts.model.AccountType;
+import com.android.contacts.model.AccountTypeManager;
+import com.android.contacts.model.AccountWithDataSet;
+import com.google.android.collect.Lists;
+
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
@@ -23,23 +30,19 @@ import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
-
-import com.android.contacts.ContactsActivity;
-import com.android.contacts.R;
-import com.android.contacts.model.AccountTypeManager;
-import com.android.contacts.model.account.AccountType;
-import com.android.contacts.model.account.AccountWithDataSet;
-import com.google.common.collect.Lists;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,12 +72,17 @@ public class AccountFilterActivity extends ContactsActivity
         super.onCreate(icicle);
         setContentView(R.layout.contact_list_filter);
 
-        mListView = (ListView) findViewById(android.R.id.list);
+        mListView = (ListView) findViewById(com.android.internal.R.id.list);
         mListView.setOnItemClickListener(this);
-
         ActionBar actionBar = getActionBar();
+       
         if (actionBar != null) {
+        	int titleId = Resources.getSystem().getIdentifier(  
+                    "action_bar_title", "id", "android"); 
+            TextView shendu_title = (TextView) findViewById(titleId);
+            shendu_title.setTextColor(getResources().getColor(R.color.action_bar_button_text_color));
             actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayHomeAsUpEnabled(false);
         }
 
         mCurrentFilter = getIntent().getParcelableExtra(KEY_EXTRA_CURRENT_FILTER);
