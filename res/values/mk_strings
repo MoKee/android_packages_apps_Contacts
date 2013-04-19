@@ -13,7 +13,7 @@
      See the License for the specific language governing permissions and
      limitations under the License.
  -->
-
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <!-- IP Call -->
     <string name="dialer_ip_call_prefix_title">IP Prefix</string>
     <string name="dialer_ip_call_prefix_summary">Tap to set IP Prefix</string>
