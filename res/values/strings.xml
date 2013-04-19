@@ -1964,12 +1964,4 @@ connection to the voicemail server is lost. [CHAR LIMIT=64] -->
     <string name="toast_added_to_blacklist">%s added to blacklist.</string>
 
     <!-- CYANOGENMOD ADDITIONS END -->
-    
-    <!-- MOKEE ADDITIONS START -->
-    <!-- IP Call -->
-    <string name="dialer_ip_call_prefix_title">IP Prefix</string>
-    <string name="dialer_ip_call_prefix_summary">Tap to set IP Prefix</string>
-    <string name="dialer_ipcall_title">IPCall</string>
-    <string name="dialer_ipcall_msg">IP prefix has not been set. Do you want to make the call without IP prefix</string>
-    <!-- MOKEE ADDITIONS END -->
 </resources>
