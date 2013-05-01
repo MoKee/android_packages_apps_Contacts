@@ -16,6 +16,10 @@
 
 package com.android.contacts.util;
 
+import com.android.contacts.ContactLoader.Result;
+import com.android.contacts.ContactPhotoManager;
+
+import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.Resources.NotFoundException;
 import android.graphics.Bitmap;
@@ -25,9 +29,6 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.util.Log;
 import android.widget.ImageView;
-
-import com.android.contacts.ContactPhotoManager;
-import com.android.contacts.model.Contact;
 
 import java.util.Arrays;
 
@@ -49,9 +50,10 @@ public class ImageViewDrawableSetter {
         mTarget = target;
     }
 
-    public void setupContactPhoto(Contact contactData, ImageView photoView) {
+    public void setupContactPhoto(Result contactData, ImageView photoView) {
         setTarget(photoView);
-        setCompressedImage(contactData.getPhotoBinaryData());
+        /*Wang:2012-11-15*/
+        setCompressedImage(photoView.getContext(), contactData);
     }
 
     public void setTransitionDuration(int durationInMillis) {
@@ -79,6 +81,66 @@ public class ImageViewDrawableSetter {
         return mCompressed;
     }
 
+    /**
+     * 
+     * @author Wang
+     * @date 2012-11-15
+     * */
+    protected Bitmap setCompressedImage(Context ctx, Result contactData) {
+        byte[] compressed = contactData.getPhotoBinaryData();
+        if (mPreviousDrawable == null) {
+            // If we don't already have a drawable, skip the exit-early test
+            // below; otherwise we might not end up setting the default image.
+        } else if (mPreviousDrawable != null && Arrays.equals(mCompressed, compressed)) {
+            // TODO: the worst case is when the arrays are equal but not
+            // identical. This takes about 1ms (more with high-res photos). A
+            // possible optimization is to sparsely sample chunks of the arrays
+            // to compare.
+            return previousBitmap();
+        }
+        
+      //Wang:2012-11-15
+//        final Drawable newDrawable = (compressed == null)
+//                ? defaultDrawable()
+//                : decodedBitmapDrawable(compressed);
+           Drawable newDrawable = null;
+           if(compressed == null){
+                    Bitmap bm = NameAvatarUtils.makeNameAvatarBitmap(mTarget.getContext(), contactData.getDisplayName());
+                    if(bm == null){
+                        newDrawable = defaultDrawable();
+                    }else{
+                        newDrawable = new BitmapDrawable(bm);
+                    }
+            }else{
+                    newDrawable = decodedBitmapDrawable(compressed);
+            }
+
+        // Remember this for next time, so that we can check if it changed.
+        mCompressed = compressed;
+
+        // If we don't have a new Drawable, something went wrong... bail out.
+        if (newDrawable == null) return previousBitmap();
+
+        if (mPreviousDrawable == null || mDurationInMillis == 0) {
+            // Set the new one immediately.
+            mTarget.setImageDrawable(newDrawable);
+        } else {
+            // Set up a transition from the previous Drawable to the new one.
+            final Drawable[] beforeAndAfter = new Drawable[2];
+            beforeAndAfter[0] = mPreviousDrawable;
+            beforeAndAfter[1] = newDrawable;
+            final TransitionDrawable transition = new TransitionDrawable(beforeAndAfter);
+            mTarget.setImageDrawable(transition);
+            transition.startTransition(mDurationInMillis);
+        }
+
+        // Remember this for next time, so that we can transition from it to the
+        // new one.
+        mPreviousDrawable = newDrawable;
+
+        return previousBitmap();
+    }
+    
     protected Bitmap setCompressedImage(byte[] compressed) {
         if (mPreviousDrawable == null) {
             // If we don't already have a drawable, skip the exit-early test
@@ -90,11 +152,11 @@ public class ImageViewDrawableSetter {
             // to compare.
             return previousBitmap();
         }
-
+        
         final Drawable newDrawable = (compressed == null)
                 ? defaultDrawable()
                 : decodedBitmapDrawable(compressed);
-
+        
         // Remember this for next time, so that we can check if it changed.
         mCompressed = compressed;
 

@@ -37,6 +37,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -118,7 +119,7 @@ public class VCardService extends Service {
     // If true, VCardExporter is able to emits files longer than 8.3 format.
     private static final boolean ALLOW_LONG_FILE_NAME = false;
 
-    private File mTargetDirectory;
+    private String mTargetDirectory;
     private String mFileNamePrefix;
     private String mFileNameSuffix;
     private int mFileIndexMinimum;
@@ -147,7 +148,7 @@ public class VCardService extends Service {
     }
 
     private void initExporterParams() {
-        mTargetDirectory = Environment.getExternalStorageDirectory();
+        mTargetDirectory = Environment.getExternalStorageDirectory().getPath();
         mFileNamePrefix = getString(R.string.config_export_file_prefix);
         mFileNameSuffix = getString(R.string.config_export_file_suffix);
         mFileNameExtension = getString(R.string.config_export_file_extension);
@@ -454,7 +455,7 @@ public class VCardService extends Service {
      * @return destination path for a vCard file to be exported. null on error and mErrorReason
      * is correctly set.
      */
-    private String getAppropriateDestination(final File destDirectory) {
+    private String getAppropriateDestination(final String destDirectory) {
         /*
          * Here, file names have 5 parts: directory, prefix, index, suffix, and extension.
          * e.g. "/mnt/sdcard/prfx00001sfx.vcf" -> "/mnt/sdcard", "prfx", "00001", "sfx", and ".vcf"
@@ -499,30 +500,28 @@ public class VCardService extends Service {
 
         for (int i = mFileIndexMinimum; i <= mFileIndexMaximum; i++) {
             boolean numberIsAvailable = true;
-            final String body = String.format(bodyFormat, mFileNamePrefix, i, mFileNameSuffix);
-            // Make sure that none of the extensions of mExtensionsToConsider matches. If this
-            // number is free, we'll go ahead with mFileNameExtension (which is included in
-            // mExtensionsToConsider)
+            String body = null;
             for (String possibleExtension : mExtensionsToConsider) {
-                final File file = new File(destDirectory, body + "." + possibleExtension);
-                final String path = file.getAbsolutePath();
+                body = String.format(bodyFormat, mFileNamePrefix, i, mFileNameSuffix);
+                final String path =
+                        String.format("%s/%s.%s", destDirectory, body, possibleExtension);
                 synchronized (this) {
-                    // Is this being exported right now? Skip this number
                     if (mReservedDestination.contains(path)) {
                         if (DEBUG) {
-                            Log.d(LOG_TAG, String.format("%s is already being exported.", path));
+                            Log.d(LOG_TAG, String.format("The path %s is reserved.", path));
                         }
                         numberIsAvailable = false;
                         break;
                     }
                 }
+                final File file = new File(path);
                 if (file.exists()) {
                     numberIsAvailable = false;
                     break;
                 }
             }
             if (numberIsAvailable) {
-                return new File(destDirectory, body + "." + mFileNameExtension).getAbsolutePath();
+                return String.format("%s/%s.%s", destDirectory, body, mFileNameExtension);
             }
         }
 

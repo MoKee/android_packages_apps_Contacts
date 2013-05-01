@@ -16,6 +16,29 @@
 
 package com.android.contacts.editor;
 
+import com.android.contacts.ContactLoader;
+import com.android.contacts.ContactSaveService;
+import com.android.contacts.GroupMetaDataLoader;
+import com.android.contacts.R;
+import com.android.contacts.activities.ContactEditorAccountsChangedActivity;
+import com.android.contacts.activities.ContactEditorActivity;
+import com.android.contacts.activities.JoinContactActivity;
+import com.android.contacts.detail.PhotoSelectionHandler;
+import com.android.contacts.editor.AggregationSuggestionEngine.Suggestion;
+import com.android.contacts.editor.Editor.EditorListener;
+import com.android.contacts.model.AccountType;
+import com.android.contacts.model.AccountTypeManager;
+import com.android.contacts.model.AccountWithDataSet;
+import com.android.contacts.model.EntityDelta;
+import com.android.contacts.model.EntityDelta.ValuesDelta;
+import com.android.contacts.model.EntityDeltaList;
+import com.android.contacts.model.EntityModifier;
+import com.android.contacts.model.GoogleAccountType;
+import com.android.contacts.util.AccountsListAdapter;
+import com.android.contacts.util.ContactPhotoUtils;
+import com.android.contacts.util.AccountsListAdapter.AccountListFilter;
+import com.android.contacts.util.HelpUtils;
+
 import android.accounts.Account;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -29,6 +52,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
+import android.content.Entity;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
@@ -60,32 +84,6 @@ import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListPopupWindow;
 import android.widget.Toast;
-
-import com.android.contacts.ContactSaveService;
-import com.android.contacts.GroupMetaDataLoader;
-import com.android.contacts.R;
-import com.android.contacts.activities.ContactEditorAccountsChangedActivity;
-import com.android.contacts.activities.ContactEditorActivity;
-import com.android.contacts.activities.JoinContactActivity;
-import com.android.contacts.detail.PhotoSelectionHandler;
-import com.android.contacts.editor.AggregationSuggestionEngine.Suggestion;
-import com.android.contacts.editor.Editor.EditorListener;
-import com.android.contacts.model.AccountTypeManager;
-import com.android.contacts.model.Contact;
-import com.android.contacts.model.ContactLoader;
-import com.android.contacts.model.RawContact;
-import com.android.contacts.model.RawContactDelta;
-import com.android.contacts.model.RawContactDelta.ValuesDelta;
-import com.android.contacts.model.RawContactDeltaList;
-import com.android.contacts.model.RawContactModifier;
-import com.android.contacts.model.account.AccountType;
-import com.android.contacts.model.account.AccountWithDataSet;
-import com.android.contacts.model.account.GoogleAccountType;
-import com.android.contacts.util.AccountsListAdapter;
-import com.android.contacts.util.AccountsListAdapter.AccountListFilter;
-import com.android.contacts.util.ContactPhotoUtils;
-import com.android.contacts.util.HelpUtils;
-import com.google.common.collect.ImmutableList;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -119,7 +117,6 @@ public class ContactEditorFragment extends Fragment implements
     private static final String KEY_UPDATED_PHOTOS = "updatedPhotos";
 
     public static final String SAVE_MODE_EXTRA_KEY = "saveMode";
-
 
     /**
      * An intent extra that forces the editor to add the edited contact
@@ -227,7 +224,7 @@ public class ContactEditorFragment extends Fragment implements
     private ContactEditorUtils mEditorUtils;
 
     private LinearLayout mContent;
-    private RawContactDeltaList mState;
+    private EntityDeltaList mState;
 
     private ViewIdGenerator mViewIdGenerator;
 
@@ -348,6 +345,11 @@ public class ContactEditorFragment extends Fragment implements
 
         setHasOptionsMenu(true);
 
+        // If we are in an orientation change, we already have mState (it was loaded by onCreate)
+        if (mState != null) {
+            bindEditors();
+        }
+
         return view;
     }
 
@@ -355,29 +357,13 @@ public class ContactEditorFragment extends Fragment implements
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        validateAction(mAction);
-
         // Handle initial actions only when existing state missing
         final boolean hasIncomingState = savedInstanceState != null;
 
-        if (mState == null) {
-            // The delta list may not have finished loading before orientation change happens.
-            // In this case, there will be a saved state but deltas will be missing.  Reload from
-            // database.
-            if (Intent.ACTION_EDIT.equals(mAction)) {
-                // Either...
-                // 1) orientation change but load never finished.
-                // or
-                // 2) not an orientation change.  data needs to be loaded for first time.
-                getLoaderManager().initLoader(LOADER_DATA, null, mDataLoaderListener);
-            }
-        } else {
-            // Orientation change, we already have mState, it was loaded by onCreate
-            bindEditors();
-        }
-
         if (!hasIncomingState) {
-            if (Intent.ACTION_INSERT.equals(mAction)) {
+            if (Intent.ACTION_EDIT.equals(mAction)) {
+                getLoaderManager().initLoader(LOADER_DATA, null, mDataLoaderListener);
+            } else if (Intent.ACTION_INSERT.equals(mAction)) {
                 final Account account = mIntentExtras == null ? null :
                         (Account) mIntentExtras.getParcelable(Intents.Insert.ACCOUNT);
                 final String dataSet = mIntentExtras == null ? null :
@@ -391,24 +377,11 @@ public class ContactEditorFragment extends Fragment implements
                     // Load Accounts async so that we can present them
                     selectAccountAndCreateContact();
                 }
-            }
+            } else if (ContactEditorActivity.ACTION_SAVE_COMPLETED.equals(mAction)) {
+                // do nothing
+            } else throw new IllegalArgumentException("Unknown Action String " + mAction +
+                    ". Only support " + Intent.ACTION_EDIT + " or " + Intent.ACTION_INSERT);
         }
-    }
-
-    /**
-     * Checks if the requested action is valid.
-     *
-     * @param action The action to test.
-     * @throws IllegalArgumentException when the action is invalid.
-     */
-    private void validateAction(String action) {
-        if (Intent.ACTION_EDIT.equals(action) || Intent.ACTION_INSERT.equals(action) ||
-                ContactEditorActivity.ACTION_SAVE_COMPLETED.equals(action)) {
-            return;
-        }
-        throw new IllegalArgumentException("Unknown Action String " + mAction +
-                ". Only support " + Intent.ACTION_EDIT + " or " + Intent.ACTION_INSERT + " or " +
-                ContactEditorActivity.ACTION_SAVE_COMPLETED);
     }
 
     @Override
@@ -447,7 +420,7 @@ public class ContactEditorFragment extends Fragment implements
             mViewIdGenerator = new ViewIdGenerator();
         } else {
             // Read state from savedState. No loading involved here
-            mState = savedState.<RawContactDeltaList> getParcelable(KEY_EDIT_STATE);
+            mState = savedState.<EntityDeltaList> getParcelable(KEY_EDIT_STATE);
             mRawContactIdRequestingPhoto = savedState.getLong(
                     KEY_RAW_CONTACT_ID_REQUESTING_PHOTO);
             mViewIdGenerator = savedState.getParcelable(KEY_VIEW_ID_GENERATOR);
@@ -463,7 +436,7 @@ public class ContactEditorFragment extends Fragment implements
         }
     }
 
-    public void setData(Contact data) {
+    public void setData(ContactLoader.Result data) {
         // If we have already loaded data, we do not want to change it here to not confuse the user
         if (mState != null) {
             Log.v(TAG, "Ignoring background change. This will have to be rebased later");
@@ -471,17 +444,19 @@ public class ContactEditorFragment extends Fragment implements
         }
 
         // See if this edit operation needs to be redirected to a custom editor
-        ImmutableList<RawContact> rawContacts = data.getRawContacts();
-        if (rawContacts.size() == 1) {
-            RawContact rawContact = rawContacts.get(0);
-            String type = rawContact.getAccountTypeString();
-            String dataSet = rawContact.getDataSet();
-            AccountType accountType = rawContact.getAccountType();
+        ArrayList<Entity> entities = data.getEntities();
+        if (entities.size() == 1) {
+            Entity entity = entities.get(0);
+            ContentValues entityValues = entity.getEntityValues();
+            String type = entityValues.getAsString(RawContacts.ACCOUNT_TYPE);
+            String dataSet = entityValues.getAsString(RawContacts.DATA_SET);
+            AccountType accountType = AccountTypeManager.getInstance(mContext).getAccountType(
+                    type, dataSet);
             if (accountType.getEditContactActivityClassName() != null &&
                     !accountType.areContactsWritable()) {
                 if (mListener != null) {
-                    String name = rawContact.getAccountName();
-                    long rawContactId = rawContact.getId();
+                    String name = entityValues.getAsString(RawContacts.ACCOUNT_NAME);
+                    long rawContactId = entityValues.getAsLong(RawContacts.Entity._ID);
                     mListener.onCustomEditContactActivityRequested(
                             new AccountWithDataSet(name, type, dataSet),
                             ContentUris.withAppendedId(RawContacts.CONTENT_URI, rawContactId),
@@ -499,10 +474,10 @@ public class ContactEditorFragment extends Fragment implements
         mListener.onCustomEditContactActivityRequested(account, uri, null, false);
     }
 
-    private void bindEditorsForExistingContact(Contact contact) {
+    private void bindEditorsForExistingContact(ContactLoader.Result contact) {
         setEnabled(true);
 
-        mState = contact.createRawContactDeltaList();
+        mState = contact.createEntityDeltaList();
         setIntentExtras(mIntentExtras);
         mIntentExtras = null;
 
@@ -511,7 +486,7 @@ public class ContactEditorFragment extends Fragment implements
         boolean localProfileExists = false;
 
         if (mIsUserProfile) {
-            for (RawContactDelta state : mState) {
+            for (EntityDelta state : mState) {
                 // For profile contacts, we need a different query URI
                 state.setProfileQueryUri();
                 // Try to find a local profile contact
@@ -521,11 +496,11 @@ public class ContactEditorFragment extends Fragment implements
             }
             // Editor should always present a local profile for editing
             if (!localProfileExists) {
-                final RawContact rawContact = new RawContact(mContext);
-                rawContact.setAccountToLocal();
-
-                RawContactDelta insert = new RawContactDelta(ValuesDelta.fromAfter(
-                        rawContact.getValues()));
+                final ContentValues values = new ContentValues();
+                values.putNull(RawContacts.ACCOUNT_NAME);
+                values.putNull(RawContacts.ACCOUNT_TYPE);
+                values.putNull(RawContacts.DATA_SET);
+                EntityDelta insert = new EntityDelta(ValuesDelta.fromAfter(values));
                 insert.setProfileQueryUri();
                 mState.add(insert);
             }
@@ -544,11 +519,13 @@ public class ContactEditorFragment extends Fragment implements
         }
 
         final AccountTypeManager accountTypes = AccountTypeManager.getInstance(mContext);
-        for (RawContactDelta state : mState) {
-            final AccountType type = state.getAccountType(accountTypes);
+        for (EntityDelta state : mState) {
+            final String accountType = state.getValues().getAsString(RawContacts.ACCOUNT_TYPE);
+            final String dataSet = state.getValues().getAsString(RawContacts.DATA_SET);
+            final AccountType type = accountTypes.getAccountType(accountType, dataSet);
             if (type.areContactsWritable()) {
                 // Apply extras to the first writable raw contact only
-                RawContactModifier.parseExtras(mContext, type, state, extras);
+                EntityModifier.parseExtras(mContext, type, state, extras);
                 break;
             }
         }
@@ -627,8 +604,7 @@ public class ContactEditorFragment extends Fragment implements
      * @param newAccount New account to be used.
      */
     private void rebindEditorsForNewContact(
-            RawContactDelta oldState, AccountWithDataSet oldAccount,
-            AccountWithDataSet newAccount) {
+            EntityDelta oldState, AccountWithDataSet oldAccount, AccountWithDataSet newAccount) {
         AccountTypeManager accountTypes = AccountTypeManager.getInstance(mContext);
         AccountType oldAccountType = accountTypes.getAccountType(
                 oldAccount.type, oldAccount.dataSet);
@@ -652,34 +628,36 @@ public class ContactEditorFragment extends Fragment implements
     }
 
     private void bindEditorsForNewContact(AccountWithDataSet newAccount,
-            final AccountType newAccountType, RawContactDelta oldState,
-            AccountType oldAccountType) {
+            final AccountType newAccountType, EntityDelta oldState, AccountType oldAccountType) {
         mStatus = Status.EDITING;
 
-        final RawContact rawContact = new RawContact(mContext);
+        final ContentValues values = new ContentValues();
         if (newAccount != null) {
-            rawContact.setAccount(newAccount);
+            values.put(RawContacts.ACCOUNT_NAME, newAccount.name);
+            values.put(RawContacts.ACCOUNT_TYPE, newAccount.type);
+            values.put(RawContacts.DATA_SET, newAccount.dataSet);
         } else {
-            rawContact.setAccountToLocal();
+            values.putNull(RawContacts.ACCOUNT_NAME);
+            values.putNull(RawContacts.ACCOUNT_TYPE);
+            values.putNull(RawContacts.DATA_SET);
         }
 
-        RawContactDelta insert = new RawContactDelta(ValuesDelta.fromAfter(rawContact.getValues()));
+        EntityDelta insert = new EntityDelta(ValuesDelta.fromAfter(values));
         if (oldState == null) {
             // Parse any values from incoming intent
-            RawContactModifier.parseExtras(mContext, newAccountType, insert, mIntentExtras);
+            EntityModifier.parseExtras(mContext, newAccountType, insert, mIntentExtras);
         } else {
-            RawContactModifier.migrateStateForNewContact(mContext, oldState, insert,
+            EntityModifier.migrateStateForNewContact(mContext, oldState, insert,
                     oldAccountType, newAccountType);
         }
 
         // Ensure we have some default fields (if the account type does not support a field,
         // ensureKind will not add it, so it is safe to add e.g. Event)
-        RawContactModifier.ensureKindExists(insert, newAccountType, Phone.CONTENT_ITEM_TYPE);
-        RawContactModifier.ensureKindExists(insert, newAccountType, Email.CONTENT_ITEM_TYPE);
-        RawContactModifier.ensureKindExists(insert, newAccountType, Organization.CONTENT_ITEM_TYPE);
-        RawContactModifier.ensureKindExists(insert, newAccountType, Event.CONTENT_ITEM_TYPE);
-        RawContactModifier.ensureKindExists(insert, newAccountType,
-                StructuredPostal.CONTENT_ITEM_TYPE);
+        EntityModifier.ensureKindExists(insert, newAccountType, Phone.CONTENT_ITEM_TYPE);
+        EntityModifier.ensureKindExists(insert, newAccountType, Email.CONTENT_ITEM_TYPE);
+        EntityModifier.ensureKindExists(insert, newAccountType, Organization.CONTENT_ITEM_TYPE);
+        EntityModifier.ensureKindExists(insert, newAccountType, Event.CONTENT_ITEM_TYPE);
+        EntityModifier.ensureKindExists(insert, newAccountType, StructuredPostal.CONTENT_ITEM_TYPE);
 
         // Set the correct URI for saving the contact as a profile
         if (mNewLocalProfile) {
@@ -688,7 +666,7 @@ public class ContactEditorFragment extends Fragment implements
 
         if (mState == null) {
             // Create state if none exists yet
-            mState = RawContactDeltaList.fromSingle(insert);
+            mState = EntityDeltaList.fromSingle(insert);
         } else {
             // Add contact onto end of existing state
             mState.add(insert);
@@ -700,12 +678,6 @@ public class ContactEditorFragment extends Fragment implements
     }
 
     private void bindEditors() {
-        // bindEditors() can only bind views if there is data in mState, so immediately return
-        // if mState is null
-        if (mState == null) {
-            return;
-        }
-
         // Sort the editors
         Collections.sort(mState, mComparator);
 
@@ -718,11 +690,14 @@ public class ContactEditorFragment extends Fragment implements
         int numRawContacts = mState.size();
         for (int i = 0; i < numRawContacts; i++) {
             // TODO ensure proper ordering of entities in the list
-            final RawContactDelta rawContactDelta = mState.get(i);
-            if (!rawContactDelta.isVisible()) continue;
+            final EntityDelta entity = mState.get(i);
+            final ValuesDelta values = entity.getValues();
+            if (!values.isVisible()) continue;
 
-            final AccountType type = rawContactDelta.getAccountType(accountTypes);
-            final long rawContactId = rawContactDelta.getRawContactId();
+            final String accountType = values.getAsString(RawContacts.ACCOUNT_TYPE);
+            final String dataSet = values.getAsString(RawContacts.DATA_SET);
+            final AccountType type = accountTypes.getAccountType(accountType, dataSet);
+            final long rawContactId = values.getAsLong(RawContacts._ID);
 
             final BaseRawContactEditorView editor;
             if (!type.areContactsWritable()) {
@@ -749,7 +724,7 @@ public class ContactEditorFragment extends Fragment implements
 
             mContent.addView(editor);
 
-            editor.setState(rawContactDelta, type, mViewIdGenerator, isEditingUserProfile());
+            editor.setState(entity, type, mViewIdGenerator, isEditingUserProfile());
 
             // Set up the photo handler.
             bindPhotoHandler(editor, type, mState);
@@ -786,9 +761,9 @@ public class ContactEditorFragment extends Fragment implements
                 }
                 nameEditor.setEditorListener(listener);
 
-                final TextFieldsEditorView phoneticNameEditor =
+                /*final TextFieldsEditorView phoneticNameEditor =
                         rawContactEditor.getPhoneticNameEditor();
-                phoneticNameEditor.setEditorListener(listener);
+                phoneticNameEditor.setEditorListener(listener);*/
                 rawContactEditor.setAutoAddToDefaultGroup(mAutoAddToDefaultGroup);
 
                 if (rawContactId == mAggregationSuggestionsRawContactId) {
@@ -822,7 +797,7 @@ public class ContactEditorFragment extends Fragment implements
     }
 
     private void bindPhotoHandler(BaseRawContactEditorView editor, AccountType type,
-            RawContactDeltaList state) {
+            EntityDeltaList state) {
         final int mode;
         if (type.areContactsWritable()) {
             if (editor.hasSetPhoto()) {
@@ -855,6 +830,7 @@ public class ContactEditorFragment extends Fragment implements
     }
 
     private void bindGroupMetaData() {
+        log("bindGroupMetaData===>mGroupMetaData :"+mGroupMetaData);
         if (mGroupMetaData == null) {
             return;
         }
@@ -877,10 +853,11 @@ public class ContactEditorFragment extends Fragment implements
         // Find the associated account for this contact (retrieve it here because there are
         // multiple paths to creating a contact and this ensures we always have the correct
         // account).
-        final RawContactDelta rawContactDelta = mState.get(0);
-        String name = rawContactDelta.getAccountName();
-        String type = rawContactDelta.getAccountType();
-        String dataSet = rawContactDelta.getDataSet();
+        final EntityDelta entity = mState.get(0);
+        final ValuesDelta values = entity.getValues();
+        String name = values.getAsString(RawContacts.ACCOUNT_NAME);
+        String type = values.getAsString(RawContacts.ACCOUNT_TYPE);
+        String dataSet = values.getAsString(RawContacts.DATA_SET);
 
         AccountWithDataSet account = (name == null || type == null) ? null :
                 new AccountWithDataSet(name, type, dataSet);
@@ -888,11 +865,12 @@ public class ContactEditorFragment extends Fragment implements
     }
 
     private void addAccountSwitcher(
-            final RawContactDelta currentState, BaseRawContactEditorView editor) {
+            final EntityDelta currentState, BaseRawContactEditorView editor) {
+        ValuesDelta values = currentState.getValues();
         final AccountWithDataSet currentAccount = new AccountWithDataSet(
-                currentState.getAccountName(),
-                currentState.getAccountType(),
-                currentState.getDataSet());
+                values.getAsString(RawContacts.ACCOUNT_NAME),
+                values.getAsString(RawContacts.ACCOUNT_TYPE),
+                values.getAsString(RawContacts.DATA_SET));
         final View accountView = editor.findViewById(R.id.account);
         final View anchorView = editor.findViewById(R.id.account_container);
         accountView.setOnClickListener(new View.OnClickListener() {
@@ -1028,7 +1006,7 @@ public class ContactEditorFragment extends Fragment implements
      */
     private boolean hasPendingChanges() {
         final AccountTypeManager accountTypes = AccountTypeManager.getInstance(mContext);
-        return RawContactModifier.hasChanges(mState, accountTypes);
+        return EntityModifier.hasChanges(mState, accountTypes);
     }
 
     /**
@@ -1037,6 +1015,12 @@ public class ContactEditorFragment extends Fragment implements
      */
     public boolean save(int saveMode) {
         if (!hasValidState() || mStatus != Status.EDITING) {
+            log(" hasValidState() =>"+hasValidState()+" | (mStatus != Status.EDITING)=> "+(mStatus != Status.EDITING)+" | mStatus="+mStatus);
+            log(" return false");
+            
+            /*Wang: fix can't exit bug*/
+            doRevertAction();
+            
             return false;
         }
 
@@ -1103,7 +1087,8 @@ public class ContactEditorFragment extends Fragment implements
         }
     }
 
-    private boolean revert() {
+    /*Wang: change to public*/
+    public boolean revert() {
         if (mState == null || !hasPendingChanges()) {
             doRevertAction();
         } else {
@@ -1174,7 +1159,7 @@ public class ContactEditorFragment extends Fragment implements
             case SaveMode.JOIN:
                 if (saveSucceeded && contactLookupUri != null) {
                     // If it was a JOIN, we are now ready to bring up the join activity.
-                    if (saveMode == SaveMode.JOIN && hasValidState()) {
+                    if (saveMode == SaveMode.JOIN) {
                         showJoinAggregateActivity(contactLookupUri);
                     }
 
@@ -1232,8 +1217,10 @@ public class ContactEditorFragment extends Fragment implements
         final AccountTypeManager accountTypes = AccountTypeManager.getInstance(mContext);
         int size = mState.size();
         for (int i = 0; i < size; i++) {
-            RawContactDelta entity = mState.get(i);
-            final AccountType type = entity.getAccountType(accountTypes);
+            ValuesDelta values = mState.get(i).getValues();
+            final String accountType = values.getAsString(RawContacts.ACCOUNT_TYPE);
+            final String dataSet = values.getAsString(RawContacts.DATA_SET);
+            final AccountType type = accountTypes.getAccountType(accountType, dataSet);
             if (type.areContactsWritable()) {
                 return true;
             }
@@ -1294,12 +1281,12 @@ public class ContactEditorFragment extends Fragment implements
                 Bundle intentExtras, boolean redirect);
     }
 
-    private class EntityDeltaComparator implements Comparator<RawContactDelta> {
+    private class EntityDeltaComparator implements Comparator<EntityDelta> {
         /**
          * Compare EntityDeltas for sorting the stack of editors.
          */
         @Override
-        public int compare(RawContactDelta one, RawContactDelta two) {
+        public int compare(EntityDelta one, EntityDelta two) {
             // Check direct equality
             if (one.equals(two)) {
                 return 0;
@@ -1354,9 +1341,11 @@ public class ContactEditorFragment extends Fragment implements
             }
 
             // Check account name
-            String oneAccount = one.getAccountName();
+            ValuesDelta oneValues = one.getValues();
+            String oneAccount = oneValues.getAsString(RawContacts.ACCOUNT_NAME);
             if (oneAccount == null) oneAccount = "";
-            String twoAccount = two.getAccountName();
+            ValuesDelta twoValues = two.getValues();
+            String twoAccount = twoValues.getAsString(RawContacts.ACCOUNT_NAME);
             if (twoAccount == null) twoAccount = "";
             value = oneAccount.compareTo(twoAccount);
             if (value != 0) {
@@ -1364,8 +1353,8 @@ public class ContactEditorFragment extends Fragment implements
             }
 
             // Both are in the same account, fall back to contact ID
-            Long oneId = one.getRawContactId();
-            Long twoId = two.getRawContactId();
+            Long oneId = oneValues.getAsLong(RawContacts._ID);
+            Long twoId = twoValues.getAsLong(RawContacts._ID);
             if (oneId == null) {
                 return -1;
             } else if (twoId == null) {
@@ -1381,7 +1370,7 @@ public class ContactEditorFragment extends Fragment implements
      */
     protected long getContactId() {
         if (mState != null) {
-            for (RawContactDelta rawContact : mState) {
+            for (EntityDelta rawContact : mState) {
                 Long contactId = rawContact.getValues().getAsLong(RawContacts.CONTACT_ID);
                 if (contactId != null) {
                     return contactId;
@@ -1420,9 +1409,7 @@ public class ContactEditorFragment extends Fragment implements
 
     @Override
     public void onAggregationSuggestionChange() {
-        Activity activity = getActivity();
-        if ((activity != null && activity.isFinishing())
-                || !isVisible() || mState == null || mStatus != Status.EDITING) {
+        if (!isAdded() || mState == null || mStatus != Status.EDITING) {
             return;
         }
 
@@ -1683,13 +1670,14 @@ public class ContactEditorFragment extends Fragment implements
         int countWithPicture = 0;
         final int numEntities = mState.size();
         for (int i = 0; i < numEntities; i++) {
-            final RawContactDelta entity = mState.get(i);
-            if (entity.isVisible()) {
+            final EntityDelta entity = mState.get(i);
+            final ValuesDelta values = entity.getValues();
+            if (values.isVisible()) {
                 final ValuesDelta primary = entity.getPrimaryEntry(Photo.CONTENT_ITEM_TYPE);
-                if (primary != null && primary.getPhoto() != null) {
+                if (primary != null && primary.getAsByteArray(Photo.PHOTO) != null) {
                     countWithPicture++;
                 } else {
-                    final long rawContactId = entity.getRawContactId();
+                    final long rawContactId = values.getAsLong(RawContacts._ID);
                     final String path = mUpdatedPhotos.getString(String.valueOf(rawContactId));
                     if (path != null) {
                         final File file = new File(path);
@@ -1710,16 +1698,16 @@ public class ContactEditorFragment extends Fragment implements
     /**
      * The listener for the data loader
      */
-    private final LoaderManager.LoaderCallbacks<Contact> mDataLoaderListener =
-            new LoaderCallbacks<Contact>() {
+    private final LoaderManager.LoaderCallbacks<ContactLoader.Result> mDataLoaderListener =
+            new LoaderCallbacks<ContactLoader.Result>() {
         @Override
-        public Loader<Contact> onCreateLoader(int id, Bundle args) {
+        public Loader<ContactLoader.Result> onCreateLoader(int id, Bundle args) {
             mLoaderStartTime = SystemClock.elapsedRealtime();
             return new ContactLoader(mContext, mLookupUri, true);
         }
 
         @Override
-        public void onLoadFinished(Loader<Contact> loader, Contact data) {
+        public void onLoadFinished(Loader<ContactLoader.Result> loader, ContactLoader.Result data) {
             final long loaderCurrentTime = SystemClock.elapsedRealtime();
             Log.v(TAG, "Time needed for loading: " + (loaderCurrentTime-mLoaderStartTime));
             if (!data.isLoaded()) {
@@ -1739,7 +1727,7 @@ public class ContactEditorFragment extends Fragment implements
         }
 
         @Override
-        public void onLoaderReset(Loader<Contact> loader) {
+        public void onLoaderReset(Loader<ContactLoader.Result> loader) {
         }
     };
 
@@ -1792,7 +1780,7 @@ public class ContactEditorFragment extends Fragment implements
         private final PhotoActionListener mPhotoEditorListener;
 
         public PhotoHandler(Context context, BaseRawContactEditorView editor, int photoMode,
-                RawContactDeltaList state) {
+                EntityDeltaList state) {
             super(context, editor.getPhotoEditor(), photoMode, false, state);
             mEditor = editor;
             mRawContactId = editor.getRawContactId();
@@ -1880,5 +1868,11 @@ public class ContactEditorFragment extends Fragment implements
                 // Nothing to do.
             }
         }
+    }
+    
+    private static final boolean debug = false;
+    private static void log(String msg){
+        msg = "ContactEditorFragment -> " + msg;
+        if(debug) Log.i("shenduNewContacts", msg);
     }
 }

@@ -16,6 +16,9 @@
 
 package com.android.contacts;
 
+import com.android.contacts.test.InjectedServices;
+import com.android.contacts.activities.TransactionSafeActivity;
+
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -23,10 +26,8 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
-
-import com.android.contacts.activities.TransactionSafeActivity;
-import com.android.contacts.test.InjectedServices;
 
 /**
  * A common superclass for Contacts activities that handles application-wide services.
@@ -126,4 +127,5 @@ public abstract class ContactsActivity extends TransactionSafeActivity
     protected static void hideFragment(FragmentTransaction ft, Fragment f) {
         if ((f != null) && !f.isHidden()) ft.hide(f);
     }
+  
 }

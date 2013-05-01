@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/shendu_dialpad_new_contacts_list_hieght" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/shendu_dialpad_new_contacts_list_hieght"
+        android:orientation="horizontal" 
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:id="@+id/dialpad_menu_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_margin="8dp"/>
+
+        <TextView
+            android:id="@+id/dialpad_menu_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@+id/dialpad_menu_icon"
+            android:textColor="@color/shendu_dialpad_input_number_color"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+</RelativeLayout>

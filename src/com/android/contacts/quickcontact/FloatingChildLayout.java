@@ -16,6 +16,10 @@
 
 package com.android.contacts.quickcontact;
 
+import com.android.contacts.R;
+import com.android.contacts.test.NeededForReflection;
+import com.android.contacts.util.SchedulingUtils;
+
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
@@ -30,11 +34,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.PopupWindow;
-
-import com.android.contacts.R;
-import com.android.contacts.test.NeededForReflection;
-import com.android.contacts.util.SchedulingUtils;
 
 /**
  * Layout containing single child {@link View} which it attempts to center
@@ -49,7 +50,7 @@ import com.android.contacts.util.SchedulingUtils;
  * coordinates disregarding decor insets; otherwise something like
  * {@link PopupWindow} might work better.
  */
-public class FloatingChildLayout extends FrameLayout {
+public class FloatingChildLayout extends LinearLayout {
     private static final String TAG = "FloatingChildLayout";
     private int mFixedTopPosition;
     private View mChild;
@@ -98,8 +99,8 @@ public class FloatingChildLayout extends FrameLayout {
         mChild.setDuplicateParentStateEnabled(true);
 
         // this will be expanded in showChild()
-        mChild.setScaleX(0.5f);
-        mChild.setScaleY(0.5f);
+        //mChild.setScaleX(0.5f);
+        //mChild.setScaleY(0.5f);
         mChild.setAlpha(0.0f);
     }
 
@@ -145,22 +146,19 @@ public class FloatingChildLayout extends FrameLayout {
 
         final int childWidth = child.getMeasuredWidth();
         final int childHeight = child.getMeasuredHeight();
-
         if (mFixedTopPosition != -1) {
             // Horizontally centered, vertically fixed position
             final int childLeft = (getWidth() - childWidth) / 2;
-            final int childTop = mFixedTopPosition;
+            final int childTop = (getHeight() - childHeight) / 2;
             layoutChild(child, childLeft, childTop);
         } else {
             // default is centered horizontally around target...
             final int childLeft = target.centerX() - (childWidth / 2);
             // ... and vertically aligned a bit below centered
-            final int childTop = target.centerY() - Math.round(childHeight * 0.35f);
-
+            final int childTop = target.centerY() - (childHeight / 2);
             // when child is outside bounds, nudge back inside
             final int clampedChildLeft = clampDimension(childLeft, childWidth, getWidth());
             final int clampedChildTop = clampDimension(childTop, childHeight, getHeight());
-
             layoutChild(child, clampedChildLeft, clampedChildTop);
         }
     }

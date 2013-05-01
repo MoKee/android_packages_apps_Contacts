@@ -16,10 +16,16 @@
 
 package com.android.contacts.detail;
 
+import com.android.contacts.R;
+import com.android.contacts.ContactLoader;
+import com.android.contacts.detail.ContactDetailPhotoSetter;
+import com.android.contacts.util.MoreMath;
+import com.android.contacts.util.PhoneCapabilityTester;
+import com.android.contacts.util.SchedulingUtils;
+
 import android.content.Context;
 import android.content.res.Resources;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
@@ -29,10 +35,7 @@ import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.android.contacts.R;
-import com.android.contacts.model.Contact;
-import com.android.contacts.util.MoreMath;
-import com.android.contacts.util.SchedulingUtils;
+import android.util.Log;
 
 /**
  * This is a horizontally scrolling carousel with 2 tabs: one to see info about the contact and
@@ -464,7 +467,7 @@ public class ContactDetailTabCarousel extends HorizontalScrollView implements On
      * Loads the data from the Loader-Result. This is the only function that has to be called
      * from the outside to fully setup the View
      */
-    public void loadData(Contact contactData) {
+    public void loadData(ContactLoader.Result contactData) {
         if (contactData == null) return;
 
         // TODO: Move this into the {@link CarouselTab} class when the updates

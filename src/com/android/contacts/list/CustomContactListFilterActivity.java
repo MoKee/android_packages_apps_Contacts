@@ -16,6 +16,18 @@
 
 package com.android.contacts.list;
 
+import com.android.contacts.ContactsActivity;
+import com.android.contacts.R;
+import com.android.contacts.model.AccountType;
+import com.android.contacts.model.AccountTypeManager;
+import com.android.contacts.model.AccountWithDataSet;
+import com.android.contacts.model.EntityDelta.ValuesDelta;
+import com.android.contacts.model.GoogleAccountType;
+import com.android.contacts.util.EmptyService;
+import com.android.contacts.util.LocalizedNameResolver;
+import com.android.contacts.util.WeakAsyncTask;
+import com.google.android.collect.Lists;
+
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -27,6 +39,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.EntityIterator;
 import android.content.Intent;
 import android.content.Loader;
 import android.content.OperationApplicationException;
@@ -52,18 +65,6 @@ import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
 import android.widget.TextView;
-
-import com.android.contacts.ContactsActivity;
-import com.android.contacts.R;
-import com.android.contacts.model.AccountTypeManager;
-import com.android.contacts.model.RawContactDelta.ValuesDelta;
-import com.android.contacts.model.account.AccountType;
-import com.android.contacts.model.account.AccountWithDataSet;
-import com.android.contacts.model.account.GoogleAccountType;
-import com.android.contacts.util.EmptyService;
-import com.android.contacts.util.LocalizedNameResolver;
-import com.android.contacts.util.WeakAsyncTask;
-import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -92,7 +93,7 @@ public class CustomContactListFilterActivity extends ContactsActivity
         super.onCreate(icicle);
         setContentView(R.layout.contact_list_filter_custom);
 
-        mList = (ExpandableListView) findViewById(android.R.id.list);
+        mList = (ExpandableListView) findViewById(com.android.internal.R.id.list);
         mList.setOnChildClickListener(this);
         mList.setHeaderDividersEnabled(true);
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -145,8 +146,7 @@ public class CustomContactListFilterActivity extends ContactsActivity
                 if (account.dataSet != null) {
                     groupsUri.appendQueryParameter(Groups.DATA_SET, account.dataSet).build();
                 }
-                android.content.EntityIterator iterator =
-                        ContactsContract.Groups.newEntityIterator(resolver.query(
+                EntityIterator iterator = ContactsContract.Groups.newEntityIterator(resolver.query(
                         groupsUri.build(), null, null, null, null));
                 try {
                     boolean hasGroups = false;

@@ -16,32 +16,31 @@
 
 package com.android.contacts.quickcontact;
 
+import com.android.contacts.ContactsUtils;
+import com.android.contacts.R;
+import com.android.contacts.model.AccountType.EditType;
+import com.android.contacts.model.DataKind;
+import com.android.contacts.util.Constants;
+import com.android.contacts.util.PhoneCapabilityTester;
+import com.android.contacts.util.StructuredPostalUtils;
+
 import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.net.WebAddress;
+import android.provider.ContactsContract.CommonDataKinds.Email;
 import android.provider.ContactsContract.CommonDataKinds.Im;
+import android.provider.ContactsContract.CommonDataKinds.Phone;
+import android.provider.ContactsContract.CommonDataKinds.SipAddress;
+import android.provider.ContactsContract.CommonDataKinds.StructuredPostal;
+import android.provider.ContactsContract.CommonDataKinds.Website;
 import android.provider.ContactsContract.Data;
 import android.text.TextUtils;
 import android.util.Log;
-
-import com.android.contacts.ContactsUtils;
-import com.android.contacts.R;
-import com.android.contacts.model.account.AccountType.EditType;
-import com.android.contacts.model.dataitem.DataItem;
-import com.android.contacts.model.dataitem.DataKind;
-import com.android.contacts.model.dataitem.EmailDataItem;
-import com.android.contacts.model.dataitem.ImDataItem;
-import com.android.contacts.model.dataitem.PhoneDataItem;
-import com.android.contacts.model.dataitem.SipAddressDataItem;
-import com.android.contacts.model.dataitem.StructuredPostalDataItem;
-import com.android.contacts.model.dataitem.WebsiteDataItem;
-import com.android.contacts.util.Constants;
-import com.android.contacts.util.PhoneCapabilityTester;
-import com.android.contacts.util.StructuredPostalUtils;
 
 /**
  * Description of a specific {@link Data#_ID} item, with style information
@@ -69,45 +68,51 @@ public class DataAction implements Action {
     /**
      * Create an action from common {@link Data} elements.
      */
-    public DataAction(Context context, DataItem item) {
+    public DataAction(Context context, String mimeType, DataKind kind, long dataId,
+            ContentValues entryValues) {
         mContext = context;
-        mKind = item.getDataKind();
-        mMimeType = item.getMimeType();
+        mKind = kind;
+        mMimeType = mimeType;
 
         // Determine type for subtitle
         mSubtitle = "";
-        if (item.hasKindTypeColumn()) {
-            final int typeValue = item.getKindTypeColumn();
+        if (kind.typeColumn != null) {
+            if (entryValues.containsKey(kind.typeColumn)) {
+                final int typeValue = entryValues.getAsInteger(kind.typeColumn);
 
-            // get type string
-            for (EditType type : item.getDataKind().typeList) {
-                if (type.rawValue == typeValue) {
-                    if (type.customColumn == null) {
-                        // Non-custom type. Get its description from the resource
-                        mSubtitle = context.getString(type.labelRes);
-                    } else {
-                        // Custom type. Read it from the database
-                        mSubtitle = item.getContentValues().getAsString(type.customColumn);
+                // get type string
+                for (EditType type : kind.typeList) {
+                    if (type.rawValue == typeValue) {
+                        if (type.customColumn == null) {
+                            // Non-custom type. Get its description from the resource
+                            mSubtitle = context.getString(type.labelRes);
+                        } else {
+                            // Custom type. Read it from the database
+                            mSubtitle = entryValues.getAsString(type.customColumn);
+                        }
+                        break;
                     }
-                    break;
                 }
             }
         }
 
-        mIsPrimary = item.isSuperPrimary();
-        mBody = item.buildDataStringForDisplay();
+        final Integer superPrimary = entryValues.getAsInteger(Data.IS_SUPER_PRIMARY);
+        mIsPrimary = superPrimary != null && superPrimary != 0;
 
-        mDataId = item.getId();
-        mDataUri = ContentUris.withAppendedId(Data.CONTENT_URI, mDataId);
+        if (mKind.actionBody != null) {
+            mBody = mKind.actionBody.inflateUsing(context, entryValues);
+        }
+
+        mDataId = dataId;
+        mDataUri = ContentUris.withAppendedId(Data.CONTENT_URI, dataId);
 
         final boolean hasPhone = PhoneCapabilityTester.isPhone(mContext);
         final boolean hasSms = PhoneCapabilityTester.isSmsIntentRegistered(mContext);
 
         // Handle well-known MIME-types with special care
-        if (item instanceof PhoneDataItem) {
+        if (Phone.CONTENT_ITEM_TYPE.equals(mimeType)) {
             if (PhoneCapabilityTester.isPhone(mContext)) {
-                PhoneDataItem phone = (PhoneDataItem) item;
-                final String number = phone.getNumber();
+                final String number = entryValues.getAsString(Phone.NUMBER);
                 if (!TextUtils.isEmpty(number)) {
 
                     final Intent phoneIntent = hasPhone ? ContactsUtils.getCallIntent(number)
@@ -119,8 +124,8 @@ public class DataAction implements Action {
                     if (hasPhone && hasSms) {
                         mIntent = phoneIntent;
                         mAlternateIntent = smsIntent;
-                        mAlternateIconRes = phone.getDataKind().iconAltRes;
-                        mAlternateIconDescriptionRes = phone.getDataKind().iconAltDescriptionRes;
+                        mAlternateIconRes = kind.iconAltRes;
+                        mAlternateIconDescriptionRes = kind.iconAltDescriptionRes;
                     } else if (hasPhone) {
                         mIntent = phoneIntent;
                     } else if (hasSms) {
@@ -128,10 +133,9 @@ public class DataAction implements Action {
                     }
                 }
             }
-        } else if (item instanceof SipAddressDataItem) {
+        } else if (SipAddress.CONTENT_ITEM_TYPE.equals(mimeType)) {
             if (PhoneCapabilityTester.isSipPhone(mContext)) {
-                final SipAddressDataItem sip = (SipAddressDataItem) item;
-                final String address = sip.getSipAddress();
+                final String address = entryValues.getAsString(SipAddress.SIP_ADDRESS);
                 if (!TextUtils.isEmpty(address)) {
                     final Uri callUri = Uri.fromParts(Constants.SCHEME_SIP, address, null);
                     mIntent = ContactsUtils.getCallIntent(callUri);
@@ -143,27 +147,26 @@ public class DataAction implements Action {
                     // for the SIP-related intent-filters in its manifest.
                 }
             }
-        } else if (item instanceof EmailDataItem) {
-            final EmailDataItem email = (EmailDataItem) item;
-            final String address = email.getData();
+        } else if (Email.CONTENT_ITEM_TYPE.equals(mimeType)) {
+            final String address = entryValues.getAsString(Email.DATA);
             if (!TextUtils.isEmpty(address)) {
                 final Uri mailUri = Uri.fromParts(Constants.SCHEME_MAILTO, address, null);
                 mIntent = new Intent(Intent.ACTION_SENDTO, mailUri);
             }
 
-        } else if (item instanceof WebsiteDataItem) {
-            final WebsiteDataItem website = (WebsiteDataItem) item;
-            final String url = website.getUrl();
+        } else if (Website.CONTENT_ITEM_TYPE.equals(mimeType)) {
+            final String url = entryValues.getAsString(Website.URL);
             if (!TextUtils.isEmpty(url)) {
                 WebAddress webAddress = new WebAddress(url);
                 mIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(webAddress.toString()));
             }
 
-        } else if (item instanceof ImDataItem) {
-            ImDataItem im = (ImDataItem) item;
-            final boolean isEmail = im.isCreatedFromEmail();
-            if (isEmail || im.isProtocolValid()) {
-                final int protocol = isEmail ? Im.PROTOCOL_GOOGLE_TALK : im.getProtocol();
+        } else if (Im.CONTENT_ITEM_TYPE.equals(mimeType)) {
+            final boolean isEmail = Email.CONTENT_ITEM_TYPE.equals(
+                    entryValues.getAsString(Data.MIMETYPE));
+            if (isEmail || isProtocolValid(entryValues)) {
+                final int protocol = isEmail ? Im.PROTOCOL_GOOGLE_TALK :
+                        entryValues.getAsInteger(Im.PROTOCOL);
 
                 if (isEmail) {
                     // Use Google Talk string when using Email, and clear data
@@ -173,8 +176,8 @@ public class DataAction implements Action {
                     mDataUri = null;
                 }
 
-                String host = im.getCustomProtocol();
-                String data = im.getData();
+                String host = entryValues.getAsString(Im.CUSTOM_PROTOCOL);
+                String data = entryValues.getAsString(isEmail ? Email.DATA : Im.DATA);
                 if (protocol != Im.PROTOCOL_CUSTOM) {
                     // Try bringing in a well-known host for specific protocols
                     host = ContactsUtils.lookupProviderNameFromId(protocol);
@@ -188,7 +191,8 @@ public class DataAction implements Action {
 
                     // If the address is also available for a video chat, we'll show the capability
                     // as a secondary action.
-                    final int chatCapability = im.getChatCapability();
+                    final Integer chatCapabilityObj = entryValues.getAsInteger(Im.CHAT_CAPABILITY);
+                    final int chatCapability = chatCapabilityObj == null ? 0 : chatCapabilityObj;
                     final boolean isVideoChatCapable =
                             (chatCapability & Im.CAPABILITY_HAS_CAMERA) != 0;
                     final boolean isAudioChatCapable =
@@ -206,9 +210,9 @@ public class DataAction implements Action {
                     }
                 }
             }
-        } else if (item instanceof StructuredPostalDataItem) {
-            StructuredPostalDataItem postal = (StructuredPostalDataItem) item;
-            final String postalAddress = postal.getFormattedAddress();
+        } else if (StructuredPostal.CONTENT_ITEM_TYPE.equals(mimeType)) {
+            final String postalAddress =
+                    entryValues.getAsString(StructuredPostal.FORMATTED_ADDRESS);
             if (!TextUtils.isEmpty(postalAddress)) {
                 mIntent = StructuredPostalUtils.getViewPostalAddressIntent(postalAddress);
             }
@@ -217,7 +221,7 @@ public class DataAction implements Action {
         if (mIntent == null) {
             // Otherwise fall back to default VIEW action
             mIntent = new Intent(Intent.ACTION_VIEW);
-            mIntent.setDataAndType(mDataUri, item.getMimeType());
+            mIntent.setDataAndType(mDataUri, mimeType);
         }
 
         mIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
@@ -230,6 +234,19 @@ public class DataAction implements Action {
 
     public void setPresence(int presence) {
         mPresence = presence;
+    }
+
+    private boolean isProtocolValid(ContentValues entryValues) {
+        final String protocol = entryValues.getAsString(Im.PROTOCOL);
+        if (protocol == null) {
+            return false;
+        }
+        try {
+            Integer.valueOf(protocol);
+        } catch (NumberFormatException e) {
+            return false;
+        }
+        return true;
     }
 
     @Override

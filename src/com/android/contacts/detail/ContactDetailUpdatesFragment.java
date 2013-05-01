@@ -16,6 +16,14 @@
 
 package com.android.contacts.detail;
 
+import com.android.contacts.ContactLoader;
+import com.android.contacts.R;
+import com.android.contacts.activities.ContactDetailActivity.FragmentKeyListener;
+import com.android.contacts.detail.ContactDetailDisplayUtils.StreamPhotoTag;
+import com.android.contacts.model.AccountType;
+import com.android.contacts.model.AccountTypeManager;
+import com.android.contacts.util.StreamItemEntry;
+
 import android.app.ListFragment;
 import android.content.ContentUris;
 import android.content.Intent;
@@ -24,23 +32,16 @@ import android.os.Bundle;
 import android.provider.ContactsContract.StreamItems;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.ListView;
-
-import com.android.contacts.R;
-import com.android.contacts.activities.ContactDetailActivity.FragmentKeyListener;
-import com.android.contacts.detail.ContactDetailDisplayUtils.StreamPhotoTag;
-import com.android.contacts.model.AccountTypeManager;
-import com.android.contacts.model.Contact;
-import com.android.contacts.model.account.AccountType;
-import com.android.contacts.util.StreamItemEntry;
 
 public class ContactDetailUpdatesFragment extends ListFragment implements FragmentKeyListener {
 
     private static final String TAG = "ContactDetailUpdatesFragment";
 
-    private Contact mContactData;
+    private ContactLoader.Result mContactData;
     private Uri mLookupUri;
 
     private LayoutInflater mInflater;
@@ -121,7 +122,7 @@ public class ContactDetailUpdatesFragment extends ListFragment implements Fragme
         }
     }
 
-    public void setData(Uri lookupUri, Contact result) {
+    public void setData(Uri lookupUri, ContactLoader.Result result) {
         if (result == null) {
             return;
         }

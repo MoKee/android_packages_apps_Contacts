@@ -1,0 +1,13 @@
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item 
+        android:state_pressed="true"
+        android:drawable="@drawable/new_action_bar_click_left" 
+        />
+    <item 
+        android:state_selected="true"
+        android:drawable="@drawable/new_action_bar_click_left" 
+        />
+    <item
+        android:drawable="@android:color/transparent"
+        />
+</selector>

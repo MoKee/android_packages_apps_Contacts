@@ -13,7 +13,9 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-
+<!-- 
+    android:background="@drawable/list_section_divider_holo_custom"
+-->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -21,7 +23,6 @@
     android:minHeight="?attr/list_item_header_height"
     android:layout_marginLeft="?attr/list_item_padding_left"
     android:layout_marginRight="?attr/list_item_padding_right"
-    android:background="@drawable/list_section_divider_holo_custom"
     android:orientation="horizontal">
 
     <TextView
@@ -29,13 +30,15 @@
         android:layout_width="0px"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:layout_gravity="center_vertical"
+        android:layout_gravity="bottom"
         android:paddingLeft="?attr/list_item_header_text_indent"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="@color/people_app_theme_color"
+        android:textColor="@color/group_view_name_color"
         android:textStyle="bold"
+ 		android:textSize="@dimen/contacts_text_size"
         android:textAllCaps="true"
-        android:singleLine="true"/>
+        android:singleLine="true"
+        />
 
     <!-- TODO: Should use correct color with a correct name (content should be same).
          can use "?android:attr/textColorTertiary" -->
@@ -43,9 +46,10 @@
         android:id="@+id/account_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:textColor="@color/contact_count_text_color"
-        android:textSize="12sp"
+        android:layout_gravity="bottom"
+        android:textColor="@color/group_view_name_color"
+        android:textSize="@dimen/contacts_text_size"
         android:singleLine="true"
-        android:ellipsize="middle" />
+        android:ellipsize="middle" 
+        />
 </LinearLayout>

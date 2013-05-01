@@ -1,0 +1,54 @@
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <!-- <item android:state_focused="true"  
+        android:state_enabled="false" 
+        android:state_pressed="true" 
+        android:drawable="@drawable/shendu_item_middle_default" 
+        />
+    
+    <item android:state_focused="true"  
+        android:state_enabled="false"                              
+        android:drawable="@drawable/shendu_item_middle_default" 
+        />
+    
+    <item android:state_focused="true"
+        android:state_pressed="true" 
+        android:drawable="@drawable/shendu_item_middle_selector_transition" 
+        /> 
+       android:state_focused="false"   
+        -->
+    
+    <item                              
+        android:state_pressed="true" 
+        android:drawable="@drawable/shendu_item_middle_press" 
+        />
+    
+    <!-- <item android:state_focused="true"
+        android:drawable="@drawable/shendu_item_middle_default" 
+        />
+    
+    <item android:state_window_focused="false" 
+        android:state_selected="true" 
+        android:drawable="@drawable/shendu_item_middle_default" 
+        /> 
+    <item android:state_focused="false" 
+        android:state_selected="true" 
+        android:drawable="@drawable/shendu_item_middle_default" 
+        /> 
+        
+ 	<item android:state_pressed="true" 
+      	android:state_selected="false" 
+      	android:drawable="@drawable/shendu_item_middle_default" />  -->
+      
+    <item
+        android:drawable="@drawable/shendu_item_middle_default" 
+        />
+    
+    
+
+  <!-- <item android:state_selected="true" android:drawable="@android:color/transparent" /> 
+  <item android:state_selected="false" android:drawable="@color/guide_list_item_bg" /> 
+ -->
+
+    
+</selector>
