@@ -16,6 +16,16 @@
 
 package com.android.contacts.model;
 
+import com.android.contacts.ContactsUtils;
+import com.android.contacts.list.ContactListFilterController;
+import com.android.contacts.util.Constants;
+import com.android.i18n.phonenumbers.PhoneNumberUtil;
+import com.android.internal.util.Objects;
+import com.google.android.collect.Lists;
+import com.google.android.collect.Maps;
+import com.google.android.collect.Sets;
+import com.google.common.annotations.VisibleForTesting;
+
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AuthenticatorDescription;
@@ -43,28 +53,12 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.TimingLogger;
 
-import com.android.contacts.ContactsUtils;
-import com.android.contacts.list.ContactListFilterController;
-import com.android.contacts.model.account.AccountType;
-import com.android.contacts.model.account.AccountTypeWithDataSet;
-import com.android.contacts.model.account.AccountWithDataSet;
-import com.android.contacts.model.account.ExchangeAccountType;
-import com.android.contacts.model.account.ExternalAccountType;
-import com.android.contacts.model.account.FallbackAccountType;
-import com.android.contacts.model.account.GoogleAccountType;
-import com.android.contacts.model.dataitem.DataKind;
-import com.android.contacts.util.Constants;
-import com.android.internal.util.Objects;
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
@@ -410,8 +404,8 @@ class AccountTypeManagerImpl extends AccountTypeManager
                 AccountType accountType;
                 if (GoogleAccountType.ACCOUNT_TYPE.equals(type)) {
                     accountType = new GoogleAccountType(mContext, auth.packageName);
-                } else if (ExchangeAccountType.isExchangeType(type)) {
-                    accountType = new ExchangeAccountType(mContext, auth.packageName, type);
+                } else if (ExchangeAccountType.ACCOUNT_TYPE.equals(type)) {
+                    accountType = new ExchangeAccountType(mContext, auth.packageName);
                 } else {
                     // TODO: use syncadapter package instead, since it provides resources
                     Log.d(TAG, "Registering external account type=" + type

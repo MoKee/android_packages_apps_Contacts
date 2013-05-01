@@ -15,11 +15,6 @@
  */
 package com.android.contacts.vcard;
 
-import android.accounts.Account;
-import android.content.ContentResolver;
-import android.net.Uri;
-import android.util.Log;
-
 import com.android.vcard.VCardEntry;
 import com.android.vcard.VCardEntryCommitter;
 import com.android.vcard.VCardEntryConstructor;
@@ -32,6 +27,11 @@ import com.android.vcard.exception.VCardException;
 import com.android.vcard.exception.VCardNestedException;
 import com.android.vcard.exception.VCardNotSupportedException;
 import com.android.vcard.exception.VCardVersionException;
+
+import android.accounts.Account;
+import android.content.ContentResolver;
+import android.net.Uri;
+import android.util.Log;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

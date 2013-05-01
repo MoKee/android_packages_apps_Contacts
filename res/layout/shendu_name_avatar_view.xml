@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="@dimen/shendu_name_avatar_size"
+    android:layout_height="@dimen/shendu_name_avatar_size"
+    android:minWidth="@dimen/shendu_name_avatar_size"
+    android:minHeight="@dimen/shendu_name_avatar_size"
+    android:singleLine="true"
+    android:textSize="@dimen/shendu_name_avatar_text_size"
+    android:gravity="center_vertical"
+    android:background="@color/shendu_name_avatar_background"
+    android:textColor="@color/shendu_name_avatar_text_color" >
+    
+
+</TextView>

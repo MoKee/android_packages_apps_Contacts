@@ -14,12 +14,13 @@
      limitations under the License.
 -->
 
-<!-- "More" or "less" expansion button in the contact editor. -->
+<!-- "More" or "less" expansion button in the contact editor. 
+    android:layout_height="@dimen/editor_min_line_item_height"-->
 
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
-    android:layout_height="@dimen/editor_min_line_item_height"
+    android:layout_height="@dimen/contacts_edittext_height"
     android:layout_gravity="top">
     <ImageView
         android:id="@+id/expansion_view"

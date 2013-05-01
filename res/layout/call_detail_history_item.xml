@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2011 The Android Open Source Project
+<!--
+     Copyright (C) 2011 The Android Open Source Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -14,50 +15,97 @@
      limitations under the License.
 -->
 
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:minHeight="@dimen/call_log_list_item_height"
-    android:paddingTop="@dimen/call_log_inner_margin"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
     android:paddingBottom="@dimen/call_log_inner_margin"
-    android:paddingLeft="@dimen/call_log_indent_margin"
-    android:paddingRight="@dimen/call_log_outer_margin"
-    android:orientation="vertical"
->
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-    >
+    android:paddingTop="@dimen/call_log_inner_margin" >
         <view
-            class="com.android.contacts.calllog.CallTypeIconsView"
             android:id="@+id/call_type_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-        />
+            android:layout_marginLeft="9.5dp"
+            android:layout_marginRight="4.5dp"
+            class="com.android.contacts.calllog.CallTypeIconsView" />
+        <LinearLayout 
+                android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+            >
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+          <TextView
+            android:id="@+id/shendu_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textSize="@dimen/shendu_call_detail_date_text_size"
+            android:textColor="@color/shendu_calldetail_list_text_color" />
+
         <TextView
+            android:id="@+id/shendu_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="@dimen/shendu_call_detail_date_text_size"
+            android:layout_marginLeft="3dp"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/shendu_calldetail_list_text_color" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/shendu_call_detail_date_linear"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/shendu_call_detail_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="middle"
+            android:maxWidth="88dp"
+            android:singleLine="true"
+            android:textSize="@dimen/shendu_call_detail_date_text_s_size"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/shendu_calldetail_list_text_color" />
+
+        <TextView
+            android:id="@+id/shendu_call_detail_attribution"
+            android:layout_width="61dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:gravity="left"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:textSize="@dimen/shendu_call_detail_date_text_s_size"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/shendu_calldetail_list_text_color" />
+      <TextView
             android:id="@+id/call_type_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/call_log_icon_margin"
+            android:textSize="@dimen/shendu_call_detail_date_text_s_size"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="@color/secondary_text_color"
-        />
+            android:textColor="@color/shendu_calldetail_list_text_color" />
+
+        <TextView
+            android:id="@+id/duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:textSize="@dimen/shendu_call_detail_date_text_s_size"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/shendu_calldetail_list_text_color" />
+
     </LinearLayout>
-    <TextView
-        android:id="@+id/date"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="@color/secondary_text_color"
-    />
-    <TextView
-        android:id="@+id/duration"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="@color/secondary_text_color"
-    />
+</LinearLayout>
 </LinearLayout>

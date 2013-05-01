@@ -16,13 +16,29 @@
 
 package com.android.contacts.quickcontact;
 
+import com.android.contacts.Collapser;
+import com.android.contacts.ContactLoader;
+import com.android.contacts.R;
+import com.android.contacts.model.AccountTypeManager;
+import com.android.contacts.model.DataKind;
+import com.android.contacts.util.Constants;
+import com.android.contacts.util.DataStatus;
+import com.android.contacts.util.ImageViewDrawableSetter;
+import com.android.contacts.util.SchedulingUtils;
+import com.android.contacts.util.StopWatch;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
+
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.ActivityNotFoundException;
 import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.Entity;
+import android.content.Entity.NamedContentValues;
 import android.content.Intent;
 import android.content.Loader;
 import android.content.pm.PackageManager;
@@ -32,11 +48,13 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.ContactsContract.CommonDataKinds.Email;
+import android.provider.ContactsContract.CommonDataKinds.Im;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.CommonDataKinds.SipAddress;
 import android.provider.ContactsContract.CommonDataKinds.StructuredPostal;
 import android.provider.ContactsContract.CommonDataKinds.Website;
 import android.provider.ContactsContract.Contacts;
+import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.QuickContact;
 import android.provider.ContactsContract.RawContacts;
 import android.support.v13.app.FragmentPagerAdapter;
@@ -55,23 +73,6 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.android.contacts.Collapser;
-import com.android.contacts.R;
-import com.android.contacts.model.Contact;
-import com.android.contacts.model.ContactLoader;
-import com.android.contacts.model.RawContact;
-import com.android.contacts.model.dataitem.DataItem;
-import com.android.contacts.model.dataitem.DataKind;
-import com.android.contacts.model.dataitem.EmailDataItem;
-import com.android.contacts.model.dataitem.ImDataItem;
-import com.android.contacts.util.Constants;
-import com.android.contacts.util.DataStatus;
-import com.android.contacts.util.ImageViewDrawableSetter;
-import com.android.contacts.util.SchedulingUtils;
-import com.android.contacts.util.StopWatch;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -104,13 +105,13 @@ public class QuickContactActivity extends Activity {
     private FloatingChildLayout mFloatingLayout;
 
     private View mPhotoContainer;
-    private ViewGroup mTrack;
-    private HorizontalScrollView mTrackScroller;
-    private View mSelectedTabRectangle;
-    private View mLineAfterTrack;
+    //private ViewGroup mTrack;
+    //private HorizontalScrollView mTrackScroller; //remove by hhl,do not used
+    //private View mSelectedTabRectangle;
+    //private View mLineAfterTrack;
 
-    private ImageView mOpenDetailsImage;
-    private ImageButton mOpenDetailsPushLayerButton;
+    //private ImageButton mOpenDetailsButton;
+    //private ImageButton mOpenDetailsPushLayerButton;
     private ViewPager mListPager;
 
     private ContactLoader mContactLoader;
@@ -194,18 +195,18 @@ public class QuickContactActivity extends Activity {
         mStopWatch.lap("l"); // layout inflated
 
         mFloatingLayout = (FloatingChildLayout) findViewById(R.id.floating_layout);
-        mTrack = (ViewGroup) findViewById(R.id.track);
-        mTrackScroller = (HorizontalScrollView) findViewById(R.id.track_scroller);
-        mOpenDetailsImage = (ImageView) findViewById(R.id.contact_details_image);
-        mOpenDetailsPushLayerButton = (ImageButton) findViewById(R.id.open_details_push_layer);
+        //mTrack = (ViewGroup) findViewById(R.id.track);
+        //mTrackScroller = (HorizontalScrollView) findViewById(R.id.track_scroller);
+        //mOpenDetailsButton = (ImageButton) findViewById(R.id.open_details_button);
+        //mOpenDetailsPushLayerButton = (ImageButton) findViewById(R.id.open_details_push_layer);
         mListPager = (ViewPager) findViewById(R.id.item_list_pager);
-        mSelectedTabRectangle = findViewById(R.id.selected_tab_rectangle);
-        mLineAfterTrack = findViewById(R.id.line_after_track);
+        //mSelectedTabRectangle = findViewById(R.id.selected_tab_rectangle);
+        //mLineAfterTrack = findViewById(R.id.line_after_track);
 
         mFloatingLayout.setOnOutsideTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                handleOutsideTouch();
+            	handleOutsideTouch();
                 return true;
             }
         });
@@ -220,13 +221,13 @@ public class QuickContactActivity extends Activity {
                 close(false);
             }
         };
-        mOpenDetailsPushLayerButton.setOnClickListener(openDetailsClickHandler);
-        mListPager.setAdapter(new ViewPagerAdapter(getFragmentManager()));
-        mListPager.setOnPageChangeListener(new PageChangeListener());
+        //mOpenDetailsButton.setOnClickListener(openDetailsClickHandler);
+        //mOpenDetailsPushLayerButton.setOnClickListener(openDetailsClickHandler);
+    
 
         final Rect sourceBounds = intent.getSourceBounds();
         if (sourceBounds != null) {
-            mFloatingLayout.setChildTargetScreen(sourceBounds);
+            //mFloatingLayout.setChildTargetScreen(sourceBounds);
         }
 
         // find and prepare correct header view
@@ -243,9 +244,20 @@ public class QuickContactActivity extends Activity {
         });
 
         mStopWatch.lap("cf"); // onCreate finished
+        
+//        mListPager.setAdapter(new ViewPagerAdapter(getFragmentManager()));
+//        mListPager.setOnPageChangeListener(new PageChangeListener());
     }
 
-    private void handleOutsideTouch() {
+    @Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+//    	mListPager.setAdapter(new ViewPagerAdapter(getFragmentManager()));
+        mListPager.setOnPageChangeListener(new PageChangeListener());
+		super.onResume();
+	}
+
+	private void handleOutsideTouch() {
         if (mFloatingLayout.isContentFullyVisible()) {
             close(true);
         }
@@ -328,38 +340,51 @@ public class QuickContactActivity extends Activity {
     /**
      * Handle the result from the ContactLoader
      */
-    private void bindData(Contact data) {
+    private void bindData(ContactLoader.Result data) {
         final ResolveCache cache = ResolveCache.getInstance(this);
         final Context context = this;
 
-        mOpenDetailsImage.setVisibility(isMimeExcluded(Contacts.CONTENT_ITEM_TYPE) ? View.GONE
-                : View.VISIBLE);
+        //mOpenDetailsButton.setVisibility(isMimeExcluded(Contacts.CONTENT_ITEM_TYPE) ? View.GONE
+                //: View.VISIBLE);
 
         mDefaultsMap.clear();
 
-        mStopWatch.lap("sph"); // Start photo setting
+        mStopWatch.lap("atm"); // AccountTypeManager initialization start
+        final AccountTypeManager accountTypes = AccountTypeManager.getInstance(
+                context.getApplicationContext());
+        mStopWatch.lap("fatm"); // AccountTypeManager initialization finished
 
         final ImageView photoView = (ImageView) mPhotoContainer.findViewById(R.id.photo);
         mPhotoSetter.setupContactPhoto(data, photoView);
 
         mStopWatch.lap("ph"); // Photo set
 
-        for (RawContact rawContact : data.getRawContacts()) {
-            for (DataItem dataItem : rawContact.getDataItems()) {
-                final String mimeType = dataItem.getMimeType();
+        for (Entity entity : data.getEntities()) {
+            final ContentValues entityValues = entity.getEntityValues();
+            final String accountType = entityValues.getAsString(RawContacts.ACCOUNT_TYPE);
+            final String dataSet = entityValues.getAsString(RawContacts.DATA_SET);
+            for (NamedContentValues subValue : entity.getSubValues()) {
+                final ContentValues entryValues = subValue.values;
+                final String mimeType = entryValues.getAsString(Data.MIMETYPE);
 
                 // Skip this data item if MIME-type excluded
                 if (isMimeExcluded(mimeType)) continue;
 
-                final long dataId = dataItem.getId();
-                final boolean isPrimary = dataItem.isPrimary();
-                final boolean isSuperPrimary = dataItem.isSuperPrimary();
+                final long dataId = entryValues.getAsLong(Data._ID);
+                final Integer primary = entryValues.getAsInteger(Data.IS_PRIMARY);
+                final boolean isPrimary = primary != null && primary != 0;
+                final Integer superPrimary = entryValues.getAsInteger(Data.IS_SUPER_PRIMARY);
+                final boolean isSuperPrimary = superPrimary != null && superPrimary != 0;
 
-                if (dataItem.getDataKind() != null) {
+                final DataKind kind =
+                        accountTypes.getKindOrFallback(accountType, dataSet, mimeType);
+
+                if (kind != null) {
                     // Build an action for this data entry, find a mapping to a UI
                     // element, build its summary from the cursor, and collect it
                     // along with all others of this MIME-type.
-                    final Action action = new DataAction(context, dataItem);
+                    final Action action = new DataAction(context, mimeType, kind, dataId,
+                            entryValues);
                     final boolean wasAdded = considerAdd(action, cache, isSuperPrimary);
                     if (wasAdded) {
                         // Remember the default
@@ -371,11 +396,12 @@ public class QuickContactActivity extends Activity {
 
                 // Handle Email rows with presence data as Im entry
                 final DataStatus status = data.getStatuses().get(dataId);
-                if (status != null && dataItem instanceof EmailDataItem) {
-                    final EmailDataItem email = (EmailDataItem) dataItem;
-                    final ImDataItem im = ImDataItem.createFromEmail(email);
-                    if (im.getDataKind() != null) {
-                        final DataAction action = new DataAction(context, im);
+                if (status != null && Email.CONTENT_ITEM_TYPE.equals(mimeType)) {
+                    final DataKind imKind = accountTypes.getKindOrFallback(accountType, dataSet,
+                            Im.CONTENT_ITEM_TYPE);
+                    if (imKind != null) {
+                        final DataAction action = new DataAction(context, Im.CONTENT_ITEM_TYPE,
+                                imKind, dataId, entryValues);
                         action.setPresence(status.getPresence());
                         considerAdd(action, cache, isSuperPrimary);
                     }
@@ -424,18 +450,18 @@ public class QuickContactActivity extends Activity {
         mStopWatch.lap("mt"); // Mime types initialized
 
         // Add buttons for each mimetype
-        mTrack.removeAllViews();
+        /*mTrack.removeAllViews();
         for (String mimeType : mSortedActionMimeTypes) {
             final View actionView = inflateAction(mimeType, cache, mTrack);
             mTrack.addView(actionView);
-        }
+        }*/
 
         mStopWatch.lap("mt"); // Buttons added
 
         final boolean hasData = !mSortedActionMimeTypes.isEmpty();
-        mTrackScroller.setVisibility(hasData ? View.VISIBLE : View.GONE);
-        mSelectedTabRectangle.setVisibility(hasData ? View.VISIBLE : View.GONE);
-        mLineAfterTrack.setVisibility(hasData ? View.VISIBLE : View.GONE);
+        //mTrackScroller.setVisibility(hasData ? View.VISIBLE : View.GONE);
+        //mSelectedTabRectangle.setVisibility(hasData ? View.VISIBLE : View.GONE);
+        //mLineAfterTrack.setVisibility(hasData ? View.VISIBLE : View.GONE);
         mListPager.setVisibility(hasData ? View.VISIBLE : View.GONE);
     }
 
@@ -480,7 +506,8 @@ public class QuickContactActivity extends Activity {
     }
 
     private CheckableImageView getActionViewAt(int position) {
-        return (CheckableImageView) mTrack.getChildAt(position);
+    	return null;
+        //return (CheckableImageView) mTrack.getChildAt(position);
     }
 
     @Override
@@ -489,14 +516,14 @@ public class QuickContactActivity extends Activity {
         listFragment.setListener(mListFragmentListener);
     }
 
-    private LoaderCallbacks<Contact> mLoaderCallbacks =
-            new LoaderCallbacks<Contact>() {
+    private LoaderCallbacks<ContactLoader.Result> mLoaderCallbacks =
+            new LoaderCallbacks<ContactLoader.Result>() {
         @Override
-        public void onLoaderReset(Loader<Contact> loader) {
+        public void onLoaderReset(Loader<ContactLoader.Result> loader) {
         }
 
         @Override
-        public void onLoadFinished(Loader<Contact> loader, Contact data) {
+        public void onLoadFinished(Loader<ContactLoader.Result> loader, ContactLoader.Result data) {
             mStopWatch.lap("lf"); // onLoadFinished
             if (isFinishing()) {
                 close(false);
@@ -514,9 +541,8 @@ public class QuickContactActivity extends Activity {
                 close(false);
                 return;
             }
-
             bindData(data);
-
+        	mListPager.setAdapter(new ViewPagerAdapter(getFragmentManager()));
             mStopWatch.lap("bd"); // bindData finished
 
             if (TRACE_LAUNCH) android.os.Debug.stopMethodTracing();
@@ -542,14 +568,11 @@ public class QuickContactActivity extends Activity {
         }
 
         @Override
-        public Loader<Contact> onCreateLoader(int id, Bundle args) {
+        public Loader<ContactLoader.Result> onCreateLoader(int id, Bundle args) {
             if (mLookupUri == null) {
                 Log.wtf(TAG, "Lookup uri wasn't initialized. Loader was started too early");
             }
-            return new ContactLoader(getApplicationContext(), mLookupUri,
-                    false /*loadGroupMetaData*/, false /*loadStreamItems*/,
-                    false /*loadInvitableAccountTypes*/, false /*postViewNotification*/,
-                    true /*computeFormattedPhoneNumber*/);
+            return new ContactLoader(getApplicationContext(), mLookupUri, false);
         }
     };
 
@@ -587,23 +610,18 @@ public class QuickContactActivity extends Activity {
     private class PageChangeListener extends SimpleOnPageChangeListener {
         @Override
         public void onPageSelected(int position) {
-            final CheckableImageView actionView = getActionViewAt(position);
-            mTrackScroller.requestChildRectangleOnScreen(actionView,
-                    new Rect(0, 0, actionView.getWidth(), actionView.getHeight()), false);
-            renderSelectedRectangle(position, 0);
+            //final CheckableImageView actionView = getActionViewAt(position);
+            //mTrackScroller.requestChildRectangleOnScreen(actionView,
+                    //new Rect(0, 0, actionView.getWidth(), actionView.getHeight()), false);
         }
 
         @Override
         public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-            renderSelectedRectangle(position, positionOffset);
-        }
-
-        private void renderSelectedRectangle(int position, float positionOffset) {
-            final RelativeLayout.LayoutParams layoutParams =
+            /*final RelativeLayout.LayoutParams layoutParams =
                     (RelativeLayout.LayoutParams) mSelectedTabRectangle.getLayoutParams();
-            final int width = layoutParams.width;
+            final int width = mSelectedTabRectangle.getWidth();
             layoutParams.leftMargin = (int) ((position + positionOffset) * width);
-            mSelectedTabRectangle.setLayoutParams(layoutParams);
+            mSelectedTabRectangle.setLayoutParams(layoutParams);*/
         }
     }
 
@@ -620,6 +638,7 @@ public class QuickContactActivity extends Activity {
 
         @Override
         public void onItemClicked(final Action action, final boolean alternate) {
+        	
             final Runnable startAppRunnable = new Runnable() {
                 @Override
                 public void run() {

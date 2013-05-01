@@ -53,8 +53,8 @@
     <string name="menu_splitAggregate" msgid="8368636463748691868">"分割"</string>
     <string name="menu_editGroup" msgid="5062005185370983720">"編集"</string>
     <string name="menu_deleteGroup" msgid="3486380004411482874">"削除"</string>
-    <string name="menu_new_contact_action_bar" msgid="7263362129442119188">"連絡先を追加"</string>
-    <string name="menu_new_group_action_bar" msgid="3520232877587377175">"グループを追加"</string>
+    <string name="menu_new_contact_action_bar" msgid="8887818026717394343">"新規"</string>
+    <string name="menu_new_group_action_bar" msgid="5055346725617932394">"新規"</string>
     <string name="splitConfirmation_title" msgid="633640935430370530">"連絡先を分けますか？"</string>
     <string name="splitConfirmation" msgid="740190210499587175">"この連絡先を複数の連絡先に分割します。"</string>
     <string name="menu_joinAggregate" msgid="5027981918265667970">"統合"</string>
@@ -72,7 +72,7 @@
     <string name="deleteConfirmation" msgid="811706994761610640">"この連絡先を削除します。"</string>
     <string name="menu_done" msgid="796017761764190697">"完了"</string>
     <string name="menu_doNotSave" msgid="58593876893538465">"キャンセル"</string>
-    <string name="menu_discard" msgid="6456087569315685632">"キャンセル"</string>
+    <string name="menu_discard" msgid="6456087569315685632">"破棄"</string>
     <string name="label_notes" msgid="8337354953278341042">"メモ"</string>
     <string name="label_sip_address" msgid="124073911714324974">"インターネット通話"</string>
     <string name="ghostData_company" msgid="5414421120553765775">"会社"</string>
@@ -137,7 +137,6 @@
     <string name="contactsAllLabel" msgid="6479708629170672169">"すべての連絡先"</string>
     <string name="contactsGroupsLabel" msgid="2841971472518003524">"グループ"</string>
     <string name="contactsFavoritesLabel" msgid="8417039765586853670">"お気入り"</string>
-    <string name="dialerAllContactsLabel" msgid="1025920923112988336">"お気に入りとすべての連絡先"</string>
     <string name="dialerIconLabel" msgid="6500826552823403796">"電話"</string>
     <string name="recentCallsIconLabel" msgid="1419116422359067949">"通話履歴"</string>
     <string name="menu_sendTextMessage" msgid="6937343460284499306">"SMSを送信"</string>
@@ -177,7 +176,7 @@
     <string name="noContactsNoSimHelpTextWithSync" product="default" msgid="7443705129830284440">"表示できる連絡先がありません（アカウントを追加した直後の場合は、連絡先が同期されるまでに数分かかることがあります）。"\n\n"連絡先を追加するには、"<font fgcolor="#ffffffff"><b>"MENU"</b></font>"キーをタップして次の操作を行います:"\n\n<li>"携帯端末と同期可能な連絡先を使ってアカウントを追加またはセットアップする場合は["<font fgcolor="#ffffffff"><b>"アカウント"</b></font>"]をタップします"\n</li>\n<li>"連絡先の表示方法を変更するには["<font fgcolor="#ffffffff"><b>"表示オプション"</b></font>"]をタップします"\n</li>\n<li>"新しい連絡先を最初から作成する場合は["<font fgcolor="#ffffffff"><b>"連絡先を新規登録"</b></font>"]をタップします"\n</li>\n<li>"SDカードから連絡先をインポートする場合は["<font fgcolor="#ffffffff"><b>"インポート/エクスポート"</b></font>"]をタップします"\n</li></string>
     <string name="noFavoritesHelpText" msgid="3744655776704833277">"お気に入りはありません。"\n\n"お気に入りのリストに連絡先を追加するには: "\n\n<li>"["<b>"連絡先"</b>"]タブをタップします"\n</li>" "\n<li>"お気に入りに追加する連絡先をタップします"\n</li>" "\n<li>"連絡先名の横にあるスターをタップします"\n</li></string>
     <string name="dialer_useDtmfDialpad" msgid="1707548397435075040">"プッシュホン式キーパッドを使う"</string>
-    <string name="dialer_returnToInCallScreen" msgid="3719386377550913067">"通話に戻る"</string>
+    <string name="dialer_returnToInCallScreen" msgid="3719386377550913067">"保留中の通話に戻る"</string>
     <string name="dialer_addAnotherCall" msgid="4205688819890074468">"別の通話を追加"</string>
     <string name="callDetailTitle" msgid="5340227785196217938">"通話詳細"</string>
     <string name="toast_call_detail_error" msgid="7200975244804730096">"通話要求の詳細が読み込めませんでした。"</string>
@@ -211,7 +210,7 @@
     <string name="description_delete_button" msgid="6263102114033407382">"Backspace"</string>
     <string name="description_digits_edittext" msgid="8760207516497016437">"発信番号"</string>
     <string name="description_contact_photo" msgid="3387458082667894062">"連絡先の写真"</string>
-    <string name="description_minus_button" msgid="6908099247930477551">"削除"</string>
+    <string name="description_minus_button" msgid="387136707700230172">"マイナス"</string>
     <string name="description_plus_button" msgid="515164827856229880">"プラス"</string>
     <string name="description_view_contact_detail" msgid="9133251213656414807">"連絡先を表示"</string>
     <string name="no_sdcard_message" product="nosdcard" msgid="5242558018442357189">"ストレージはありませんでした。"</string>
@@ -511,10 +510,6 @@
     <string name="voicemail_fetching_timout" msgid="6691792377574905201">"ボイスメールを取得できませんでした。"</string>
     <string name="call_log_new_header" msgid="846546437517724715">"新しい着信"</string>
     <string name="call_log_old_header" msgid="6262205894314263629">"以前の着信"</string>
-    <string name="call_log_voicemail_header" msgid="3945407886667089173">"ボイスメールのある着信のみ"</string>
-    <string name="call_log_incoming_header" msgid="2787722299753674684">"着信のみ"</string>
-    <string name="call_log_outgoing_header" msgid="761009180766735769">"発信のみ"</string>
-    <string name="call_log_missed_header" msgid="8017148056610855956">"不在着信のみ"</string>
     <string name="voicemail_status_voicemail_not_available" msgid="3021980206152528883">"ボイスメールサーバーに接続できません。"</string>
     <string name="voicemail_status_messages_waiting" msgid="7113421459602803605">"ボイスメールサーバーに接続できません（新着ボイスメールあり）。"</string>
     <string name="voicemail_status_configure_voicemail" msgid="3738537770636895689">"ボイスメールをセットアップします。"</string>
@@ -529,9 +524,6 @@
     <string name="call_log_item_count_and_date" msgid="7641933305703520787">"（<xliff:g id="COUNT">%1$d</xliff:g>）<xliff:g id="DATE">%2$s</xliff:g>"</string>
     <string name="group_name_hint" msgid="238359485263401293">"グループの名前"</string>
     <string name="nfc_vcard_file_name" msgid="2823095213265993609">"NFC受信の連絡先"</string>
-    <string name="menu_show_outgoing_only" msgid="1965570298133301970">"発信のみを表示"</string>
-    <string name="menu_show_incoming_only" msgid="7534206815238877417">"着信のみを表示"</string>
-    <string name="menu_show_missed_only" msgid="154473166059743996">"不在着信のみを表示"</string>
     <string name="menu_show_voicemails_only" msgid="1898421289561435703">"ボイスメールのみ表示"</string>
     <string name="menu_show_all_calls" msgid="7560347482073345885">"すべての通話を表示"</string>
     <string name="status_available" msgid="5586870015822828392">"オンライン"</string>
@@ -567,12 +559,9 @@
     <string name="dialog_phone_call_prohibited_message" msgid="6554711866586660441">"発信できません"</string>
     <string name="dialog_voicemail_not_ready_message" msgid="4384716252789515378">"ボイスメールをセットアップするには、MENUキー&gt;[設定]をタップします。"</string>
     <string name="dialog_voicemail_airplane_mode_message" msgid="530922773669546093">"機内モードをOFFにしてからボイスメールを呼び出してください。"</string>
-    <string name="menu_export_database" msgid="2659719297530170820">"データベースファイルをエクスポート"</string>
     <string name="action_menu_overflow_description" msgid="2303272250613084574">"その他のオプション"</string>
-    <string name="expand_collapse_name_fields_description" msgid="8682630859539604311">"名前フィールドの展開/折りたたみ"</string>
 
     <!-- CM extra entries -->
-    <string name="t9_loading">読込中\u2026</string>
     <string name="t9_sort_title">T9ソートモード</string>
     <string name="t9_sort_summary">T9結果のフィルタを選択</string>
     <string name="t9_sort_name">名前が一致した順</string>
@@ -585,5 +574,4 @@
     <string name="dialer_ui_title">ダイヤラ設定</string>
     <string name="dialer_ui_orientation_title">画面の回転を有効</string>
     <string name="dialer_ui_orientation_summary">センサーによりダイヤラ画面を回転させる</string>
-
 </resources>

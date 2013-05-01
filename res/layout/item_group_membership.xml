@@ -23,18 +23,35 @@
 
     <include
         layout="@layout/edit_kind_title" />
+	<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent" 
+        android:orientation="vertical"
+        android:layout_marginLeft="@dimen/account_container_left_padding"
+        android:layout_marginRight="@dimen/account_container_left_padding"
+        android:padding="@dimen/account_container_left_padding"
+        android:background="@drawable/shendu_listview_item_overall"
+       	>
+       	<Button
+            android:id="@+id/group_list"
+            style="?android:attr/spinnerStyle"
+            android:layout_width="@dimen/contacts_editspinner_one_width"
+            android:layout_height="@dimen/contacts_edittext_height"
+            android:background="@drawable/contacts_editspinner_bg"
+            android:focusable="true"
+            android:gravity="left|center_vertical"
+            android:minHeight="@dimen/contacts_edittext_height"
+            android:paddingLeft="@dimen/item_group_membership_paddingleft"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <Button
-        style="?android:attr/spinnerStyle"
-        android:id="@+id/group_list"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="@dimen/editor_min_line_item_height"
+	</LinearLayout>
+<!-- 
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="@dimen/editor_field_left_padding"
         android:layout_marginLeft="@dimen/editor_field_left_padding"
         android:layout_marginRight="@dimen/editor_field_left_padding"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:gravity="left|center_vertical"
-        android:focusable="true"
-        android:paddingLeft="12dip" />
-
+ -->
 </com.android.contacts.editor.GroupMembershipView>

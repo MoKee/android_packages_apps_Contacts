@@ -15,6 +15,8 @@
  */
 package com.android.contacts.list;
 
+import com.google.common.collect.Lists;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.ContentObserver;
@@ -24,8 +26,6 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.provider.ContactsContract.ProviderStatus;
 import android.util.Log;
-
-import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
 

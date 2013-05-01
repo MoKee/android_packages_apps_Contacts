@@ -16,11 +16,11 @@
 
 package com.android.contacts.util;
 
-import android.os.AsyncTask;
-import android.os.Looper;
-
 import com.android.contacts.test.NeededForTesting;
 import com.google.common.base.Preconditions;
+
+import android.os.AsyncTask;
+import android.os.Looper;
 
 import java.util.concurrent.Executor;
 

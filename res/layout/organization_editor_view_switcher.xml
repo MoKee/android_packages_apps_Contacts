@@ -20,23 +20,31 @@
   list of edit text fields).
 -->
 
+<!-- 
+	android:background="@android:color/holo_green_light"
+-->
+
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-
+    android:layout_height="wrap_content"
+    >
+<!-- 
+        android:background="?android:attr/selectableItemBackground"
+-->
     <TextView
         android:id="@+id/add_organization_button"
         android:layout_width="match_parent"
-        android:layout_height="48dip"
+        android:layout_height="@dimen/organization_editor_view_switcher_textview_height"
         android:paddingLeft="@dimen/editor_add_field_label_left_padding"
         android:paddingRight="16dip"
         android:gravity="center_vertical"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="?android:attr/textColorSecondary"
-        android:background="?android:attr/selectableItemBackground"
+        android:textColor="@color/secondary_text_color"
+        android:textSize="@dimen/favorites_item_view_title_size"
         android:text="@string/add_organization"/>
 
-    <!-- This is later populated with the actual editable text fields for "organization" -->
+    <!-- This is later populated with the actual editable text fields for "organization" 
+        android:layout_marginLeft="-20dp"-->
     <FrameLayout
         android:id="@+id/container"
         android:layout_width="match_parent"

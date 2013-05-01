@@ -16,6 +16,8 @@
 
 package com.android.contacts.widget;
 
+import com.android.contacts.R;
+
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Rect;
@@ -24,8 +26,6 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-
-import com.android.contacts.R;
 
 /**
  * Layout similar to LinearLayout that allows a child to specify examples of

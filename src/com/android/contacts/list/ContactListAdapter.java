@@ -15,8 +15,11 @@
  */
 package com.android.contacts.list;
 
+import com.android.contacts.R;
+
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.ContactCounts;
@@ -27,8 +30,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-
-import com.android.contacts.R;
+import android.util.Log;
 
 /**
  * A cursor adapter for the {@link ContactsContract.Contacts#CONTENT_TYPE} content type.
@@ -47,6 +49,7 @@ public abstract class ContactListAdapter extends ContactEntryListAdapter {
             Contacts.PHOTO_THUMBNAIL_URI,           // 5
             Contacts.LOOKUP_KEY,                    // 6
             Contacts.IS_USER_PROFILE,               // 7
+            Contacts.HAS_PHONE_NUMBER   //8 Wang
         };
 
         private static final String[] CONTACT_PROJECTION_ALTERNATIVE = new String[] {
@@ -58,6 +61,7 @@ public abstract class ContactListAdapter extends ContactEntryListAdapter {
             Contacts.PHOTO_THUMBNAIL_URI,           // 5
             Contacts.LOOKUP_KEY,                    // 6
             Contacts.IS_USER_PROFILE,               // 7
+            Contacts.HAS_PHONE_NUMBER   //8 Wang
         };
 
         private static final String[] FILTER_PROJECTION_PRIMARY = new String[] {
@@ -69,7 +73,8 @@ public abstract class ContactListAdapter extends ContactEntryListAdapter {
             Contacts.PHOTO_THUMBNAIL_URI,           // 5
             Contacts.LOOKUP_KEY,                    // 6
             Contacts.IS_USER_PROFILE,               // 7
-            SearchSnippetColumns.SNIPPET,           // 8
+            Contacts.HAS_PHONE_NUMBER,   //8 Wang
+            SearchSnippetColumns.SNIPPET,           // 9 Wang
         };
 
         private static final String[] FILTER_PROJECTION_ALTERNATIVE = new String[] {
@@ -81,7 +86,8 @@ public abstract class ContactListAdapter extends ContactEntryListAdapter {
             Contacts.PHOTO_THUMBNAIL_URI,           // 5
             Contacts.LOOKUP_KEY,                    // 6
             Contacts.IS_USER_PROFILE,               // 7
-            SearchSnippetColumns.SNIPPET,           // 8
+            Contacts.HAS_PHONE_NUMBER ,  //8 Wang
+            SearchSnippetColumns.SNIPPET,           // 9 Wang
         };
 
         public static final int CONTACT_ID               = 0;
@@ -92,7 +98,8 @@ public abstract class ContactListAdapter extends ContactEntryListAdapter {
         public static final int CONTACT_PHOTO_URI        = 5;
         public static final int CONTACT_LOOKUP_KEY       = 6;
         public static final int CONTACT_IS_USER_PROFILE  = 7;
-        public static final int CONTACT_SNIPPET          = 8;
+        public static final int CONTACT_HAS_PHONE_NUMBER  = 8; //Wang
+        public static final int CONTACT_SNIPPET          = 9; //Wang
     }
 
     private CharSequence mUnknownNameText;
@@ -196,7 +203,7 @@ public abstract class ContactListAdapter extends ContactEntryListAdapter {
             Cursor cursor) {
         if (isSectionHeaderDisplayEnabled()) {
             Placement placement = getItemPlacementInSection(position);
-
+            
             // First position, set the contacts number string
             if (position == 0 && cursor.getInt(ContactQuery.CONTACT_IS_USER_PROFILE) == 1) {
                 view.setCountView(getContactsCount());
@@ -204,7 +211,37 @@ public abstract class ContactListAdapter extends ContactEntryListAdapter {
                 view.setCountView(null);
             }
             view.setSectionHeader(placement.sectionHeader);
-            view.setDividerVisible(!placement.lastInSection);
+            
+            //add by hhl, for rounder background
+            boolean first = placement.firstInSection;
+            boolean last = placement.lastInSection;
+            if(position==cursor.getCount()-1){
+                view.setDividerVisible(false);
+            	if(first){
+                	view.setShenduRoundedBackground(R.drawable.shendu_listview_item_overall);
+            	}else{
+                	if(position==0){
+                    	view.setShenduRoundedBackground(R.drawable.shendu_listview_item_overall);
+                	}else{
+                    	view.setShenduRoundedBackground(R.drawable.shendu_listview_item_bottom);
+                	}
+            	}
+            }else{
+                view.setDividerVisible(!placement.lastInSection);
+                if(first && last){
+                	view.setShenduRoundedBackground(R.drawable.shendu_listview_item_overall);
+                }else if(first && !last){
+                	view.setShenduRoundedBackground(R.drawable.shendu_listview_item_top);
+                }else if(!first && last){
+                	view.setShenduRoundedBackground(R.drawable.shendu_listview_item_bottom);
+                }else if(!first && !last){
+                	if(position==0){
+                    	view.setShenduRoundedBackground(R.drawable.shendu_listview_item_top);
+                	}else{
+                    	view.setShenduRoundedBackground(R.drawable.shendu_listview_item_middle);
+                	}
+                }
+            }
         } else {
             view.setSectionHeader(null);
             view.setDividerVisible(true);

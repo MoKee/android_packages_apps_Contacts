@@ -15,6 +15,9 @@
  */
 package com.android.contacts.group;
 
+import com.android.contacts.R;
+import com.android.contacts.group.SuggestedMemberListAdapter.SuggestedMember;
+
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
@@ -35,9 +38,6 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Filter;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.android.contacts.R;
-import com.android.contacts.group.SuggestedMemberListAdapter.SuggestedMember;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -16,9 +16,9 @@
 
 package com.android.contacts.vcard;
 
-import android.net.Uri;
-
 import com.android.vcard.VCardEntry;
+
+import android.net.Uri;
 
 interface VCardImportExportListener {
     void onImportProcessed(ImportRequest request, int jobId, int sequence);

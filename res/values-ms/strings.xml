@@ -53,8 +53,8 @@
     <string name="menu_splitAggregate" msgid="8368636463748691868">"Asingkan"</string>
     <string name="menu_editGroup" msgid="5062005185370983720">"Edit"</string>
     <string name="menu_deleteGroup" msgid="3486380004411482874">"Padam"</string>
-    <string name="menu_new_contact_action_bar" msgid="7263362129442119188">"Tambah Kenalan"</string>
-    <string name="menu_new_group_action_bar" msgid="3520232877587377175">"Tambah Kumpulan"</string>
+    <string name="menu_new_contact_action_bar" msgid="8887818026717394343">"Baru"</string>
+    <string name="menu_new_group_action_bar" msgid="5055346725617932394">"Baru"</string>
     <string name="splitConfirmation_title" msgid="633640935430370530">"Pisahkan kenalan?"</string>
     <string name="splitConfirmation" msgid="740190210499587175">"Kenalan ini akan dipisahkan kepada berbilang kenalan."</string>
     <string name="menu_joinAggregate" msgid="5027981918265667970">"Sertai"</string>
@@ -137,7 +137,6 @@
     <string name="contactsAllLabel" msgid="6479708629170672169">"Semua kenalan"</string>
     <string name="contactsGroupsLabel" msgid="2841971472518003524">"Kumpulan"</string>
     <string name="contactsFavoritesLabel" msgid="8417039765586853670">"Kegemaran"</string>
-    <string name="dialerAllContactsLabel" msgid="1025920923112988336">"Kegemaran dan semua kenalan"</string>
     <string name="dialerIconLabel" msgid="6500826552823403796">"Telefon"</string>
     <string name="recentCallsIconLabel" msgid="1419116422359067949">"Log panggilan"</string>
     <string name="menu_sendTextMessage" msgid="6937343460284499306">"Hantar mesej teks"</string>
@@ -211,7 +210,7 @@
     <string name="description_delete_button" msgid="6263102114033407382">"undur ruang"</string>
     <string name="description_digits_edittext" msgid="8760207516497016437">"nombor untuk didail"</string>
     <string name="description_contact_photo" msgid="3387458082667894062">"foto kenalan"</string>
-    <string name="description_minus_button" msgid="6908099247930477551">"padam"</string>
+    <string name="description_minus_button" msgid="387136707700230172">"tolak"</string>
     <string name="description_plus_button" msgid="515164827856229880">"tambah"</string>
     <string name="description_view_contact_detail" msgid="9133251213656414807">"Lihat kenalan"</string>
     <string name="no_sdcard_message" product="nosdcard" msgid="5242558018442357189">"Tiada storan ditemui."</string>
@@ -513,10 +512,6 @@
     <string name="voicemail_fetching_timout" msgid="6691792377574905201">"Tidak dapat mengambil mel suara."</string>
     <string name="call_log_new_header" msgid="846546437517724715">"Baru"</string>
     <string name="call_log_old_header" msgid="6262205894314263629">"Lebih lama"</string>
-    <string name="call_log_voicemail_header" msgid="3945407886667089173">"Panggilan dengan mel suara sahaja"</string>
-    <string name="call_log_incoming_header" msgid="2787722299753674684">"Panggilan masuk sahaja"</string>
-    <string name="call_log_outgoing_header" msgid="761009180766735769">"Panggilan keluar sahaja"</string>
-    <string name="call_log_missed_header" msgid="8017148056610855956">"Panggilan terlepas sahaja"</string>
     <string name="voicemail_status_voicemail_not_available" msgid="3021980206152528883">"Tidak boleh bersambung kepada pelayan mel suara."</string>
     <string name="voicemail_status_messages_waiting" msgid="7113421459602803605">"Tak boleh brsmbg kpd pelayan mel suara. Mel suara baru menunggu."</string>
     <string name="voicemail_status_configure_voicemail" msgid="3738537770636895689">"Sediakan mel suara anda."</string>
@@ -531,9 +526,6 @@
     <string name="call_log_item_count_and_date" msgid="7641933305703520787">"(<xliff:g id="COUNT">%1$d</xliff:g>) <xliff:g id="DATE">%2$s</xliff:g>"</string>
     <string name="group_name_hint" msgid="238359485263401293">"Nama kumpulan"</string>
     <string name="nfc_vcard_file_name" msgid="2823095213265993609">"Knln melalui NFC"</string>
-    <string name="menu_show_outgoing_only" msgid="1965570298133301970">"Tunjuk panggilan keluar shj"</string>
-    <string name="menu_show_incoming_only" msgid="7534206815238877417">"Tunjuk panggilan masuk shj"</string>
-    <string name="menu_show_missed_only" msgid="154473166059743996">"Tunjuk panggilan terlepas shj"</string>
     <string name="menu_show_voicemails_only" msgid="1898421289561435703">"Tunjukkan mel suara sahaja"</string>
     <string name="menu_show_all_calls" msgid="7560347482073345885">"Tunjukkan semua panggilan"</string>
     <string name="status_available" msgid="5586870015822828392">"Ada"</string>
@@ -569,7 +561,5 @@
     <string name="dialog_phone_call_prohibited_message" msgid="6554711866586660441">"Panggilan tidak dihantar"</string>
     <string name="dialog_voicemail_not_ready_message" msgid="4384716252789515378">"Untuuk menyediakan mel suara, pergi ke Menu &gt; Tetapan."</string>
     <string name="dialog_voicemail_airplane_mode_message" msgid="530922773669546093">"Untuk membuat panggilan ke mel suara, mula-mula matikan mod Pesawat."</string>
-    <string name="menu_export_database" msgid="2659719297530170820">"Eksport fail pangkalan data"</string>
     <string name="action_menu_overflow_description" msgid="2303272250613084574">"Lagi pilihan"</string>
-    <string name="expand_collapse_name_fields_description" msgid="8682630859539604311">"Kembangkan atau runtuhkan medan nama"</string>
 </resources>

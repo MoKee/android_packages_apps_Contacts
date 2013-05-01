@@ -13,7 +13,7 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2" xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- Title for the activity that dials the phone.  This is the name
          used in the Launcher icon. -->
     <string name="launcherDialer">Phone</string>
@@ -21,6 +21,25 @@
     <!-- Title for the activity that opens the People app.  This is the name
          used in the Launcher icon. -->
     <string name="people">People</string>
+
+    <string name="t9_default_sort">1</string>
+    <string name="t9_sort_title">T9 sorting mode</string>
+    <string name="t9_sort_summary">Choose how to filter T9 results</string>
+    <string name="t9_sort_name">Name matches first</string>
+    <string name="t9_sort_number">Number matches first</string>
+    <string name="t9_state_title">Enable T9 dialer</string>
+    <string name="t9_state_summary">Enable T9 searching in dialer</string>
+    <string name="t9_dial_click_title">Dial selected contact</string>
+    <string name="t9_dial_click_summary">Dial the selected contact for T9</string>
+    <string name="t9_add_to_contacts">Add to contacts</string>
+    <string name="t9_map_row_2">2abcàáâäåɑæçǽćčá</string>
+    <string name="t9_map_row_3">3deféèêë</string>
+    <string name="t9_map_row_4">4ghiíìïîǵ</string>
+    <string name="t9_map_row_5">5jklḱḱĺ</string>
+    <string name="t9_map_row_6">6mnoòóöôøñŋǿḿńő</string>
+    <string name="t9_map_row_7">7pqrsßɾṕŕśřš</string>
+    <string name="t9_map_row_8">8tuvúùüûű</string>
+    <string name="t9_map_row_9">9wxyzýẃź</string>
 
     <!-- Directory partition name -->
     <string name="contactsList">Contacts</string>
@@ -136,11 +155,11 @@
     <!-- Menu item that deletes the currently selected group [CHAR LIMIT=30] -->
     <string name="menu_deleteGroup">Delete</string>
 
-    <!-- Menu item (in the action bar) that creates a new contact [CHAR LIMIT=30] -->
-    <string name="menu_new_contact_action_bar">Add Contact</string>
+    <!-- Menu item (in the action bar) that creates a new contacts [CHAR LIMIT=12] -->
+    <string name="menu_new_contact_action_bar">New</string>
 
-    <!-- Menu item (in the action bar) that creates a new group [CHAR LIMIT=30] -->
-    <string name="menu_new_group_action_bar">Add Group</string>
+    <!-- Menu item (in the action bar) that creates a new group [CHAR LIMIT=12] -->
+    <string name="menu_new_group_action_bar">New</string>
 
     <!-- Title of the confirmation dialog for separating contacts into multiple instances [CHAR LIMIT=26] -->
     <string name="splitConfirmation_title">Separate contact?</string>
@@ -381,10 +400,6 @@
          [CHAR LIMIT=NONE] -->
     <string name="contactsFavoritesLabel">Favorites</string>
 
-    <!-- The description text for the favorites and all contacts tab in the phone app.
-         [CHAR LIMIT=NONE] -->
-    <string name="dialerAllContactsLabel">Favorites and all contacts</string>
-
     <!-- The description text for the dialer tab.
 
          Note: AccessibilityServices use this attribute to announce what the view represents.
@@ -392,6 +407,11 @@
 
          [CHAR LIMIT=NONE] -->
     <string name="dialerIconLabel">Phone</string>
+
+    <!-- Dialer UI Settings -->
+    <string name="dialer_ui_title">Dialer settings</string>
+    <string name="dialer_ui_orientation_title">Enable sensor orientation</string>
+    <string name="dialer_ui_orientation_summary">Rotate dialer based on sensor</string>
 
     <!-- The description text for the call log tab.
 
@@ -455,8 +475,8 @@
     <!-- String used for displaying calls to the voicemail number in the call log -->
     <string name="voicemail">Voicemail</string>
 
-    <!-- String used to display calls from unknown numbers in the call log -->
-    <string name="unknown">Unknown</string>
+    <!-- String used to display calls with unknown call types in the call log -->
+    <string name="unknown">Unknown type</string>
 
     <!-- String used to display calls from private numbers in the call log -->
     <string name="private_num">Private number</string>
@@ -582,6 +602,9 @@
 
     <!-- Title for voicemail details screen -->
     <string name="type_voicemail">Voicemail</string>
+
+    <!-- Title for unknown call details screen -->
+    <string name="type_unknown">Unknown call</string>
 
     <!-- Description for incoming calls going to voice mail vs. not -->
     <string name="actionIncomingCall">Incoming calls</string>
@@ -732,10 +755,8 @@
     <!-- String describing the Contact Editor Minus button
 
          Used by AccessibilityService to announce the purpose of the button.
-
-         [CHAR LIMIT=NONE]
     -->
-    <string name="description_minus_button">delete</string>
+    <string name="description_minus_button">minus</string>
 
     <!-- String describing the Contact Editor Plus button
 
@@ -1613,21 +1634,9 @@
     <!-- The header in the call log used to identify items that have been already consumed [CHAR LIMIT=10] -->
     <string name="call_log_old_header">Older</string>
 
-    <!-- The header to show that call log is only showing voicemail calls. [CHAR LIMIT=40] -->
-    <string name="call_log_voicemail_header">Calls with voicemail only</string>
-
-    <!-- The header to show that call log is only showing incoming calls. [CHAR LIMIT=40] -->
-    <string name="call_log_incoming_header">Incoming calls only</string>
-
-    <!-- The header to show that call log is only showing outgoing calls. [CHAR LIMIT=40] -->
-    <string name="call_log_outgoing_header">Outgoing calls only</string>
-
-    <!-- The header to show that call log is only showing missed calls. [CHAR LIMIT=40] -->
-    <string name="call_log_missed_header">Missed calls only</string>
-
     <!--  Voicemail status message shown at the top of call log to notify the user that no new
-voicemails are currently available. This can happen when both notification as well as data
-connection to the voicemail server is lost. [CHAR LIMIT=64] -->
+      voicemails are currently available. This can happen when both notification as well as data
+      connection to the voicemail server is lost. [CHAR LIMIT=64] -->
     <string name="voicemail_status_voicemail_not_available">Can\'t connect to voicemail server.</string>
     <!--  Voicemail status message shown at the top of call log to notify the user that there is no
       data connection to the voicemail server, but there are new voicemails waiting on the server.
@@ -1666,15 +1675,6 @@ connection to the voicemail server is lost. [CHAR LIMIT=64] -->
 
     <!-- The "file name" displayed for vCards received directly via NFC [CHAR LIMIT=16] -->
     <string name="nfc_vcard_file_name">Contact received over NFC</string>
-
-    <!-- Menu item used to show only outgoing in the call log. [CHAR LIMIT=30] -->
-    <string name="menu_show_outgoing_only">Show outgoing only</string>
-
-    <!-- Menu item used to show only incoming in the call log. [CHAR LIMIT=30] -->
-    <string name="menu_show_incoming_only">Show incoming only</string>
-
-    <!-- Menu item used to show only missed in the call log. [CHAR LIMIT=30] -->
-    <string name="menu_show_missed_only">Show missed only</string>
 
     <!-- Menu item used to show only voicemails in the call log. [CHAR LIMIT=30] -->
     <string name="menu_show_voicemails_only">Show voicemails only</string>
@@ -1845,20 +1845,92 @@ connection to the voicemail server is lost. [CHAR LIMIT=64] -->
          voicemail service in Airplane mode. [CHAR LIMI=NONE] -->
     <string name="dialog_voicemail_airplane_mode_message">To call voicemail, first turn off Airplane mode.</string>
 
-    <!-- Menu item shown only when the special debug mode is enabled, which is used to send all contacts database files via email.  [CHAR LIMI=NONE] -->
-    <string name="menu_export_database">Export database files</string>
-
     <!-- Content description for the fake action menu overflow button.
          This should be same as the description for the real action menu
          overflow button available in ActionBar.
          [CHAR LIMIT=NONE] -->
     <string name="action_menu_overflow_description" msgid="2295659037509008453">More options</string>
+    
+     <!-- shendu 2012-10-15 text -->
+    <string name="shendu_call_dialer_show_text">dialpad</string>
+    <string name="shendu_group_editor_name_title">Group Name</string>
+    <string name="shendu_group_editor_members_title">Group Members</string>
+    <string name="shendu_group_editor_add_members">Add Members</string>
+    <string name="menu_to_dialer" >Dailer</string>
+    <string name="shendu_context_menu_edit" >Edit Contact</string>
+    <string name="shendu_context_menu_delete" >Delete Contact</string>
+    <string name="shendu_context_menu_share" >Share Contact</string>
+    
+    <string name="shendu_add_blacklist">Add Blacklist</string>
+    <string name="shendu_send_sms">Send SMS</string>
+    
+    <item type="id" name="shendu_tag_first"></item>
+    <item type="id" name="shendu_tag_second"></item>
+    <item type="id" name="shendu_tag_name"></item>
+    <item type="id" name="shendu_tag_position"></item>
 
-    <!-- Content description for the expand or collapse name fields button.
-         Clicking this button causes the name editor to toggle between showing
-         a single field where the entire name is edited at once, or multiple
-         fields corresponding to each part of the name (Name Prefix, First Name,
-         Middle Name, Last Name, Name Suffix).
-         [CHAR LIMIT=NONE] -->
-    <string name="expand_collapse_name_fields_description">Expand or collapse name fields</string>
+    <string name="number_of_items_selected" >%1$d selected</string>
+    <string name="select_all" >Select all</string>
+    <string name="deselect_all" >Deselect all</string>
+    <string name="group_insert_members_message">Inserted %1$d / %2$d</string>
+    <string name="message_prepare">Waiting</string>
+    <string name="message_using_number">Using Number</string>
+    
+    <string name="default_group_friend" >Friend</string>
+    <string name="default_group_family" >Family</string>
+    <string name="default_group_colleague" >Colleague</string>
+    
+    <!--Wang: Sim export infor-->
+    <string name="export_to_sim" product="default">Export to sim</string>
+    
+     <!--Wang: Ringtone setting string-->
+     <string name="default_ringtone" >Default Ringtone</string>
+     <string name="ringtone_title" >Ringtone</string>
+     
+     <!--Wang: Fast Search-->
+     <string name="fast_a" >A</string>
+     <string name="fast_b" >B</string>
+     <string name="fast_c" >C</string>
+     <string name="fast_d" >D</string>
+     <string name="fast_e" >E</string>
+     <string name="fast_f" >F</string>
+     <string name="fast_g" >G</string>
+     <string name="fast_h" >H</string>
+     <string name="fast_i" >I</string>
+     <string name="fast_j" >J</string>
+     <string name="fast_k" >K</string>
+     <string name="fast_l" >L</string>
+     <string name="fast_m" >M</string>
+     <string name="fast_n" >N</string>
+     <string name="fast_o" >O</string>
+     <string name="fast_p" >P</string>
+     <string name="fast_q" >Q</string>
+     <string name="fast_r" >R</string>
+     <string name="fast_s" >S</string>
+     <string name="fast_t" >T</string>
+     <string name="fast_u" >U</string>
+     <string name="fast_v" >V</string>
+     <string name="fast_w" >W</string>
+     <string name="fast_x" >X</string>
+     <string name="fast_y" >Y</string>
+     <string name="fast_z" >Z</string>
+     
+     <!--Wang: SMS share -->
+     <string name="share_name" >Name:%1$s</string>
+     <string name="share_number" >Number:%1$s</string>
+     
+         <!-- add ringtone options -->
+    <string name="sound_ringtones">Ringtones</string>
+    <string name="sound_music">Music</string>
+    <string name="file_not_find">This media file not available or not exist...."</string>
+    <string name="sdcard_not_find">"SDCard Unmounted...."</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- Mokee Start -->
+    <string name="dialer_ip_call_prefix_title">IP Prefix</string>
+    <string name="dialer_ip_call_prefix_summary">Tap to set IP Prefix</string>
+    <string name="dialer_ipcall_title">IPCall</string>
+    <string name="dialer_ipcall_msg">IP prefix has not been set. Do you want to make the call withou
+t IP prefix</string>
+
 </resources>

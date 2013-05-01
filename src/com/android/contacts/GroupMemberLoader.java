@@ -15,6 +15,8 @@
  */
 package com.android.contacts;
 
+import com.android.contacts.preference.ContactsPreferences;
+
 import android.content.Context;
 import android.content.CursorLoader;
 import android.net.Uri;
@@ -23,8 +25,6 @@ import android.provider.ContactsContract.CommonDataKinds.GroupMembership;
 import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.Directory;
-
-import com.android.contacts.preference.ContactsPreferences;
 
 import java.util.ArrayList;
 import java.util.List;

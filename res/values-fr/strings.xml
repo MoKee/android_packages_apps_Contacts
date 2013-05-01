@@ -16,6 +16,32 @@
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <!-- CM Changes are put first to prevent problems on merge -->
+
+    <string name="dialer_ui_title">Paramètres du clavier</string>
+    <string name="dialer_ui_orientation_title">Auto-rotation</string>
+    <string name="dialer_ui_orientation_summary">Utiliser le capteur pour passer du mode portrait au mode paysage</string>
+
+    <string name="t9_default_sort">1</string>
+    <string name="t9_sort_title">Mode de tri T9</string>
+    <string name="t9_sort_summary">Méthode de tri des résultats issus du mode T9</string>
+    <string name="t9_sort_name">Noms en priorité</string>
+    <string name="t9_sort_number">Numéros en priorité</string>
+    <string name="t9_state_title">Activer le mode T9</string>
+    <string name="t9_state_summary">Activer la recherche des contacts par les lettres du clavier</string>
+    <string name="t9_dial_click_title">Sélection contact T9</string>
+    <string name="t9_dial_click_summary">Appeler de préférence le contact sélectionné par le mode T9</string>
+    <string name="t9_add_to_contacts">Ajouter aux contacts</string>
+    <string name="t9_map_row_2">2abcàáâäåɑæçǽćčá</string>
+    <string name="t9_map_row_3">3deféèêë</string>
+    <string name="t9_map_row_4">4ghiíìïîǵ</string>
+    <string name="t9_map_row_5">5jklḱḱĺ</string>
+    <string name="t9_map_row_6">6mnoòóöôøñŋǿḿńő</string>
+    <string name="t9_map_row_7">7pqrsßɾṕŕśřš</string>
+    <string name="t9_map_row_8">8tuvúùüûű</string>
+    <string name="t9_map_row_9">9wxyzýẃź</string>
+
     <string name="launcherDialer" msgid="8636288196618486553">"Téléphone"</string>
     <string name="people" msgid="1048457247435785074">"Contacts"</string>
     <string name="contactsList" msgid="8661624236494819731">"Contacts"</string>
@@ -53,8 +79,8 @@
     <string name="menu_splitAggregate" msgid="8368636463748691868">"Séparer"</string>
     <string name="menu_editGroup" msgid="5062005185370983720">"Modifier"</string>
     <string name="menu_deleteGroup" msgid="3486380004411482874">"Supprimer"</string>
-    <string name="menu_new_contact_action_bar" msgid="7263362129442119188">"Ajouter un contact"</string>
-    <string name="menu_new_group_action_bar" msgid="3520232877587377175">"Ajouter un groupe"</string>
+    <string name="menu_new_contact_action_bar" msgid="8887818026717394343">"Nouveau"</string>
+    <string name="menu_new_group_action_bar" msgid="5055346725617932394">"Nouveau"</string>
     <string name="splitConfirmation_title" msgid="633640935430370530">"Séparer le contact ?"</string>
     <string name="splitConfirmation" msgid="740190210499587175">"Ce contact va être séparé en plusieurs contacts."</string>
     <string name="menu_joinAggregate" msgid="5027981918265667970">"Joindre"</string>
@@ -137,7 +163,6 @@
     <string name="contactsAllLabel" msgid="6479708629170672169">"Tous les contacts"</string>
     <string name="contactsGroupsLabel" msgid="2841971472518003524">"Groupes"</string>
     <string name="contactsFavoritesLabel" msgid="8417039765586853670">"Favoris"</string>
-    <string name="dialerAllContactsLabel" msgid="1025920923112988336">"Favoris et tous les contacts"</string>
     <string name="dialerIconLabel" msgid="6500826552823403796">"Tél."</string>
     <string name="recentCallsIconLabel" msgid="1419116422359067949">"Appels"</string>
     <string name="menu_sendTextMessage" msgid="6937343460284499306">"Envoyer un SMS"</string>
@@ -211,7 +236,7 @@
     <string name="description_delete_button" msgid="6263102114033407382">"retour arrière"</string>
     <string name="description_digits_edittext" msgid="8760207516497016437">"numéro à composer"</string>
     <string name="description_contact_photo" msgid="3387458082667894062">"photo du contact"</string>
-    <string name="description_minus_button" msgid="6908099247930477551">"supprimer"</string>
+    <string name="description_minus_button" msgid="387136707700230172">"moins"</string>
     <string name="description_plus_button" msgid="515164827856229880">"plus"</string>
     <string name="description_view_contact_detail" msgid="9133251213656414807">"Afficher le contact"</string>
     <string name="no_sdcard_message" product="nosdcard" msgid="5242558018442357189">"Aucune mémoire stock. trouvée."</string>
@@ -511,10 +536,6 @@
     <string name="voicemail_fetching_timout" msgid="6691792377574905201">"Impossible de récupérer messages vocaux."</string>
     <string name="call_log_new_header" msgid="846546437517724715">"Nouveau"</string>
     <string name="call_log_old_header" msgid="6262205894314263629">"Précédent"</string>
-    <string name="call_log_voicemail_header" msgid="3945407886667089173">"Seulement les appels avec message vocal"</string>
-    <string name="call_log_incoming_header" msgid="2787722299753674684">"Seulement les appels entrants"</string>
-    <string name="call_log_outgoing_header" msgid="761009180766735769">"Seulement les appels sortants"</string>
-    <string name="call_log_missed_header" msgid="8017148056610855956">"Seulement les appels manqués"</string>
     <string name="voicemail_status_voicemail_not_available" msgid="3021980206152528883">"Impossible de se connecter au serveur de messagerie vocale."</string>
     <string name="voicemail_status_messages_waiting" msgid="7113421459602803605">"Connexion messagerie vocale impossible. Messages en attente."</string>
     <string name="voicemail_status_configure_voicemail" msgid="3738537770636895689">"Configurez votre messagerie vocale."</string>
@@ -529,9 +550,6 @@
     <string name="call_log_item_count_and_date" msgid="7641933305703520787">"(<xliff:g id="COUNT">%1$d</xliff:g>) <xliff:g id="DATE">%2$s</xliff:g>"</string>
     <string name="group_name_hint" msgid="238359485263401293">"Nom du groupe"</string>
     <string name="nfc_vcard_file_name" msgid="2823095213265993609">"Contact reçu via NFC"</string>
-    <string name="menu_show_outgoing_only" msgid="1965570298133301970">"Afficher appels sortants uniq."</string>
-    <string name="menu_show_incoming_only" msgid="7534206815238877417">"Afficher appels entrants uniq."</string>
-    <string name="menu_show_missed_only" msgid="154473166059743996">"Afficher appels manqués uniq."</string>
     <string name="menu_show_voicemails_only" msgid="1898421289561435703">"Messages vocaux uniquement"</string>
     <string name="menu_show_all_calls" msgid="7560347482073345885">"Afficher tous les appels"</string>
     <string name="status_available" msgid="5586870015822828392">"Disponible"</string>
@@ -567,7 +585,5 @@
     <string name="dialog_phone_call_prohibited_message" msgid="6554711866586660441">"Appel non effectué."</string>
     <string name="dialog_voicemail_not_ready_message" msgid="4384716252789515378">"Pour configurer la messagerie vocale, accédez à Menu &gt; Paramètres."</string>
     <string name="dialog_voicemail_airplane_mode_message" msgid="530922773669546093">"Veuillez désactiver le mode Avion avant d\'appeler la messagerie vocale."</string>
-    <string name="menu_export_database" msgid="2659719297530170820">"Exporter les fichiers de la base de données"</string>
     <string name="action_menu_overflow_description" msgid="2303272250613084574">"Plus d\'options"</string>
-    <string name="expand_collapse_name_fields_description" msgid="8682630859539604311">"Développer ou réduire les champs de nom"</string>
 </resources>

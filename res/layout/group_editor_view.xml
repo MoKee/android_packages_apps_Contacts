@@ -14,40 +14,120 @@
      limitations under the License.
 -->
 
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-   <include
+    <include
         android:id="@+id/account_header"
-        layout="@layout/editor_account_header"/>
+        layout="@layout/editor_account_header" />
 
-    <LinearLayout android:layout_width="match_parent"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="8dip"
-        android:paddingRight="8dip"
-        android:orientation="vertical">
-
-        <EditText
-            android:id="@+id/group_name"
-            android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/account_container_left_padding"
+        android:paddingRight="@dimen/account_container_left_padding" >
+		<!--  
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:inputType="textCapWords"
-            android:imeOptions="flagNoExtractUi|flagNoFullscreen"
-            android:hint="@string/group_name_hint"
+            android:paddingLeft="8dip"
+            android:background="@drawable/list_section_divider_holo_custom"
+            android:textColor="@color/people_app_theme_color"
+		-->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:gravity="center_vertical"
+            android:text="@string/shendu_group_editor_name_title"
+            android:textColor="@color/contacts_view_header_name_color"
+            android:textSize="@dimen/favorites_item_view_title_size" 
+            />
+		<LinearLayout
+        	android:layout_width="match_parent"
+        	android:layout_height="61dp"
+			android:padding="@dimen/account_container_left_padding"
+			android:background="@drawable/shendu_listview_item_overall"
+        	>
+		<!--  
             android:minHeight="48dip"
-            android:paddingLeft="8dip"/>
+            android:paddingLeft="8dip"
+            android:textAppearance="?android:attr/textAppearanceMedium" 
+	        android:paddingLeft="8dip"
+			android:minHeight="48dip"
+		-->
+        	<EditText
+	            android:id="@+id/group_name"
+	            android:layout_width="match_parent"
+	            android:layout_height="match_parent"
+	            android:hint="@string/group_name_hint"
+	            android:imeOptions="flagNoExtractUi|flagNoFullscreen"
+	            android:inputType="textCapWords"
+	            android:background="@drawable/contacts_edittext_bg"
+	            android:textAppearance="?android:attr/textAppearanceMedium" 
+	            />
+		</LinearLayout>
+        <!--
+            android:layout_height="wrap_content"  
+            android:background="@drawable/list_section_divider_holo_custom"
+            android:paddingLeft="8dip"
+            android:textColor="@color/people_app_theme_color"
+        -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:gravity="center_vertical"
+            android:text="@string/shendu_group_editor_members_title"
+            android:textColor="@color/contacts_view_header_name_color"
+            android:textSize="@dimen/favorites_item_view_title_size" />
+        <include
+            android:visibility="gone"
+            android:id="@+id/add_member_field"
+            layout="@layout/group_editor_autocomplete_view" />
+
 
         <include
-            layout="@layout/group_editor_autocomplete_view"
-            android:id="@+id/add_member_field"/>
+            android:id="@android:id/list"
+            layout="@layout/group_editor_existing_member_list" />
+        
+        <!--
+            android:background="@drawable/action_background"  
+            android:background="@drawable/shendu_listview_item_bottom"
+        -->
+<!--         <RelativeLayout
+            android:visibility="visible"
+            android:id="@+id/add_member_view"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/contacts_view_person_data_height"
+            android:minHeight="48dip"
+            android:clickable="true"
+            android:orientation="vertical" >
 
-        <include
-            layout="@layout/group_editor_existing_member_list"
-            android:id="@android:id/list"/>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:src="@drawable/ic_menu_add_field_holo_light" />
+
+            <TextView
+                android:layout_centerVertical="true"
+                android:gravity="center_vertical"
+                android:drawableLeft="@drawable/ic_menu_add_field_holo_light"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="@string/shendu_group_editor_add_members" 
+            	android:textColor="@color/contacts_view_header_name_color"
+            	android:layout_marginLeft="@dimen/contacts_detail_actionbar_padding"
+                android:textSize="@dimen/favorites_item_view_title_size"
+                />
+             
+            <View 
+                android:layout_alignParentBottom="true"
+                android:layout_width="match_parent"
+                android:layout_height="1dip"
+                android:background="@drawable/group_browser_divider"/>
+           
+        </RelativeLayout> -->
     </LinearLayout>
 
 </LinearLayout>

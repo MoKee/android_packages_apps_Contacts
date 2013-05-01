@@ -15,6 +15,11 @@
  */
 package com.android.contacts.list;
 
+import com.android.contacts.ContactPhotoManager;
+import com.android.contacts.R;
+import com.android.contacts.list.ContactListAdapter.ContactQuery;
+import com.android.contacts.widget.IndexerListAdapter;
+
 import android.content.Context;
 import android.content.CursorLoader;
 import android.database.Cursor;
@@ -32,10 +37,6 @@ import android.view.ViewGroup;
 import android.widget.QuickContactBadge;
 import android.widget.SectionIndexer;
 import android.widget.TextView;
-
-import com.android.contacts.ContactPhotoManager;
-import com.android.contacts.R;
-import com.android.contacts.widget.IndexerListAdapter;
 
 import java.util.HashSet;
 
@@ -414,6 +415,10 @@ public abstract class ContactEntryListAdapter extends IndexerListAdapter {
         if (isSectionHeaderDisplayEnabled() && partitionIndex == getIndexedPartition()) {
             updateIndexer(cursor);
         }
+        //Wang:
+        if(mCursorChangedListener != null){
+        	mCursorChangedListener.onCurosrChanged(this, cursor);
+        }
     }
 
     public void changeCursor(Cursor cursor) {
@@ -649,8 +654,18 @@ public abstract class ContactEntryListAdapter extends IndexerListAdapter {
             getPhotoLoader().loadThumbnail(quickContact, photoId, mDarkTheme);
         } else {
             final String photoUriString = cursor.getString(photoUriColumn);
-            final Uri photoUri = photoUriString == null ? null : Uri.parse(photoUriString);
-            getPhotoLoader().loadPhoto(quickContact, photoUri, -1, mDarkTheme);
+            final Uri photoUri = photoUriString == null ? null : Uri.parse(photoUriString);  
+            //====================
+            //Wang:
+            long contactID = -1;
+            try {
+                contactID = cursor.getLong(ContactQuery.CONTACT_ID);
+            } catch (Exception e) {
+                contactID = -1;
+            }
+            getPhotoLoader().loadPhoto(quickContact, photoUri, -1, mDarkTheme,
+                    view.getNameTextView().getText().toString(), contactID);
+            //====================
         }
 
     }
@@ -674,5 +689,14 @@ public abstract class ContactEntryListAdapter extends IndexerListAdapter {
 
     public String getContactsCount() {
         return mContactsCount;
+    }
+    
+    /** Wang:*/
+    public interface onCursorChangedListener{
+    	  public void onCurosrChanged(ContactEntryListAdapter adapter, Cursor c);
+    }
+    private onCursorChangedListener mCursorChangedListener;
+    public void setOnCursorChangedListener(onCursorChangedListener listener){
+    	mCursorChangedListener = listener;
     }
 }

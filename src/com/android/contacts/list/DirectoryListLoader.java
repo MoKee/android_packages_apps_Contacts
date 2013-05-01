@@ -15,6 +15,8 @@
  */
 package com.android.contacts.list;
 
+import com.android.contacts.R;
+
 import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -26,8 +28,6 @@ import android.os.Handler;
 import android.provider.ContactsContract.Directory;
 import android.text.TextUtils;
 import android.util.Log;
-
-import com.android.contacts.R;
 
 /**
  * A specialized loader for the list of directories, see {@link Directory}.

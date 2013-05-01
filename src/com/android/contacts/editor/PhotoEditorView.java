@@ -16,6 +16,13 @@
 
 package com.android.contacts.editor;
 
+import com.android.contacts.ContactsUtils;
+import com.android.contacts.R;
+import com.android.contacts.model.DataKind;
+import com.android.contacts.model.EntityDelta;
+import com.android.contacts.model.EntityDelta.ValuesDelta;
+import com.android.contacts.util.ContactPhotoUtils;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -24,13 +31,6 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-
-import com.android.contacts.ContactsUtils;
-import com.android.contacts.R;
-import com.android.contacts.model.RawContactDelta;
-import com.android.contacts.model.RawContactDelta.ValuesDelta;
-import com.android.contacts.model.dataitem.DataKind;
-import com.android.contacts.util.ContactPhotoUtils;
 
 /**
  * Simple editor for {@link Photo}.
@@ -42,7 +42,7 @@ public class PhotoEditorView extends LinearLayout implements Editor {
 
     private ValuesDelta mEntry;
     private EditorListener mListener;
-    private View mTriangleAffordance;
+    //private View mTriangleAffordance; //do not used,remove by hhl
 
     private boolean mHasSetPhoto = false;
     private boolean mReadOnly;
@@ -71,7 +71,7 @@ public class PhotoEditorView extends LinearLayout implements Editor {
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-        mTriangleAffordance = findViewById(R.id.photo_triangle_affordance);
+        //mTriangleAffordance = findViewById(R.id.photo_triangle_affordance);
         mPhotoImageView = (ImageView) findViewById(R.id.photo);
         mFrameView = findViewById(R.id.frame);
         mFrameView.setOnClickListener(new OnClickListener() {
@@ -92,7 +92,7 @@ public class PhotoEditorView extends LinearLayout implements Editor {
 
     /** {@inheritDoc} */
     @Override
-    public void setValues(DataKind kind, ValuesDelta values, RawContactDelta state, boolean readOnly,
+    public void setValues(DataKind kind, ValuesDelta values, EntityDelta state, boolean readOnly,
             ViewIdGenerator vig) {
         mEntry = values;
         mReadOnly = readOnly;
@@ -143,7 +143,7 @@ public class PhotoEditorView extends LinearLayout implements Editor {
         mEntry.setFromTemplate(false);
 
         // When the user chooses a new photo mark it as super primary
-        mEntry.setSuperPrimary(true);
+        mEntry.put(Photo.IS_SUPER_PRIMARY, 1);
 
         // Even though high-res photos cannot be saved by passing them via
         // an EntityDeltaList (since they cause the Bundle size limit to be
@@ -154,7 +154,7 @@ public class PhotoEditorView extends LinearLayout implements Editor {
         final int size = ContactsUtils.getThumbnailSize(getContext());
         final Bitmap scaled = Bitmap.createScaledBitmap(photo, size, size, false);
         final byte[] compressed = ContactPhotoUtils.compressBitmap(scaled);
-        if (compressed != null) mEntry.setPhoto(compressed);
+        if (compressed != null) mEntry.put(Photo.PHOTO, compressed);
     }
 
     /**
@@ -178,7 +178,7 @@ public class PhotoEditorView extends LinearLayout implements Editor {
         mListener = listener;
 
         final boolean isPushable = listener != null;
-        mTriangleAffordance.setVisibility(isPushable ? View.VISIBLE : View.INVISIBLE);
+        //mTriangleAffordance.setVisibility(isPushable ? View.VISIBLE : View.INVISIBLE);
         mFrameView.setVisibility(isPushable ? View.VISIBLE : View.INVISIBLE);
     }
 
