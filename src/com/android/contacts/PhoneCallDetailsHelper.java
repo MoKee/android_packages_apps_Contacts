@@ -124,8 +124,8 @@ public class PhoneCallDetailsHelper {
         }
 
         Context mContext = views.labelView.getContext();   
-        if(mContext.getResources().getConfiguration().locale.getCountry().equals("CN")||mContext.getResources().getConfiguration().locale.getCountry().equals("TW")) {
-        	CharSequence PhoneLocationStr = PhoneLocation.getCityFromPhone(String.valueOf(details.number), mContext);
+        if(mContext.getResources().getConfiguration().locale.getCountry().equals("CN") || mContext.getResources().getConfiguration().locale.getCountry().equals("TW")) {
+        	CharSequence PhoneLocationStr = PhoneLocation.getCityFromPhone(String.valueOf(details.number));
         	views.locationView.setText(PhoneLocationStr);
         	views.locationView.setVisibility(TextUtils.isEmpty(PhoneLocationStr) ? View.INVISIBLE : View.VISIBLE);
         } else {
