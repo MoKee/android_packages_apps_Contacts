@@ -16,12 +16,15 @@
 
 package com.android.contacts.calllog;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.PhoneLookup;
+import android.provider.Settings;
+import android.provider.Telephony;
 import android.telephony.PhoneNumberUtils;
 import android.text.TextUtils;
 import android.widget.Toast;
@@ -35,10 +38,6 @@ import com.android.contacts.util.UriUtils;
 public class ContactInfoHelper {
     private final Context mContext;
     private final String mCurrentCountryIso;
-
-    // Blacklist support
-    private static final String INSERT_BLACKLIST = "com.android.phone.INSERT_BLACKLIST";
-    private static final String BLACKLIST_NUMBER = "number";
 
     public ContactInfoHelper(Context context, String currentCountryIso) {
         mContext = context;
@@ -226,12 +225,25 @@ public class ContactInfoHelper {
      * @param number the number to be blacklisted
      */
     public void addNumberToBlacklist(String number) {
-                Intent intent = new Intent(INSERT_BLACKLIST);
-        intent.putExtra(BLACKLIST_NUMBER, number);
-        mContext.sendBroadcast(intent);
+        ContentValues cv = new ContentValues();
+        cv.put(Telephony.Blacklist.PHONE_MODE, 1);
 
-        // Give the user some feedback
-        String message = mContext.getString(R.string.toast_added_to_blacklist, number);
-        Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
+        Uri uri = Uri.withAppendedPath(Telephony.Blacklist.CONTENT_FILTER_BYNUMBER_URI, number);
+        int count = mContext.getContentResolver().update(uri, cv, null, null);
+
+        if (count != 0) {
+            // Give the user some feedback
+            String message = mContext.getString(R.string.toast_added_to_blacklist, number);
+            Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * Checks whether calls can be blacklisted; that is, whether the
+     * phone blacklist is enabled
+     */
+    public boolean canBlacklistCalls() {
+        return Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.PHONE_BLACKLIST_ENABLED, 1) != 0;
     }
 }
