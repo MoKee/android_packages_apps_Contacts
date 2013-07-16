@@ -16,7 +16,7 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <!-- T9 -->
     <string name="t9_loading">Loading\u2026</string>
-    <string name="t9_default_sort" translatable="false">1</string>
+    <string name="t9_default_sort" translatable="false">3</string>
     <string name="t9_sort_title">T9 sorting mode</string>
     <string name="t9_sort_summary">Choose how to filter T9 results</string>
     <string name="t9_sort_name">Name matches first</string>
