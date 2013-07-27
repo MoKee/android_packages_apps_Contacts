@@ -29,20 +29,20 @@
     <dimen name="editor_round_button_padding_top">8dip</dimen>
     <dimen name="editor_round_button_padding_bottom">8dip</dimen>
 
-    <!-- Left padding of the label in the add field button for the contact editor -->
-    <dimen name="editor_add_field_label_left_padding">16dip</dimen>
-
-    <!-- Width of the Type-Label in the Editor -->
-    <dimen name="editor_type_label_width">100dip</dimen>
-
-    <!-- Left padding of a field in the Editor -->
-    <dimen name="editor_field_left_padding">4dip</dimen>
+    <!-- Minimum height of a row in the Editor -->
+    <dimen name="editor_min_line_item_height">48dip</dimen>
 
     <!-- Right padding of a field in the Editor -->
     <dimen name="editor_field_right_padding">4dip</dimen>
 
-    <!-- Minimum height of a row in the Editor -->
-    <dimen name="editor_min_line_item_height">48dip</dimen>
+    <!-- Left padding of a field in the Editor -->
+    <dimen name="editor_field_left_padding">4dip</dimen>
+
+    <!-- Width of the Type-Label in the Editor -->
+    <dimen name="editor_type_label_width">100dip</dimen>
+
+    <!-- Left padding of the label in the add field button for the contact editor -->
+    <dimen name="editor_add_field_label_left_padding">16dip</dimen>
 
     <!-- Height of the shadow asset under the photo on the contact detail page -->
     <dimen name="detail_contact_photo_shadow_height">10dip</dimen>
@@ -93,17 +93,11 @@
     <!-- Left and right padding for a contact detail item -->
     <dimen name="detail_item_icon_margin">8dip</dimen>
 
-    <!-- Left and right padding for a contact detail item -->
-    <dimen name="detail_item_side_margin">16dip</dimen>
-
     <!-- Top and bottom padding for a contact detail item -->
     <dimen name="detail_item_vertical_margin">8dip</dimen>
 
     <!-- Minimum height of a row in the contact detail -->
     <dimen name="detail_min_line_item_height">48dip</dimen>
-
-    <!-- Width of height of an icon from a third-party app in the networks section of the contact card. -->
-    <dimen name="detail_network_icon_size">32dip</dimen>
 
     <!-- Font size for the display name in header of the contact detail page -->
     <dimen name="detail_header_name_text_size">36sp</dimen>
@@ -112,26 +106,11 @@
          (phone number, email, etc.) and a secondary action button -->
     <dimen name="detail_vertical_divider_vertical_margin">16dip</dimen>
 
-    <!-- Padding to be used between a visible scrollbar and the contact list -->
-    <dimen name="list_visible_scrollbar_padding">32dip</dimen>
-
     <!-- Font size used for the contact name in the widget -->
     <dimen name="widget_text_size_name">14sp</dimen>
 
     <!-- Font size used for the social status in the widget -->
     <dimen name="widget_text_size_snippet">13sp</dimen>
-
-    <!-- Size of the shortcut icon. 0dip means: use the system default -->
-    <dimen name="shortcut_icon_size">0dip</dimen>
-
-    <!-- Width of darkened border for shortcut icon -->
-    <dimen name="shortcut_icon_border_width">1dp</dimen>
-
-    <!-- Text size of shortcut icon overlay text -->
-    <dimen name="shortcut_overlay_text_size">12dp</dimen>
-
-    <!-- Extra vertical padding for darkened background behind shortcut icon overlay text -->
-    <dimen name="shortcut_overlay_text_background_padding">1dp</dimen>
 
     <!-- Height of list sections (A, B, C) that show the first character of the contacts -->
     <dimen name="list_section_height">25dip</dimen>
@@ -160,88 +139,21 @@
     <!-- Height of the quick contact photo container (for screens that are too large to use the screen width/height as a constraint)-->
     <dimen name="quick_contact_photo_container_height">180dip</dimen>
 
-    <!-- Height of edit text in dialpad fragment -->
-    <dimen name="dialpad_horizontal_margin">0dip</dimen>
-    <dimen name="dialpad_vertical_margin">2dip</dimen>
-    <dimen name="dialpad_digits_text_size">35sp</dimen>
-
-    <!-- Just used in landscape mode -->
-    <dimen name="dialpad_digits_height">0px</dimen>
-    <dimen name="dialpad_digits_margin_bottom">0px</dimen>
-    <dimen name="dialpad_center_margin">3dp</dimen>
-    <dimen name="dialpad_button_margin">2dp</dimen>
-    <!-- Match call_button_height to Phone's dimens/in_call_end_button_height -->
-    <dimen name="call_button_height">74dp</dimen>
-
     <!-- Width of search view in action bar.  Use 0dip for MATCH_PARENT -->
     <dimen name="search_view_width">0dip</dimen>
 
-    <!-- contact browser list margins -->
-    <dimen name="contact_browser_list_header_left_margin">16dip</dimen>
-    <dimen name="contact_browser_list_header_right_margin">@dimen/list_visible_scrollbar_padding</dimen>
-    <dimen name="contact_browser_list_item_photo_size">64dip</dimen>
-    <dimen name="contact_browser_list_item_text_indent">8dip</dimen>
-    <dimen name="contact_browser_list_top_margin">8dip</dimen>
     <!-- For join screen. Mainly for tablet. -->
     <dimen name="join_header_left_margin">@dimen/contact_browser_list_header_left_margin</dimen>
     <dimen name="join_header_right_margin">@dimen/contact_browser_list_header_right_margin</dimen>
     <dimen name="join_header_top_margin">16dip</dimen>
     <dimen name="join_header_bottom_margin">0dip</dimen>
 
-    <!-- Padding between the action bar's bottom edge and the first header
-         in contacts/group lists. -->
-    <dimen name="list_header_extra_top_padding">0dip</dimen>
-
-    <!-- ContactTile Layouts -->
-    <!--
-      Use sp instead of dip so that the shadowbox heights can all scale uniformly
-      when the font size is scaled for accessibility purposes
-    -->
-    <dimen name="contact_tile_shadowbox_height">48sp</dimen>
-
-    <!-- Top padding of the ListView in the contact tile list -->
-    <dimen name="contact_tile_list_padding_top">0dip</dimen>
-
-    <!-- Call Log -->
-    <dimen name="call_log_call_action_size">32dip</dimen>
-    <dimen name="call_log_call_action_width">48dip</dimen>
-    <dimen name="call_log_icon_margin">4dip</dimen>
-    <dimen name="call_log_inner_margin">8dip</dimen>
-    <dimen name="call_log_outer_margin">16dip</dimen>
-    <dimen name="call_log_indent_margin">24dip</dimen>
-    <dimen name="call_log_list_item_height">56dip</dimen>
-    <dimen name="call_log_list_contact_photo_size">64dip</dimen>
-    <dimen name="call_detail_contact_name_margin">24dip</dimen>
-    <dimen name="call_detail_button_spacing">2dip</dimen>
-
-    <!-- Empty message margins -->
-    <dimen name="empty_message_top_margin">48dip</dimen>
     <dimen name="no_accounts_message_margin">20dip</dimen>
 
-    <!-- For contact filter setting screens -->
-    <dimen name="contact_filter_left_margin">16dip</dimen>
-    <dimen name="contact_filter_right_margin">16dip</dimen>
-    <dimen name="contact_filter_item_min_height">48dip</dimen>
-    <dimen name="contact_filter_icon_size">32dip</dimen>
     <dimen name="contact_filter_header_min_height">24dip</dimen>
-
-    <!--  Vertical and horizontal padding in between contact tiles -->
-    <dimen name="contact_tile_divider_padding">1dip</dimen>
 
     <!--  Width of the lead margin on the left of a block quote inside a stream item -->
     <dimen name="stream_item_stripe_width">8dip</dimen>
-
-    <!-- Layout weight values for dialpad screen. These layouts will be used in one
-         LinearLayout (dialpad_fragment.xml), configuring dialpad screen's vertical
-         ratio. -->
-    <integer name="dialpad_layout_weight_digits">20</integer>
-    <integer name="dialpad_layout_weight_dialpad">65</integer>
-    <integer name="dialpad_layout_weight_additional_buttons">15</integer>
-
-    <!-- Minimum height used with @drawable/list_section_divider_holo_custom.
-         Right now the drawable has implicit 32dip minimal height, which is confusing.
-         This value is for making the hidden configuration explicit in xml. -->
-    <dimen name="list_section_divider_min_height">32dip</dimen>
 
     <!-- Max width of the SearchView when the contact picker is a dialog (on wide
          screen devices). -->
@@ -251,9 +163,4 @@
         wide screen devices). -->
     <dimen name="contact_picker_contact_list_min_height">550dip</dimen>
 
-    <!-- Min with of fake menu buttons, which should be same as ActionBar's one -->
-    <dimen name="fake_menu_button_min_width">56dip</dimen>
-
-    <!-- Size of the pie chart in the call stats detail activity -->
-    <dimen name="call_stats_details_chart_size">140dip</dimen>
 </resources>

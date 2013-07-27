@@ -32,10 +32,12 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.android.contacts.ContactPhotoManager;
-import com.android.contacts.ContactTileLoaderFactory;
+import com.android.contacts.common.ContactPhotoManager;
+import com.android.contacts.common.ContactTileLoaderFactory;
 import com.android.contacts.R;
-import com.android.contacts.list.ContactTileAdapter.DisplayType;
+import com.android.contacts.common.list.ContactTileAdapter;
+import com.android.contacts.common.list.ContactTileView;
+import com.android.contacts.common.list.ContactTileAdapter.DisplayType;
 
 /**
  * Fragment containing a list of starred contacts followed by a list of frequently contacted.

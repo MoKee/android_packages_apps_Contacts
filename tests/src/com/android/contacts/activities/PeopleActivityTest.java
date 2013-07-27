@@ -32,22 +32,22 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.test.suitebuilder.annotation.SmallTest;
 import android.widget.TextView;
 
-import com.android.contacts.ContactPhotoManager;
 import com.android.contacts.ContactsApplication;
 import com.android.contacts.R;
+import com.android.contacts.common.ContactPhotoManager;
+import com.android.contacts.common.test.mocks.ContactsMockContext;
+import com.android.contacts.common.test.mocks.MockContentProvider;
+import com.android.contacts.common.test.mocks.MockContentProvider.Query;
 import com.android.contacts.detail.ContactDetailFragment;
 import com.android.contacts.interactions.TestLoaderManager;
 import com.android.contacts.list.ContactBrowseListFragment;
-import com.android.contacts.model.AccountTypeManager;
-import com.android.contacts.model.account.AccountType;
-import com.android.contacts.model.account.AccountWithDataSet;
-import com.android.contacts.model.account.BaseAccountType;
+import com.android.contacts.common.model.AccountTypeManager;
+import com.android.contacts.common.model.account.AccountType;
+import com.android.contacts.common.model.account.AccountWithDataSet;
+import com.android.contacts.common.model.account.BaseAccountType;
 import com.android.contacts.test.InjectedServices;
-import com.android.contacts.tests.mocks.ContactsMockContext;
 import com.android.contacts.tests.mocks.MockAccountTypeManager;
 import com.android.contacts.tests.mocks.MockContactPhotoManager;
-import com.android.contacts.tests.mocks.MockContentProvider;
-import com.android.contacts.tests.mocks.MockContentProvider.Query;
 import com.android.contacts.tests.mocks.MockSharedPreferences;
 import com.android.contacts.util.PhoneCapabilityTester;
 
@@ -103,11 +103,11 @@ public class PeopleActivityTest
         accountType.accountType = TEST_ACCOUNT_TYPE;
 
         AccountWithDataSet account = new AccountWithDataSet(TEST_ACCOUNT, TEST_ACCOUNT_TYPE, null);
-
-        services.setSystemService(AccountTypeManager.ACCOUNT_TYPE_SERVICE,
-                new MockAccountTypeManager(
-                        new AccountType[] { accountType }, new AccountWithDataSet[] { account }));
         ContactsApplication.injectServices(services);
+
+        final MockAccountTypeManager mockManager = new MockAccountTypeManager(
+                        new AccountType[] { accountType }, new AccountWithDataSet[] { account });
+        AccountTypeManager.setInstanceForTest(mockManager);
     }
 
     @Override

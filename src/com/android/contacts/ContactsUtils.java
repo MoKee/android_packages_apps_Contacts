@@ -18,34 +18,20 @@ package com.android.contacts;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.database.Cursor;
-import android.graphics.Rect;
-import android.location.CountryDetector;
-import android.net.Uri;
-import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Im;
-import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.DisplayPhoto;
-import android.provider.ContactsContract.QuickContact;
 import android.telephony.PhoneNumberUtils;
 import android.text.TextUtils;
-import android.view.View;
-import android.widget.TextView;
 
-import com.android.contacts.activities.DialtactsActivity;
-import com.android.contacts.model.AccountTypeManager;
-import com.android.contacts.model.account.AccountType;
-import com.android.contacts.model.account.AccountWithDataSet;
-import com.android.contacts.test.NeededForTesting;
-import com.android.contacts.util.Constants;
-import com.google.common.annotations.VisibleForTesting;
+import com.android.contacts.common.model.account.AccountWithDataSet;
+import com.android.contacts.common.test.NeededForTesting;
+import com.android.contacts.common.model.AccountTypeManager;
 
 import java.util.List;
 
 public class ContactsUtils {
     private static final String TAG = "ContactsUtils";
-    private static final String WAIT_SYMBOL_AS_STRING = String.valueOf(PhoneNumberUtils.WAIT);
 
     private static int sThumbnailSize = -1;
 
@@ -111,63 +97,6 @@ public class ContactsUtils {
     }
 
     /**
-     * Returns true if two data with mimetypes which represent values in contact entries are
-     * considered equal for collapsing in the GUI. For caller-id, use
-     * {@link PhoneNumberUtils#compare(Context, String, String)} instead
-     */
-    public static final boolean shouldCollapse(CharSequence mimetype1, CharSequence data1,
-            CharSequence mimetype2, CharSequence data2) {
-        // different mimetypes? don't collapse
-        if (!TextUtils.equals(mimetype1, mimetype2)) return false;
-
-        // exact same string? good, bail out early
-        if (TextUtils.equals(data1, data2)) return true;
-
-        // so if either is null, these two must be different
-        if (data1 == null || data2 == null) return false;
-
-        // if this is not about phone numbers, we know this is not a match (of course, some
-        // mimetypes could have more sophisticated matching is the future, e.g. addresses)
-        if (!TextUtils.equals(Phone.CONTENT_ITEM_TYPE, mimetype1)) return false;
-
-        return shouldCollapsePhoneNumbers(data1.toString(), data2.toString());
-    }
-
-    private static final boolean shouldCollapsePhoneNumbers(
-            String number1WithLetters, String number2WithLetters) {
-        final String number1 = PhoneNumberUtils.convertKeypadLettersToDigits(number1WithLetters);
-        final String number2 = PhoneNumberUtils.convertKeypadLettersToDigits(number2WithLetters);
-
-        int index1 = 0;
-        int index2 = 0;
-        for (;;) {
-            // Skip formatting characters.
-            while (index1 < number1.length() &&
-                    !PhoneNumberUtils.isNonSeparator(number1.charAt(index1))) {
-                index1++;
-            }
-            while (index2 < number2.length() &&
-                    !PhoneNumberUtils.isNonSeparator(number2.charAt(index2))) {
-                index2++;
-            }
-            // If both have finished, match.  If only one has finished, not match.
-            final boolean number1End = (index1 == number1.length());
-            final boolean number2End = (index2 == number2.length());
-            if (number1End) {
-                return number2End;
-            }
-            if (number2End) return false;
-
-            // If the non-formatting characters are different, not match.
-            if (number1.charAt(index1) != number2.charAt(index2)) return false;
-
-            // Go to the next characters.
-            index1++;
-            index2++;
-        }
-    }
-
-    /**
      * Returns true if two {@link Intent}s are both null, or have the same action.
      */
     public static final boolean areIntentActionEqual(Intent a, Intent b) {
@@ -180,16 +109,6 @@ public class ContactsUtils {
         return TextUtils.equals(a.getAction(), b.getAction());
     }
 
-    /**
-     * @return The ISO 3166-1 two letters country code of the country the user
-     *         is in.
-     */
-    public static final String getCurrentCountryIso(Context context) {
-        CountryDetector detector =
-                (CountryDetector) context.getSystemService(Context.COUNTRY_DETECTOR);
-        return detector.detectCountry().getCountryIso();
-    }
-
     public static boolean areContactWritableAccountsAvailable(Context context) {
         final List<AccountWithDataSet> accounts =
                 AccountTypeManager.getInstance(context).getAccounts(true /* writeable */);
@@ -200,155 +119,6 @@ public class ContactsUtils {
         final List<AccountWithDataSet> accounts =
                 AccountTypeManager.getInstance(context).getGroupWritableAccounts();
         return !accounts.isEmpty();
-    }
-
-    /**
-     * Returns the intent to launch for the given invitable account type and contact lookup URI.
-     * This will return null if the account type is not invitable (i.e. there is no
-     * {@link AccountType#getInviteContactActivityClassName()} or
-     * {@link AccountType#syncAdapterPackageName}).
-     */
-    public static Intent getInvitableIntent(AccountType accountType, Uri lookupUri) {
-        String syncAdapterPackageName = accountType.syncAdapterPackageName;
-        String className = accountType.getInviteContactActivityClassName();
-        if (TextUtils.isEmpty(syncAdapterPackageName) || TextUtils.isEmpty(className)) {
-            return null;
-        }
-        Intent intent = new Intent();
-        intent.setClassName(syncAdapterPackageName, className);
-
-        intent.setAction(ContactsContract.Intents.INVITE_CONTACT);
-
-        // Data is the lookup URI.
-        intent.setData(lookupUri);
-        return intent;
-    }
-
-    /**
-     * Checks whether two phone numbers resolve to the same phone.
-     */
-    public static boolean phoneNumbersEqual(String number1, String number2) {
-        if (PhoneNumberUtils.isUriNumber(number1) || PhoneNumberUtils.isUriNumber(number2)) {
-            return sipAddressesEqual(number1, number2);
-        } else {
-            return PhoneNumberUtils.compare(number1, number2);
-        }
-    }
-
-    @VisibleForTesting
-    static boolean sipAddressesEqual(String number1, String number2) {
-        if (number1 == null || number2 == null) return number1 == number2;
-
-        int index1 = number1.indexOf('@');
-        final String userinfo1;
-        final String rest1;
-        if (index1 != -1) {
-            userinfo1 = number1.substring(0, index1);
-            rest1 = number1.substring(index1);
-        } else {
-            userinfo1 = number1;
-            rest1 = "";
-        }
-
-        int index2 = number2.indexOf('@');
-        final String userinfo2;
-        final String rest2;
-        if (index2 != -1) {
-            userinfo2 = number2.substring(0, index2);
-            rest2 = number2.substring(index2);
-        } else {
-            userinfo2 = number2;
-            rest2 = "";
-        }
-
-        return userinfo1.equals(userinfo2) && rest1.equalsIgnoreCase(rest2);
-    }
-
-    /**
-     * Return Uri with an appropriate scheme, accepting Voicemail, SIP, and usual phone call
-     * numbers.
-     */
-    public static Uri getCallUri(String number) {
-        if (PhoneNumberUtils.isUriNumber(number)) {
-             return Uri.fromParts(Constants.SCHEME_SIP, number, null);
-        }
-        return Uri.fromParts(Constants.SCHEME_TEL, number, null);
-     }
-
-    /**
-     * Return an Intent for making a phone call. Scheme (e.g. tel, sip) will be determined
-     * automatically.
-     */
-    public static Intent getCallIntent(String number) {
-        return getCallIntent(number, null);
-    }
-
-    /**
-     * Return an Intent for making a phone call. A given Uri will be used as is (without any
-     * sanity check).
-     */
-    public static Intent getCallIntent(Uri uri) {
-        return getCallIntent(uri, null);
-    }
-
-    /**
-     * A variant of {@link #getCallIntent(String)} but also accept a call origin. For more
-     * information about call origin, see comments in Phone package (PhoneApp).
-     */
-    public static Intent getCallIntent(String number, String callOrigin) {
-        return getCallIntent(getCallUri(number), callOrigin);
-    }
-
-    /**
-     * A variant of {@link #getCallIntent(Uri)} but also accept a call origin. For more
-     * information about call origin, see comments in Phone package (PhoneApp).
-     */
-    public static Intent getCallIntent(Uri uri, String callOrigin) {
-        final Intent intent = new Intent(Intent.ACTION_CALL_PRIVILEGED, uri);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        if (callOrigin != null) {
-            intent.putExtra(DialtactsActivity.EXTRA_CALL_ORIGIN, callOrigin);
-        }
-        return intent;
-    }
-
-    /**
-     * Return an Intent for launching voicemail screen.
-     */
-    public static Intent getVoicemailIntent() {
-        final Intent intent = new Intent(Intent.ACTION_CALL_PRIVILEGED,
-                Uri.fromParts("voicemail", "", null));
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        return intent;
-    }
-
-    /**
-     * Returns a header view based on the R.layout.list_separator, where the
-     * containing {@link TextView} is set using the given textResourceId.
-     */
-    public static View createHeaderView(Context context, int textResourceId) {
-        View view = View.inflate(context, R.layout.list_separator, null);
-        TextView textView = (TextView) view.findViewById(R.id.title);
-        textView.setText(context.getString(textResourceId));
-        return view;
-    }
-
-    /**
-     * Returns the {@link Rect} with left, top, right, and bottom coordinates
-     * that are equivalent to the given {@link View}'s bounds. This is equivalent to how the
-     * target {@link Rect} is calculated in {@link QuickContact#showQuickContact}.
-     */
-    public static Rect getTargetRectFromView(Context context, View view) {
-        final float appScale = context.getResources().getCompatibilityInfo().applicationScale;
-        final int[] pos = new int[2];
-        view.getLocationOnScreen(pos);
-
-        final Rect rect = new Rect();
-        rect.left = (int) (pos[0] * appScale + 0.5f);
-        rect.top = (int) (pos[1] * appScale + 0.5f);
-        rect.right = (int) ((pos[0] + view.getWidth()) * appScale + 0.5f);
-        rect.bottom = (int) ((pos[1] + view.getHeight()) * appScale + 0.5f);
-        return rect;
     }
 
     /**
@@ -371,11 +141,4 @@ public class ContactsUtils {
         return sThumbnailSize;
     }
 
-    /**
-     * @return if the context is in landscape orientation.
-     */
-    public static boolean isLandscape(Context context) {
-        return context.getResources().getConfiguration().orientation
-                == Configuration.ORIENTATION_LANDSCAPE;
-    }
 }

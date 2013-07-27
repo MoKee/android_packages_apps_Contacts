@@ -28,8 +28,8 @@ import android.widget.LinearLayout;
 import com.android.contacts.ContactsUtils;
 import com.android.contacts.R;
 import com.android.contacts.model.RawContactDelta;
-import com.android.contacts.model.RawContactDelta.ValuesDelta;
-import com.android.contacts.model.dataitem.DataKind;
+import com.android.contacts.common.model.ValuesDelta;
+import com.android.contacts.common.model.dataitem.DataKind;
 import com.android.contacts.util.ContactPhotoUtils;
 
 /**

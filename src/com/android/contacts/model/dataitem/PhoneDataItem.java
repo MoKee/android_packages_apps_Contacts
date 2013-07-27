@@ -17,11 +17,12 @@
 package com.android.contacts.model.dataitem;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.telephony.PhoneNumberUtils;
 
-import com.android.contacts.model.RawContact;
+import com.android.contacts.common.model.dataitem.DataKind;
 
 /**
  * Represents a phone data item, wrapping the columns in
@@ -31,8 +32,8 @@ public class PhoneDataItem extends DataItem {
 
     public static final String KEY_FORMATTED_PHONE_NUMBER = "formattedPhoneNumber";
 
-    /* package */ PhoneDataItem(RawContact rawContact, ContentValues values) {
-        super(rawContact, values);
+    /* package */ PhoneDataItem(ContentValues values) {
+        super(values);
     }
 
     public String getNumber() {
@@ -75,7 +76,7 @@ public class PhoneDataItem extends DataItem {
      * #computeFormattedPhoneNumber}). Otherwise this method returns the unformatted phone number.
      */
     @Override
-    public String buildDataStringForDisplay() {
+    public String buildDataStringForDisplay(Context context, DataKind kind) {
         final String formatted = getFormattedPhoneNumber();
         if (formatted != null) {
             return formatted;

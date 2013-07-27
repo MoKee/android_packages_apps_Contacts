@@ -24,7 +24,14 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 
 import com.android.contacts.R;
-import com.android.contacts.list.ShortcutIntentBuilder.OnShortcutIntentCreatedListener;
+import com.android.contacts.common.list.ContactEntryListAdapter;
+import com.android.contacts.common.list.ContactEntryListFragment;
+import com.android.contacts.common.list.ContactListAdapter;
+import com.android.contacts.common.list.ContactListFilter;
+import com.android.contacts.common.list.DefaultContactListAdapter;
+import com.android.contacts.common.list.DirectoryListLoader;
+import com.android.contacts.common.list.ShortcutIntentBuilder;
+import com.android.contacts.common.list.ShortcutIntentBuilder.OnShortcutIntentCreatedListener;
 
 /**
  * Fragment for the contact list used for browsing contacts (as compared to
@@ -68,10 +75,6 @@ public class ContactPickerFragment extends ContactEntryListFragment<ContactEntry
 
     public void setEditMode(boolean flag) {
         mEditMode = flag;
-    }
-
-    public boolean isShortcutRequested() {
-        return mShortcutRequested;
     }
 
     public void setShortcutRequested(boolean flag) {
@@ -177,31 +180,6 @@ public class ContactPickerFragment extends ContactEntryListFragment<ContactEntry
     @Override
     protected View inflateView(LayoutInflater inflater, ViewGroup container) {
         return inflater.inflate(R.layout.contact_picker_content, null);
-    }
-
-    @Override
-    protected void prepareEmptyView() {
-        if (isSearchMode()) {
-            return;
-        } else if (isSyncActive()) {
-            if (mShortcutRequested) {
-                // Help text is the same no matter whether there is SIM or not.
-                setEmptyText(R.string.noContactsHelpTextWithSyncForCreateShortcut);
-            } else if (hasIccCard()) {
-                setEmptyText(R.string.noContactsHelpTextWithSync);
-            } else {
-                setEmptyText(R.string.noContactsNoSimHelpTextWithSync);
-            }
-        } else {
-            if (mShortcutRequested) {
-                // Help text is the same no matter whether there is SIM or not.
-                setEmptyText(R.string.noContactsHelpTextWithSyncForCreateShortcut);
-            } else if (hasIccCard()) {
-                setEmptyText(R.string.noContactsHelpText);
-            } else {
-                setEmptyText(R.string.noContactsNoSimHelpText);
-            }
-        }
     }
 
     @Override

@@ -47,6 +47,7 @@ import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.Groups;
 import android.provider.ContactsContract.Intents;
 import android.provider.ContactsContract.RawContacts;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -67,25 +68,27 @@ import com.android.contacts.R;
 import com.android.contacts.activities.ContactEditorAccountsChangedActivity;
 import com.android.contacts.activities.ContactEditorActivity;
 import com.android.contacts.activities.JoinContactActivity;
+import com.android.contacts.common.model.AccountTypeManager;
+import com.android.contacts.common.model.ValuesDelta;
+import com.android.contacts.common.model.account.AccountType;
+import com.android.contacts.common.model.account.AccountWithDataSet;
+import com.android.contacts.common.model.account.GoogleAccountType;
+import com.android.contacts.common.util.AccountsListAdapter;
+import com.android.contacts.common.util.AccountsListAdapter.AccountListFilter;
 import com.android.contacts.detail.PhotoSelectionHandler;
 import com.android.contacts.editor.AggregationSuggestionEngine.Suggestion;
 import com.android.contacts.editor.Editor.EditorListener;
-import com.android.contacts.model.AccountTypeManager;
 import com.android.contacts.model.Contact;
 import com.android.contacts.model.ContactLoader;
 import com.android.contacts.model.RawContact;
 import com.android.contacts.model.RawContactDelta;
-import com.android.contacts.model.RawContactDelta.ValuesDelta;
 import com.android.contacts.model.RawContactDeltaList;
 import com.android.contacts.model.RawContactModifier;
-import com.android.contacts.model.account.AccountType;
-import com.android.contacts.model.account.AccountWithDataSet;
-import com.android.contacts.model.account.GoogleAccountType;
-import com.android.contacts.util.AccountsListAdapter;
-import com.android.contacts.util.AccountsListAdapter.AccountListFilter;
 import com.android.contacts.util.ContactPhotoUtils;
 import com.android.contacts.util.HelpUtils;
+import com.android.contacts.util.UiClosables;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -117,6 +120,11 @@ public class ContactEditorFragment extends Fragment implements
     private static final String KEY_NEW_LOCAL_PROFILE = "newLocalProfile";
     private static final String KEY_IS_USER_PROFILE = "isUserProfile";
     private static final String KEY_UPDATED_PHOTOS = "updatedPhotos";
+    private static final String KEY_IS_EDIT = "isEdit";
+    private static final String KEY_HAS_NEW_CONTACT = "hasNewContact";
+    private static final String KEY_NEW_CONTACT_READY = "newContactDataReady";
+    private static final String KEY_EXISTING_CONTACT_READY = "existingContactDataReady";
+    private static final String KEY_RAW_CONTACTS = "rawContacts";
 
     public static final String SAVE_MODE_EXTRA_KEY = "saveMode";
 
@@ -235,6 +243,21 @@ public class ContactEditorFragment extends Fragment implements
 
     private int mStatus;
 
+    // Whether to show the new contact blank form and if it's corresponding delta is ready.
+    private boolean mHasNewContact = false;
+    private boolean mNewContactDataReady = false;
+
+    // Whether it's an edit of existing contact and if it's corresponding delta is ready.
+    private boolean mIsEdit = false;
+    private boolean mExistingContactDataReady = false;
+
+    // This is used to pre-populate the editor with a display name when a user edits a read-only
+    // contact.
+    private String mDefaultDisplayName;
+
+    // Used to temporarily store existing contact data during a rebind call (i.e. account switch)
+    private ImmutableList<RawContact> mRawContacts;
+
     private AggregationSuggestionEngine mAggregationSuggestionEngine;
     private long mAggregationSuggestionsRawContactId;
     private View mAggregationSuggestionView;
@@ -290,7 +313,7 @@ public class ContactEditorFragment extends Fragment implements
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             final AggregationSuggestionView suggestionView = (AggregationSuggestionView) view;
             suggestionView.handleItemClickEvent();
-            mAggregationSuggestionPopup.dismiss();
+            UiClosables.closeQuietly(mAggregationSuggestionPopup);
             mAggregationSuggestionPopup = null;
         }
     };
@@ -330,13 +353,20 @@ public class ContactEditorFragment extends Fragment implements
     @Override
     public void onStop() {
         super.onStop();
-        if (mAggregationSuggestionEngine != null) {
-            mAggregationSuggestionEngine.quit();
-        }
+
+        UiClosables.closeQuietly(mAggregationSuggestionPopup);
 
         // If anything was left unsaved, save it now but keep the editor open.
         if (!getActivity().isChangingConfigurations() && mStatus == Status.EDITING) {
             save(SaveMode.RELOAD);
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mAggregationSuggestionEngine != null) {
+            mAggregationSuggestionEngine.quit();
         }
     }
 
@@ -357,10 +387,7 @@ public class ContactEditorFragment extends Fragment implements
 
         validateAction(mAction);
 
-        // Handle initial actions only when existing state missing
-        final boolean hasIncomingState = savedInstanceState != null;
-
-        if (mState == null) {
+        if (mState.isEmpty()) {
             // The delta list may not have finished loading before orientation change happens.
             // In this case, there will be a saved state but deltas will be missing.  Reload from
             // database.
@@ -376,8 +403,12 @@ public class ContactEditorFragment extends Fragment implements
             bindEditors();
         }
 
-        if (!hasIncomingState) {
-            if (Intent.ACTION_INSERT.equals(mAction)) {
+        // Handle initial actions only when existing state missing
+        if (savedInstanceState == null) {
+            if (Intent.ACTION_EDIT.equals(mAction)) {
+                mIsEdit = true;
+            } else if (Intent.ACTION_INSERT.equals(mAction)) {
+                mHasNewContact = true;
                 final Account account = mIntentExtras == null ? null :
                         (Account) mIntentExtras.getParcelable(Intents.Insert.ACCOUNT);
                 final String dataSet = mIntentExtras == null ? null :
@@ -460,23 +491,37 @@ public class ContactEditorFragment extends Fragment implements
             mNewLocalProfile = savedState.getBoolean(KEY_NEW_LOCAL_PROFILE);
             mIsUserProfile = savedState.getBoolean(KEY_IS_USER_PROFILE);
             mUpdatedPhotos = savedState.getParcelable(KEY_UPDATED_PHOTOS);
+            mIsEdit = savedState.getBoolean(KEY_IS_EDIT);
+            mHasNewContact = savedState.getBoolean(KEY_HAS_NEW_CONTACT);
+            mNewContactDataReady = savedState.getBoolean(KEY_NEW_CONTACT_READY);
+            mExistingContactDataReady = savedState.getBoolean(KEY_EXISTING_CONTACT_READY);
+            mRawContacts = ImmutableList.copyOf(savedState.<RawContact>getParcelableArrayList(
+                    KEY_RAW_CONTACTS));
+
+        }
+
+        // mState can still be null because it may not have have finished loading before
+        // onSaveInstanceState was called.
+        if (mState == null) {
+            mState = new RawContactDeltaList();
         }
     }
 
-    public void setData(Contact data) {
+    public void setData(Contact contact) {
+
         // If we have already loaded data, we do not want to change it here to not confuse the user
-        if (mState != null) {
+        if (!mState.isEmpty()) {
             Log.v(TAG, "Ignoring background change. This will have to be rebased later");
             return;
         }
 
         // See if this edit operation needs to be redirected to a custom editor
-        ImmutableList<RawContact> rawContacts = data.getRawContacts();
-        if (rawContacts.size() == 1) {
-            RawContact rawContact = rawContacts.get(0);
+        mRawContacts = contact.getRawContacts();
+        if (mRawContacts.size() == 1) {
+            RawContact rawContact = mRawContacts.get(0);
             String type = rawContact.getAccountTypeString();
             String dataSet = rawContact.getDataSet();
-            AccountType accountType = rawContact.getAccountType();
+            AccountType accountType = rawContact.getAccountType(mContext);
             if (accountType.getEditContactActivityClassName() != null &&
                     !accountType.areContactsWritable()) {
                 if (mListener != null) {
@@ -491,7 +536,21 @@ public class ContactEditorFragment extends Fragment implements
             }
         }
 
-        bindEditorsForExistingContact(data);
+        String displayName = null;
+        // Check for writable raw contacts.  If there are none, then we need to create one so user
+        // can edit.  For the user profile case, there is already an editable contact.
+        if (!contact.isUserProfile() && !contact.isWritableContact(mContext)) {
+            mHasNewContact = true;
+
+            // This is potentially an asynchronous call and will add deltas to list.
+            selectAccountAndCreateContact();
+            displayName = contact.getDisplayName();
+        }
+
+        // This also adds deltas to list
+        // If displayName is null at this point it is simply ignored later on by the editor.
+        bindEditorsForExistingContact(displayName, contact.isUserProfile(),
+                mRawContacts);
     }
 
     @Override
@@ -499,15 +558,17 @@ public class ContactEditorFragment extends Fragment implements
         mListener.onCustomEditContactActivityRequested(account, uri, null, false);
     }
 
-    private void bindEditorsForExistingContact(Contact contact) {
+    private void bindEditorsForExistingContact(String displayName, boolean isUserProfile,
+            ImmutableList<RawContact> rawContacts) {
         setEnabled(true);
+        mDefaultDisplayName = displayName;
 
-        mState = contact.createRawContactDeltaList();
+        mState.addAll(rawContacts.iterator());
         setIntentExtras(mIntentExtras);
         mIntentExtras = null;
 
         // For user profile, change the contacts query URI
-        mIsUserProfile = contact.isUserProfile();
+        mIsUserProfile = isUserProfile;
         boolean localProfileExists = false;
 
         if (mIsUserProfile) {
@@ -521,7 +582,7 @@ public class ContactEditorFragment extends Fragment implements
             }
             // Editor should always present a local profile for editing
             if (!localProfileExists) {
-                final RawContact rawContact = new RawContact(mContext);
+                final RawContact rawContact = new RawContact();
                 rawContact.setAccountToLocal();
 
                 RawContactDelta insert = new RawContactDelta(ValuesDelta.fromAfter(
@@ -531,7 +592,7 @@ public class ContactEditorFragment extends Fragment implements
             }
         }
         mRequestFocus = true;
-
+        mExistingContactDataReady = true;
         bindEditors();
     }
 
@@ -641,8 +702,13 @@ public class ContactEditorFragment extends Fragment implements
                 mListener.onCustomCreateContactActivityRequested(newAccount, mIntentExtras);
             }
         } else {
-            mState = null;
+            mExistingContactDataReady = false;
+            mNewContactDataReady = false;
+            mState = new RawContactDeltaList();
             bindEditorsForNewContact(newAccount, newAccountType, oldState, oldAccountType);
+            if (mIsEdit) {
+                bindEditorsForExistingContact(mDefaultDisplayName, mIsUserProfile, mRawContacts);
+            }
         }
     }
 
@@ -656,14 +722,15 @@ public class ContactEditorFragment extends Fragment implements
             AccountType oldAccountType) {
         mStatus = Status.EDITING;
 
-        final RawContact rawContact = new RawContact(mContext);
+        final RawContact rawContact = new RawContact();
         if (newAccount != null) {
             rawContact.setAccount(newAccount);
         } else {
             rawContact.setAccountToLocal();
         }
 
-        RawContactDelta insert = new RawContactDelta(ValuesDelta.fromAfter(rawContact.getValues()));
+        final ValuesDelta valuesDelta = ValuesDelta.fromAfter(rawContact.getValues());
+        final RawContactDelta insert = new RawContactDelta(valuesDelta);
         if (oldState == null) {
             // Parse any values from incoming intent
             RawContactModifier.parseExtras(mContext, newAccountType, insert, mIntentExtras);
@@ -686,23 +753,25 @@ public class ContactEditorFragment extends Fragment implements
             insert.setProfileQueryUri();
         }
 
-        if (mState == null) {
-            // Create state if none exists yet
-            mState = RawContactDeltaList.fromSingle(insert);
-        } else {
-            // Add contact onto end of existing state
-            mState.add(insert);
-        }
+        mState.add(insert);
 
         mRequestFocus = true;
 
+        mNewContactDataReady = true;
         bindEditors();
     }
 
     private void bindEditors() {
         // bindEditors() can only bind views if there is data in mState, so immediately return
         // if mState is null
-        if (mState == null) {
+        if (mState.isEmpty()) {
+            return;
+        }
+
+        // Check if delta list is ready.  Delta list is populated from existing data and when
+        // editing an read-only contact, it's also populated with newly created data for the
+        // blank form.  When the data is not ready, skip. This method will be called multiple times.
+        if ((mIsEdit && !mExistingContactDataReady) || (mHasNewContact && !mNewContactDataReady)) {
             return;
         }
 
@@ -716,6 +785,7 @@ public class ContactEditorFragment extends Fragment implements
                 Context.LAYOUT_INFLATER_SERVICE);
         final AccountTypeManager accountTypes = AccountTypeManager.getInstance(mContext);
         int numRawContacts = mState.size();
+
         for (int i = 0; i < numRawContacts; i++) {
             // TODO ensure proper ordering of entities in the list
             final RawContactDelta rawContactDelta = mState.get(i);
@@ -733,10 +803,10 @@ public class ContactEditorFragment extends Fragment implements
                 editor = (RawContactEditorView) inflater.inflate(R.layout.raw_contact_editor_view,
                         mContent, false);
             }
-            if (Intent.ACTION_INSERT.equals(mAction) && numRawContacts == 1) {
+            if (mHasNewContact && !mNewLocalProfile) {
                 final List<AccountWithDataSet> accounts =
                         AccountTypeManager.getInstance(mContext).getAccounts(true);
-                if (accounts.size() > 1 && !mNewLocalProfile) {
+                if (accounts.size() > 1) {
                     addAccountSwitcher(mState.get(0), editor);
                 } else {
                     disableAccountSwitcher(editor);
@@ -779,12 +849,15 @@ public class ContactEditorFragment extends Fragment implements
                     }
                 };
 
-                final TextFieldsEditorView nameEditor = rawContactEditor.getNameEditor();
+                final StructuredNameEditorView nameEditor = rawContactEditor.getNameEditor();
                 if (mRequestFocus) {
                     nameEditor.requestFocus();
                     mRequestFocus = false;
                 }
                 nameEditor.setEditorListener(listener);
+                if (!TextUtils.isEmpty(mDefaultDisplayName)) {
+                    nameEditor.setDisplayName(mDefaultDisplayName);
+                }
 
                 final TextFieldsEditorView phoneticNameEditor =
                         rawContactEditor.getPhoneticNameEditor();
@@ -911,7 +984,7 @@ public class ContactEditorFragment extends Fragment implements
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position,
                             long id) {
-                        popup.dismiss();
+                        UiClosables.closeQuietly(popup);
                         AccountWithDataSet newAccount = adapter.getItem(position);
                         if (!newAccount.equals(currentAccount)) {
                             rebindEditorsForNewContact(currentState, currentAccount, newAccount);
@@ -945,15 +1018,20 @@ public class ContactEditorFragment extends Fragment implements
         final MenuItem splitMenu = menu.findItem(R.id.menu_split);
         final MenuItem joinMenu = menu.findItem(R.id.menu_join);
         final MenuItem helpMenu = menu.findItem(R.id.menu_help);
+        final MenuItem discardMenu = menu.findItem(R.id.menu_discard);
 
         // Set visibility of menus
         doneMenu.setVisible(false);
 
         // Split only if more than one raw profile and not a user profile
-        splitMenu.setVisible(mState != null && mState.size() > 1 && !isEditingUserProfile());
+        splitMenu.setVisible(mState.size() > 1 && !isEditingUserProfile());
 
         // Cannot join a user profile
         joinMenu.setVisible(!isEditingUserProfile());
+
+        // Discard menu is only available if at least one raw contact is editable
+        discardMenu.setVisible(mState != null &&
+                mState.getFirstWritableRawContact(mContext) != null);
 
         // help menu depending on whether this is inserting or editing
         if (Intent.ACTION_INSERT.equals(mAction)) {
@@ -1019,7 +1097,7 @@ public class ContactEditorFragment extends Fragment implements
      * performing user actions.
      */
     private boolean hasValidState() {
-        return mState != null && mState.size() > 0;
+        return mState.size() > 0;
     }
 
     /**
@@ -1104,7 +1182,7 @@ public class ContactEditorFragment extends Fragment implements
     }
 
     private boolean revert() {
-        if (mState == null || !hasPendingChanges()) {
+        if (mState.isEmpty() || !hasPendingChanges()) {
             doRevertAction();
         } else {
             CancelEditDialogFragment.show(this);
@@ -1180,7 +1258,7 @@ public class ContactEditorFragment extends Fragment implements
 
                     // If this was in INSERT, we are changing into an EDIT now.
                     // If it already was an EDIT, we are changing to the new Uri now
-                    mState = null;
+                    mState = new RawContactDeltaList();
                     load(Intent.ACTION_EDIT, contactLookupUri, null);
                     mStatus = Status.LOADING;
                     getLoaderManager().restartLoader(LOADER_DATA, null, mDataLoaderListener);
@@ -1380,12 +1458,10 @@ public class ContactEditorFragment extends Fragment implements
      * Returns the contact ID for the currently edited contact or 0 if the contact is new.
      */
     protected long getContactId() {
-        if (mState != null) {
-            for (RawContactDelta rawContact : mState) {
-                Long contactId = rawContact.getValues().getAsLong(RawContacts.CONTACT_ID);
-                if (contactId != null) {
-                    return contactId;
-                }
+        for (RawContactDelta rawContact : mState) {
+            Long contactId = rawContact.getValues().getAsLong(RawContacts.CONTACT_ID);
+            if (contactId != null) {
+                return contactId;
             }
         }
         return 0;
@@ -1422,13 +1498,11 @@ public class ContactEditorFragment extends Fragment implements
     public void onAggregationSuggestionChange() {
         Activity activity = getActivity();
         if ((activity != null && activity.isFinishing())
-                || !isVisible() || mState == null || mStatus != Status.EDITING) {
+                || !isVisible() ||  mState.isEmpty() || mStatus != Status.EDITING) {
             return;
         }
 
-        if (mAggregationSuggestionPopup != null && mAggregationSuggestionPopup.isShowing()) {
-            mAggregationSuggestionPopup.dismiss();
-        }
+        UiClosables.closeQuietly(mAggregationSuggestionPopup);
 
         if (mAggregationSuggestionEngine.getSuggestedContactCount() == 0) {
             return;
@@ -1589,6 +1663,13 @@ public class ContactEditorFragment extends Fragment implements
         outState.putBoolean(KEY_IS_USER_PROFILE, mIsUserProfile);
         outState.putInt(KEY_STATUS, mStatus);
         outState.putParcelable(KEY_UPDATED_PHOTOS, mUpdatedPhotos);
+        outState.putBoolean(KEY_HAS_NEW_CONTACT, mHasNewContact);
+        outState.putBoolean(KEY_IS_EDIT, mIsEdit);
+        outState.putBoolean(KEY_NEW_CONTACT_READY, mNewContactDataReady);
+        outState.putBoolean(KEY_EXISTING_CONTACT_READY, mExistingContactDataReady);
+        outState.putParcelableArrayList(KEY_RAW_CONTACTS,
+                mRawContacts == null ?
+                Lists.<RawContact> newArrayList() :  Lists.newArrayList(mRawContacts));
 
         super.onSaveInstanceState(outState);
     }
@@ -1767,7 +1848,7 @@ public class ContactEditorFragment extends Fragment implements
 
     @Override
     public void onSplitContactConfirmed() {
-        if (mState == null) {
+        if (mState.isEmpty()) {
             // This may happen when this Fragment is recreated by the system during users
             // confirming the split action (and thus this method is called just before onCreate()),
             // for example.

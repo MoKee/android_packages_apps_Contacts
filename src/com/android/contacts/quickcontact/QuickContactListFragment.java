@@ -32,7 +32,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.android.contacts.ContactPresenceIconUtil;
+import com.android.contacts.common.ContactPresenceIconUtil;
 import com.android.contacts.R;
 
 import java.util.List;
@@ -43,9 +43,11 @@ public class QuickContactListFragment extends Fragment {
     private List<Action> mActions;
     private RelativeLayout mFragmentContainer;
     private Listener mListener;
+    private String mMimeType;
 
-    public QuickContactListFragment() {
+    public QuickContactListFragment(String mimeType) {
         setRetainInstance(true);
+        this.mMimeType = mimeType;
     }
 
     @Override
@@ -58,6 +60,10 @@ public class QuickContactListFragment extends Fragment {
         mFragmentContainer.setOnClickListener(mOutsideClickListener);
         configureAdapter();
         return mFragmentContainer;
+    }
+
+    public String getMimeType() {
+        return mMimeType;
     }
 
     public void setActions(List<Action> actions) {
@@ -125,8 +131,11 @@ public class QuickContactListFragment extends Fragment {
                 alternateActionButton.setContentDescription(action.getAlternateIconDescription());
                 alternateActionButton.setVisibility(hasAlternateAction ? View.VISIBLE : View.GONE);
 
-                // Special case for phone numbers in accessibility mode
                 if (mimeType.equals(Phone.CONTENT_ITEM_TYPE)) {
+                    // Force LTR text direction for phone numbers
+                    text1.setTextDirection(View.TEXT_DIRECTION_LTR);
+
+                    // Special case for phone numbers in accessibility mode
                     text1.setContentDescription(getActivity().getString(
                             R.string.description_dial_phone_number, action.getBody()));
                     if (hasAlternateAction) {

@@ -26,8 +26,10 @@
         android:layout_height="wrap_content"
         android:visibility="gone"
         android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:layout_marginRight="40dip"
+        android:layout_marginEnd="40dip"
         android:layout_marginTop="20dip"
         android:layout_marginBottom="20dip" />
 
@@ -37,13 +39,14 @@
         android:layout_above="@id/contact_quick_fix"
         android:layout_height="match_parent"
         android:baselineAligned="false"
-        android:background="@color/background_primary">
+        android:background="@android:color/white">
 
         <include android:id="@+id/static_photo_container"
             layout="@layout/photo_selector_view"
             android:layout_width="@dimen/detail_contact_photo_size"
             android:layout_height="@dimen/detail_contact_photo_size"
             android:layout_marginLeft="@dimen/detail_contact_photo_margin"
+            android:layout_marginStart="@dimen/detail_contact_photo_margin"
             android:layout_marginTop="@dimen/detail_contact_photo_margin" />
 
         <ListView android:id="@android:id/list"
@@ -68,6 +71,8 @@
             android:textColor="?android:attr/textColorSecondary"
             android:paddingLeft="10dip"
             android:paddingRight="10dip"
+            android:paddingStart="10dip"
+            android:paddingEnd="10dip"
             android:paddingTop="10dip"
             android:lineSpacingMultiplier="0.92"/>
     </ScrollView>

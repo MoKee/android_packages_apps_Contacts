@@ -14,10 +14,6 @@
      limitations under the License.
 -->
 <resources>
-    <color name="textColorIconOverlay">#fff</color>
-    <color name="textColorIconOverlayShadow">#000</color>
-
-    <color name="shortcut_overlay_text_background">#7f000000</color>
 
     <color name="quickcontact_list_divider">#ffcdcdcd</color>
     <color name="quickcontact_list_background">#ffe2e2e2</color>
@@ -34,79 +30,13 @@
     <!-- Color of the text in the updates tab in the tab carousel on the contact detail page -->
     <color name="detail_update_tab_text_color">#777777</color>
 
-    <!-- Color of the text describing an unconsumed missed call. -->
-    <color name="call_log_missed_call_highlight_color">#FF0000</color>
-
-    <!-- Color of the text describing an unconsumed voicemail. -->
-    <color name="call_log_voicemail_highlight_color">#33b5e5</color>
-
-    <!-- Colour background for the voicemail playback ui. -->
-    <color name="voicemail_playback_ui_background">@android:color/black</color>
-
-    <!-- Colour of voicemail progress bar to the right of position indicator. -->
-    <color name="voicemail_playback_seek_bar_yet_to_play">#44ffffff</color>
-
-    <!-- Colour of voicemail progress bar to the left of position indicator. -->
-    <color name="voicemail_playback_seek_bar_already_played">#ccffffff</color>
-
-    <!-- Color of the theme of the People app -->
-    <color name="people_app_theme_color">#33B5E5</color>
-
-    <!-- Secondary text color in the Phone app -->
-    <color name="dialtacts_secondary_text_color">#888888</color>
-
-    <!-- Colors in the contact browser list -->
-    <color name="contact_count_text_color">#AAAAAA</color>
-
     <!-- Color of the text of the tab carousel in the contact details  -->
     <color name="detail_tab_carousel_tab_label_color">#EEEEEE</color>
 
     <!-- Color of the text for buttons in the action bar  -->
     <color name="action_bar_button_text_color">#FFFFFF</color>
 
-    <!--  Color of the status message for starred contacts in the People app -->
-    <color name="people_contact_tile_status_color">#CCCCCC</color>
-
-    <!--  Color of the semi-transparent shadow box on contact tiles -->
-    <color name="contact_tile_shadow_box_color">#7F000000</color>
-
     <!--  Color of the vertical stripe that goes on the left of a block quote inside a stream item -->
     <color name="stream_item_stripe_color">#CCCCCC</color>
-
-    <!-- Color of image view placeholder. -->
-    <color name="image_placeholder">#DDDDDD</color>
-
-    <!-- Standard color for selected items. -->
-    <color name="item_selected">#660099cc</color>
-
-    <!-- Colors for incoming and outgoing calls in the call statistics -->
-    <color name="call_stats_incoming">#33b5e5</color>
-    <color name="call_stats_outgoing">#99cc00</color>
-    <color name="call_stats_missed">#eb1313</color>
-    <color name="call_stats_bar_background">#88888888</color>
-
-    <!-- New Colors for Theme Chooser to be compatible -->
-    <color name="call_log_primary_text_color">#FFFFFF</color>
-    <color name="call_log_primary_background_color">#000000</color>
-    <color name="call_log_secondary_text_color">#888888</color>
-    <color name="call_log_secondary_background_color">#333333</color>
-    <color name="call_log_header_color">#33b5e5</color>
-    <color name="call_log_voicemail_status_background_color">#262626</color>
-    <color name="call_log_voicemail_status_text_color">#888888</color>
-    <color name="call_log_voicemail_status_action_text_color">#33b5e5</color>
-    <color name="call_detail_background">#ff000000</color>
-    <color name="call_detail_separator">#ff33b5e5</color>
-    <color name="call_detail_photo_bg">#7f000000</color>
-    <color name="call_log_divider">#55ffffff</color>
-    <color name="detail_tab_carousel_tab_label_Background_color">#7f000000</color>
-    <color name="white_text">#ffffffff</color>
-    <color name="black_text">#ff000000</color>
-    <color name="contact_tile_name_text">#ffffffff</color>
-    <color name="dialpad_switch_bg">#66000000</color>
-    <color name="account_container">#eeeeee</color>
-    <color name="photo_backdrop">#000000</color>
-    <color name="photo_container">#4cffffff</color>
-    <color name="social_widget_bg">#00000000</color>
-    <color name="contact_detail_fragment">#ffffff</color>
 
 </resources>

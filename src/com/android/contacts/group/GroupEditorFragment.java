@@ -57,21 +57,21 @@ import android.widget.QuickContactBadge;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.contacts.ContactPhotoManager;
 import com.android.contacts.ContactSaveService;
 import com.android.contacts.GroupMemberLoader;
 import com.android.contacts.GroupMemberLoader.GroupEditorQuery;
 import com.android.contacts.GroupMetaDataLoader;
 import com.android.contacts.R;
 import com.android.contacts.activities.GroupEditorActivity;
-import com.android.contacts.editor.SelectAccountDialogFragment;
+import com.android.contacts.common.ContactPhotoManager;
+import com.android.contacts.common.model.account.AccountType;
+import com.android.contacts.common.model.account.AccountWithDataSet;
+import com.android.contacts.common.editor.SelectAccountDialogFragment;
 import com.android.contacts.group.SuggestedMemberListAdapter.SuggestedMember;
-import com.android.contacts.model.AccountTypeManager;
-import com.android.contacts.model.account.AccountType;
-import com.android.contacts.model.account.AccountWithDataSet;
-import com.android.contacts.util.AccountsListAdapter.AccountListFilter;
-import com.android.contacts.util.ViewUtil;
-import com.android.internal.util.Objects;
+import com.android.contacts.common.model.AccountTypeManager;
+import com.android.contacts.common.util.AccountsListAdapter.AccountListFilter;
+import com.android.contacts.common.util.ViewUtil;
+import com.google.common.base.Objects;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -570,6 +570,10 @@ public class GroupEditorFragment extends Fragment implements SelectAccountDialog
      */
     public boolean save() {
         if (!hasValidGroupName() || mStatus != Status.EDITING) {
+            mStatus = Status.CLOSING;
+            if (mListener != null) {
+                mListener.onReverted();
+            }
             return false;
         }
 

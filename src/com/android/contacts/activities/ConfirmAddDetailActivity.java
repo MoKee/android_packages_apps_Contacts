@@ -60,18 +60,19 @@ import android.widget.Toast;
 
 import com.android.contacts.R;
 import com.android.contacts.editor.Editor;
+import com.android.contacts.editor.EditorUiUtils;
 import com.android.contacts.editor.ViewIdGenerator;
-import com.android.contacts.model.AccountTypeManager;
+import com.android.contacts.common.model.AccountTypeManager;
 import com.android.contacts.model.RawContact;
 import com.android.contacts.model.RawContactDelta;
-import com.android.contacts.model.RawContactDelta.ValuesDelta;
+import com.android.contacts.common.model.ValuesDelta;
 import com.android.contacts.model.RawContactDeltaList;
 import com.android.contacts.model.RawContactModifier;
-import com.android.contacts.model.account.AccountType;
-import com.android.contacts.model.account.AccountWithDataSet;
-import com.android.contacts.model.dataitem.DataKind;
+import com.android.contacts.common.model.account.AccountType;
+import com.android.contacts.common.model.account.AccountWithDataSet;
+import com.android.contacts.common.model.dataitem.DataKind;
 import com.android.contacts.util.DialogManager;
-import com.android.contacts.util.EmptyService;
+import com.android.contacts.common.util.EmptyService;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -630,7 +631,7 @@ public class ConfirmAddDetailActivity extends Activity implements
                 editableAccount.type, editableAccount.dataSet);
 
         // Create a new RawContactDelta for the new raw_contact.
-        final RawContact rawContact = new RawContact(context);
+        final RawContact rawContact = new RawContact();
         rawContact.setAccount(editableAccount);
 
         final RawContactDelta entityDelta = new RawContactDelta(ValuesDelta.fromAfter(
@@ -700,7 +701,8 @@ public class ConfirmAddDetailActivity extends Activity implements
      * to the end of mEditors
      */
     private void inflateEditorView(DataKind dataKind, ValuesDelta valuesDelta, RawContactDelta state) {
-        final View view = mInflater.inflate(dataKind.editorLayoutResourceId, mEditorContainerView,
+        final int layoutResId = EditorUiUtils.getLayoutResourceId(dataKind.mimeType);
+        final View view = mInflater.inflate(layoutResId, mEditorContainerView,
                 false);
 
         if (view instanceof Editor) {

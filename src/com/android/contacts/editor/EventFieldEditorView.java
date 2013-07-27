@@ -30,10 +30,10 @@ import com.android.contacts.datepicker.DatePicker;
 import com.android.contacts.datepicker.DatePickerDialog;
 import com.android.contacts.datepicker.DatePickerDialog.OnDateSetListener;
 import com.android.contacts.model.RawContactDelta;
-import com.android.contacts.model.RawContactDelta.ValuesDelta;
-import com.android.contacts.model.account.AccountType.EditField;
-import com.android.contacts.model.account.AccountType.EventEditType;
-import com.android.contacts.model.dataitem.DataKind;
+import com.android.contacts.common.model.ValuesDelta;
+import com.android.contacts.common.model.account.AccountType.EditField;
+import com.android.contacts.common.model.account.AccountType.EventEditType;
+import com.android.contacts.common.model.dataitem.DataKind;
 import com.android.contacts.util.DateUtils;
 
 import java.text.ParsePosition;
@@ -121,7 +121,8 @@ public class EventFieldEditorView extends LabeledEditorView {
     private void rebuildDateView() {
         final EditField editField = getKind().fieldList.get(0);
         final String column = editField.column;
-        String data = DateUtils.formatDate(getContext(), getEntry().getAsString(column));
+        String data = DateUtils.formatDate(getContext(), getEntry().getAsString(column),
+                false /*Use the short DateFormat to ensure that it fits inside the EditText*/);
         if (TextUtils.isEmpty(data)) {
             mDateView.setText(mNoDateString);
             mDateView.setTextColor(mSecondaryTextColor);
@@ -202,44 +203,26 @@ public class EventFieldEditorView extends LabeledEditorView {
         final boolean isYearOptional = getType().isYearOptional();
 
         final int oldYear, oldMonth, oldDay;
-        if (TextUtils.isEmpty(oldValue)) {
-            // Default to January first of this year
-            oldYear = defaultYear;
-            oldMonth = 0;
-            oldDay = 1;
-        } else {
-            final ParsePosition position = new ParsePosition(0);
-            // Try parsing with year
-            Date date1 = kind.dateFormatWithYear.parse(oldValue, position);
-            if (date1 == null) {
-                // If that format does not fit, try guessing the right format
-                date1 = DateUtils.parseDate(oldValue);
-            }
-            if (date1 != null) {
-                calendar.setTime(date1);
-                oldYear = calendar.get(Calendar.YEAR);
-                oldMonth = calendar.get(Calendar.MONTH);
-                oldDay = calendar.get(Calendar.DAY_OF_MONTH);
-            } else {
-                // Unfortunately, we need a one-off hack for February 29th, because
-                // the parse functions assume 1970, which wasn't a leap year
-                // Caveat here: This won't catch AccountTypes that allow omitting the year but
-                // require a time of the day. But as we don't have any of those at the moment,
-                // this shouldn't be an issue
-                if (DateUtils.NO_YEAR_DATE_FEB29TH.equals(oldValue)) {
-                    oldYear = isYearOptional ? DatePickerDialog.NO_YEAR : defaultYear;
-                    oldMonth = Calendar.FEBRUARY;
-                    oldDay = 29;
-                } else {
-                    final Date date2 = kind.dateFormatWithoutYear.parse(oldValue, position);
-                    // Don't understand the date? Let's not show any dialog
-                    if (date2 == null) return null;
 
-                    calendar.setTime(date2);
+        if (TextUtils.isEmpty(oldValue)) {
+            // Default to the current date
+            oldYear = defaultYear;
+            oldMonth = calendar.get(Calendar.MONTH);
+            oldDay = calendar.get(Calendar.DAY_OF_MONTH);
+        } else {
+            // Try parsing with year
+            Calendar cal = DateUtils.parseDate(oldValue, false);
+            if (cal != null) {
+                if (DateUtils.isYearSet(cal)) {
+                    oldYear = cal.get(Calendar.YEAR);
+                } else {
+                    //cal.set(Calendar.YEAR, 0);
                     oldYear = isYearOptional ? DatePickerDialog.NO_YEAR : defaultYear;
-                    oldMonth = calendar.get(Calendar.MONTH);
-                    oldDay = calendar.get(Calendar.DAY_OF_MONTH);
                 }
+                oldMonth = cal.get(Calendar.MONTH);
+                oldDay = cal.get(Calendar.DAY_OF_MONTH);
+            } else {
+                return null;
             }
         }
         final OnDateSetListener callBack = new OnDateSetListener() {
@@ -262,7 +245,6 @@ public class EventFieldEditorView extends LabeledEditorView {
                 } else {
                     resultString = kind.dateFormatWithYear.format(outCalendar.getTime());
                 }
-
                 onFieldChanged(column, resultString);
                 rebuildDateView();
             }

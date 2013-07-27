@@ -27,6 +27,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
+import android.os.UserManager;
 import android.preference.PreferenceActivity;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.Contacts;
@@ -36,6 +37,7 @@ import android.provider.Settings;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
@@ -57,43 +59,43 @@ import com.android.contacts.detail.ContactDetailLayoutController;
 import com.android.contacts.detail.ContactDetailUpdatesFragment;
 import com.android.contacts.detail.ContactLoaderFragment;
 import com.android.contacts.detail.ContactLoaderFragment.ContactLoaderFragmentListener;
-import com.android.contacts.dialog.ClearFrequentsDialog;
+import com.android.contacts.common.dialog.ClearFrequentsDialog;
 import com.android.contacts.group.GroupBrowseListFragment;
 import com.android.contacts.group.GroupBrowseListFragment.OnGroupBrowserActionListener;
 import com.android.contacts.group.GroupDetailFragment;
 import com.android.contacts.interactions.ContactDeletionInteraction;
-import com.android.contacts.interactions.ImportExportDialogFragment;
-import com.android.contacts.interactions.PhoneNumberInteraction;
+import com.android.contacts.common.interactions.ImportExportDialogFragment;
 import com.android.contacts.list.ContactBrowseListFragment;
-import com.android.contacts.list.ContactEntryListFragment;
-import com.android.contacts.list.ContactListFilter;
-import com.android.contacts.list.ContactListFilterController;
-import com.android.contacts.list.ContactTileAdapter.DisplayType;
+import com.android.contacts.common.list.ContactEntryListFragment;
+import com.android.contacts.common.list.ContactListFilter;
+import com.android.contacts.common.list.ContactListFilterController;
+import com.android.contacts.common.list.ContactTileAdapter.DisplayType;
 import com.android.contacts.list.ContactTileFrequentFragment;
 import com.android.contacts.list.ContactTileListFragment;
 import com.android.contacts.list.ContactsIntentResolver;
 import com.android.contacts.list.ContactsRequest;
 import com.android.contacts.list.ContactsUnavailableFragment;
 import com.android.contacts.list.DefaultContactBrowseListFragment;
-import com.android.contacts.list.DirectoryListLoader;
+import com.android.contacts.common.list.DirectoryListLoader;
 import com.android.contacts.list.OnContactBrowserActionListener;
 import com.android.contacts.list.OnContactsUnavailableActionListener;
 import com.android.contacts.list.ProviderStatusWatcher;
 import com.android.contacts.list.ProviderStatusWatcher.ProviderStatusListener;
 import com.android.contacts.model.Contact;
-import com.android.contacts.model.account.AccountWithDataSet;
+import com.android.contacts.common.model.account.AccountWithDataSet;
 import com.android.contacts.preference.ContactsPreferenceActivity;
 import com.android.contacts.preference.DisplayOptionsPreferenceFragment;
-import com.android.contacts.util.AccountFilterUtil;
+import com.android.contacts.common.util.AccountFilterUtil;
 import com.android.contacts.util.AccountPromptUtils;
-import com.android.contacts.util.Constants;
+import com.android.contacts.common.util.Constants;
 import com.android.contacts.util.DialogManager;
 import com.android.contacts.util.HelpUtils;
 import com.android.contacts.util.PhoneCapabilityTester;
-import com.android.contacts.util.UriUtils;
+import com.android.contacts.common.util.UriUtils;
 import com.android.contacts.widget.TransitionAnimationView;
 
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -109,6 +111,8 @@ public class PeopleActivity extends ContactsActivity
 
     /** Shows a toogle button for hiding/showing updates. Don't submit with true */
     private static final boolean DEBUG_TRANSITIONS = false;
+
+    private static final int TAB_FADE_IN_DURATION = 500;
 
     private static final String ENABLE_DEBUG_OPTIONS_HIDDEN_CODE = "debug debug!";
 
@@ -157,6 +161,7 @@ public class PeopleActivity extends ContactsActivity
 
     private View mFavoritesView;
     private View mBrowserView;
+    private TransitionAnimationView mPeopleActivityView;
     private TransitionAnimationView mContactDetailsView;
     private TransitionAnimationView mGroupDetailsView;
 
@@ -257,7 +262,6 @@ public class PeopleActivity extends ContactsActivity
             finish();
             return;
         }
-
         mContactListFilterController = ContactListFilterController.getInstance(this);
         mContactListFilterController.checkFilterValidity(false);
         mContactListFilterController.addListener(this);
@@ -266,6 +270,7 @@ public class PeopleActivity extends ContactsActivity
 
         mIsRecreatedInstance = (savedState != null);
         createViewsAndFragments(savedState);
+        getWindow().setBackgroundDrawableResource(R.color.background_primary);
         if (Log.isLoggable(Constants.PERFORMANCE_TAG, Log.DEBUG)) {
             Log.d(Constants.PERFORMANCE_TAG, "PeopleActivity.onCreate finish");
         }
@@ -391,6 +396,7 @@ public class PeopleActivity extends ContactsActivity
             // Prepare 2-pane only fragments/views...
 
             // Container views for fragments
+            mPeopleActivityView = getView(R.id.people_view);
             mFavoritesView = getView(R.id.favorites_view);
             mContactDetailsView = getView(R.id.contact_details_view);
             mGroupDetailsView = getView(R.id.group_details_view);
@@ -610,7 +616,7 @@ public class PeopleActivity extends ContactsActivity
         // If we are switching from one group to another, do a cross-fade
         if (mGroupDetailFragment != null && mGroupDetailFragment.getGroupUri() != null &&
                 !UriUtils.areEqual(mGroupDetailFragment.getGroupUri(), groupUri)) {
-            mGroupDetailsView.startMaskTransition(false);
+            mGroupDetailsView.startMaskTransition(false, -1);
         }
         mGroupDetailFragment.loadGroup(groupUri);
         invalidateOptionsMenuIfNeeded();
@@ -689,6 +695,7 @@ public class PeopleActivity extends ContactsActivity
         if (mActionBarAdapter.isSearchMode()) {
             tab = TabState.ALL;
         }
+
         switch (tab) {
             case TabState.FAVORITES:
                 mFavoritesView.setVisibility(View.VISIBLE);
@@ -710,6 +717,7 @@ public class PeopleActivity extends ContactsActivity
                 mGroupDetailsView.setVisibility(View.GONE);
                 break;
         }
+        mPeopleActivityView.startMaskTransition(false, TAB_FADE_IN_DURATION);
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction ft = fragmentManager.beginTransaction();
 
@@ -986,10 +994,16 @@ public class PeopleActivity extends ContactsActivity
         mAllFragment.setFilter(mContactListFilterController.getFilter());
 
         final boolean useTwoPane = PhoneCapabilityTester.isUsingTwoPanes(this);
-        mAllFragment.setVerticalScrollbarPosition(
-                useTwoPane
-                        ? View.SCROLLBAR_POSITION_LEFT
-                        : View.SCROLLBAR_POSITION_RIGHT);
+        final Locale locale = Locale.getDefault();
+        final int layoutDirection = TextUtils.getLayoutDirectionFromLocale(locale);
+        final boolean isLayoutRtl = (layoutDirection == View.LAYOUT_DIRECTION_RTL);
+        final int position;
+        if (useTwoPane)  {
+            position = isLayoutRtl ? View.SCROLLBAR_POSITION_RIGHT : View.SCROLLBAR_POSITION_LEFT;
+        } else {
+            position = isLayoutRtl ? View.SCROLLBAR_POSITION_LEFT: View.SCROLLBAR_POSITION_RIGHT;
+        }
+        mAllFragment.setVerticalScrollbarPosition(position);
         mAllFragment.setSelectionVisible(useTwoPane);
         mAllFragment.setQuickContactEnabled(!useTwoPane);
     }
@@ -1034,7 +1048,13 @@ public class PeopleActivity extends ContactsActivity
             // If there are no accounts on the device and we should show the "no account" prompt
             // (based on {@link SharedPreferences}), then launch the account setup activity so the
             // user can sign-in or create an account.
-            if (!areContactWritableAccountsAvailable() &&
+            //
+            // Also check for ability to modify accounts.  In limited user mode, you can't modify
+            // accounts so there is no point sending users to account setup activity.
+            final UserManager userManager = UserManager.get(this);
+            final boolean disallowModifyAccounts = userManager.getUserRestrictions().getBoolean(
+                    UserManager.DISALLOW_MODIFY_ACCOUNTS);
+            if (!disallowModifyAccounts && !areContactWritableAccountsAvailable() &&
                     AccountPromptUtils.shouldShowAccountPrompt(this)) {
                 AccountPromptUtils.launchAccountPrompt(this);
                 return;
@@ -1126,16 +1146,6 @@ public class PeopleActivity extends ContactsActivity
             ContentValues values = new ContentValues(1);
             values.put(Contacts.STARRED, 0);
             getContentResolver().update(contactUri, values, null, null);
-        }
-
-        @Override
-        public void onCallContactAction(Uri contactUri) {
-            PhoneNumberInteraction.startInteractionForPhoneCall(PeopleActivity.this, contactUri);
-        }
-
-        @Override
-        public void onSmsContactAction(Uri contactUri) {
-            PhoneNumberInteraction.startInteractionForTextMessage(PeopleActivity.this, contactUri);
         }
 
         @Override
@@ -1255,7 +1265,8 @@ public class PeopleActivity extends ContactsActivity
 
         @Override
         public void onImportContactsFromFileAction() {
-            ImportExportDialogFragment.show(getFragmentManager(), areContactsAvailable());
+            ImportExportDialogFragment.show(getFragmentManager(), areContactsAvailable(),
+                    PeopleActivity.class);
         }
 
         @Override
@@ -1509,7 +1520,7 @@ public class PeopleActivity extends ContactsActivity
                     intent.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT,
                             DisplayOptionsPreferenceFragment.class.getName());
                     intent.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT_TITLE,
-                            R.string.preference_displayOptions);
+                            R.string.activity_title_settings);
                 }
                 startActivity(intent);
                 return true;
@@ -1545,7 +1556,8 @@ public class PeopleActivity extends ContactsActivity
                 return true;
             }
             case R.id.menu_import_export: {
-                ImportExportDialogFragment.show(getFragmentManager(), areContactsAvailable());
+                ImportExportDialogFragment.show(getFragmentManager(), areContactsAvailable(),
+                        PeopleActivity.class);
                 return true;
             }
             case R.id.menu_clear_frequents: {

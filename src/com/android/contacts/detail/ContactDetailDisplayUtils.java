@@ -39,13 +39,13 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.android.contacts.ContactPhotoManager;
+import com.android.contacts.common.ContactPhotoManager;
 import com.android.contacts.R;
 import com.android.contacts.model.Contact;
 import com.android.contacts.model.RawContact;
 import com.android.contacts.model.dataitem.DataItem;
 import com.android.contacts.model.dataitem.OrganizationDataItem;
-import com.android.contacts.preference.ContactsPreferences;
+import com.android.contacts.common.preference.ContactsPreferences;
 import com.android.contacts.util.ContactBadgeUtil;
 import com.android.contacts.util.HtmlUtils;
 import com.android.contacts.util.MoreMath;

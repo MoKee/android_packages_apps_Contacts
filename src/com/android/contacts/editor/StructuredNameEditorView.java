@@ -26,9 +26,9 @@ import android.text.TextUtils;
 import android.util.AttributeSet;
 
 import com.android.contacts.model.RawContactDelta;
-import com.android.contacts.model.RawContactDelta.ValuesDelta;
+import com.android.contacts.common.model.ValuesDelta;
 import com.android.contacts.model.dataitem.DataItem;
-import com.android.contacts.model.dataitem.DataKind;
+import com.android.contacts.common.model.dataitem.DataKind;
 import com.android.contacts.model.dataitem.StructuredNameDataItem;
 import com.android.contacts.util.NameConverter;
 
@@ -67,7 +67,7 @@ public class StructuredNameEditorView extends TextFieldsEditorView {
             ViewIdGenerator vig) {
         super.setValues(kind, entry, state, readOnly, vig);
         if (mSnapshot == null) {
-            mSnapshot = (StructuredNameDataItem) DataItem.createFrom(null,
+            mSnapshot = (StructuredNameDataItem) DataItem.createFrom(
                     new ContentValues(getValues().getCompleteValues()));
             mChanged = entry.isInsert();
         } else {
@@ -200,6 +200,18 @@ public class StructuredNameEditorView extends TextFieldsEditorView {
         }
     }
 
+    /**
+     * Set the display name onto the text field directly.  This does not affect the underlying
+     * data structure so it is similar to the user typing the value in on the field directly.
+     *
+     * @param name The name to set on the text field.
+     */
+    public void setDisplayName(String name) {
+        // For now, assume the first text field is the name.
+        // TODO: Find a better way to get a hold of the name field.
+        super.setValue(0, name);
+    }
+
     @Override
     protected Parcelable onSaveInstanceState() {
         SavedState state = new SavedState(super.onSaveInstanceState());
@@ -214,7 +226,7 @@ public class StructuredNameEditorView extends TextFieldsEditorView {
         super.onRestoreInstanceState(ss.mSuperState);
 
         mChanged = ss.mChanged;
-        mSnapshot = (StructuredNameDataItem) DataItem.createFrom(null, ss.mSnapshot);
+        mSnapshot = (StructuredNameDataItem) DataItem.createFrom(ss.mSnapshot);
     }
 
     private static class SavedState implements Parcelable {

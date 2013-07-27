@@ -38,20 +38,20 @@ import android.provider.ContactsContract.RawContacts;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.LargeTest;
 
-import com.android.contacts.model.AccountTypeManager;
+import com.android.contacts.common.model.AccountTypeManager;
 import com.android.contacts.model.RawContact;
 import com.android.contacts.model.RawContactDelta;
-import com.android.contacts.model.RawContactDelta.ValuesDelta;
+import com.android.contacts.common.model.ValuesDelta;
 import com.android.contacts.model.RawContactDeltaList;
 import com.android.contacts.model.RawContactModifier;
-import com.android.contacts.model.account.AccountType;
-import com.android.contacts.model.account.AccountType.EditType;
-import com.android.contacts.model.account.ExchangeAccountType;
-import com.android.contacts.model.account.GoogleAccountType;
-import com.android.contacts.model.dataitem.DataKind;
-import com.android.contacts.tests.mocks.ContactsMockContext;
+import com.android.contacts.common.model.account.AccountType;
+import com.android.contacts.common.model.account.AccountType.EditType;
+import com.android.contacts.common.model.account.ExchangeAccountType;
+import com.android.contacts.common.model.account.GoogleAccountType;
+import com.android.contacts.common.model.dataitem.DataKind;
+import com.android.contacts.common.test.mocks.ContactsMockContext;
 import com.android.contacts.tests.mocks.MockAccountTypeManager;
-import com.android.contacts.tests.mocks.MockContentProvider;
+import com.android.contacts.common.test.mocks.MockContentProvider;
 import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
@@ -91,14 +91,14 @@ public class RawContactModifierTests extends AndroidTestCase {
                 this.accountType = TEST_ACCOUNT_TYPE;
 
                 final DataKind nameKind = new DataKind(StructuredName.CONTENT_ITEM_TYPE,
-                        R.string.nameLabelsGroup, -1, true, -1);
+                        R.string.nameLabelsGroup, -1, true);
                 nameKind.typeOverallMax = 1;
                 addKind(nameKind);
 
                 // Phone allows maximum 2 home, 1 work, and unlimited other, with
                 // constraint of 5 numbers maximum.
                 final DataKind phoneKind = new DataKind(
-                        Phone.CONTENT_ITEM_TYPE, -1, 10, true, -1);
+                        Phone.CONTENT_ITEM_TYPE, -1, 10, true);
 
                 phoneKind.typeOverallMax = 5;
                 phoneKind.typeColumn = Phone.TYPE;
@@ -115,24 +115,21 @@ public class RawContactModifierTests extends AndroidTestCase {
                 addKind(phoneKind);
 
                 // Email is unlimited
-                final DataKind emailKind = new DataKind(
-                        Email.CONTENT_ITEM_TYPE, -1, 10, true, -1);
+                final DataKind emailKind = new DataKind(Email.CONTENT_ITEM_TYPE, -1, 10, true);
                 emailKind.typeOverallMax = -1;
                 emailKind.fieldList = Lists.newArrayList();
                 emailKind.fieldList.add(new EditField(Email.DATA, -1, -1));
                 addKind(emailKind);
 
                 // IM is only one
-                final DataKind imKind = new DataKind(Im.CONTENT_ITEM_TYPE, -1, 10,
-                        true, -1);
+                final DataKind imKind = new DataKind(Im.CONTENT_ITEM_TYPE, -1, 10, true);
                 imKind.typeOverallMax = 1;
                 imKind.fieldList = Lists.newArrayList();
                 imKind.fieldList.add(new EditField(Im.DATA, -1, -1));
                 addKind(imKind);
 
                 // Organization is only one
-                final DataKind orgKind = new DataKind(
-                        Organization.CONTENT_ITEM_TYPE, -1, 10, true, -1);
+                final DataKind orgKind = new DataKind(Organization.CONTENT_ITEM_TYPE, -1, 10, true);
                 orgKind.typeOverallMax = 1;
                 orgKind.fieldList = Lists.newArrayList();
                 orgKind.fieldList.add(new EditField(Organization.COMPANY, -1, -1));
@@ -180,7 +177,7 @@ public class RawContactModifierTests extends AndroidTestCase {
         contact.put(RawContacts.ACCOUNT_NAME, TEST_ACCOUNT_NAME);
         contact.put(RawContacts.ACCOUNT_TYPE, TEST_ACCOUNT_TYPE);
 
-        final RawContact before = new RawContact(mContext, contact);
+        final RawContact before = new RawContact(contact);
         for (ContentValues values : entries) {
             before.addDataItemValues(values);
         }
@@ -524,7 +521,9 @@ public class RawContactModifierTests extends AndroidTestCase {
 
         // Try creating a contact without any child entries
         final RawContactDelta state = getRawContact(null);
-        final RawContactDeltaList set = RawContactDeltaList.fromSingle(state);
+        final RawContactDeltaList set = new RawContactDeltaList();
+        set.add(state);
+
 
         // Build diff, expecting single insert
         final ArrayList<ContentProviderOperation> diff = Lists.newArrayList();
@@ -552,7 +551,8 @@ public class RawContactModifierTests extends AndroidTestCase {
         // Try creating a contact with single empty entry
         final RawContactDelta state = getRawContact(null);
         RawContactModifier.insertChild(state, kindPhone, typeHome);
-        final RawContactDeltaList set = RawContactDeltaList.fromSingle(state);
+        final RawContactDeltaList set = new RawContactDeltaList();
+        set.add(state);
 
         // Build diff, expecting two insert operations
         final ArrayList<ContentProviderOperation> diff = Lists.newArrayList();
@@ -596,7 +596,8 @@ public class RawContactModifierTests extends AndroidTestCase {
         second.put(Phone.NUMBER, TEST_PHONE);
 
         final RawContactDelta state = getRawContact(TEST_ID, first, second);
-        final RawContactDeltaList set = RawContactDeltaList.fromSingle(state);
+        final RawContactDeltaList set = new RawContactDeltaList();
+        set.add(state);
 
         // Build diff, expecting no changes
         final ArrayList<ContentProviderOperation> diff = Lists.newArrayList();
@@ -661,7 +662,8 @@ public class RawContactModifierTests extends AndroidTestCase {
         first.put(Phone.NUMBER, TEST_PHONE);
 
         final RawContactDelta state = getRawContact(TEST_ID, first);
-        final RawContactDeltaList set = RawContactDeltaList.fromSingle(state);
+        final RawContactDeltaList set = new RawContactDeltaList();
+        set.add(state);
 
         // Build diff, expecting no changes
         final ArrayList<ContentProviderOperation> diff = Lists.newArrayList();

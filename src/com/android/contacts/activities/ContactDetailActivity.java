@@ -47,7 +47,7 @@ import com.android.contacts.detail.ContactLoaderFragment;
 import com.android.contacts.detail.ContactLoaderFragment.ContactLoaderFragmentListener;
 import com.android.contacts.interactions.ContactDeletionInteraction;
 import com.android.contacts.model.Contact;
-import com.android.contacts.model.account.AccountWithDataSet;
+import com.android.contacts.common.model.account.AccountWithDataSet;
 import com.android.contacts.util.PhoneCapabilityTester;
 
 import java.util.ArrayList;
@@ -260,12 +260,23 @@ public class ContactDetailActivity extends ContactsActivity {
         actionBar.setTitle(displayName);
         actionBar.setSubtitle(company);
 
+        final StringBuilder talkback = new StringBuilder();
         if (!TextUtils.isEmpty(displayName)) {
+            talkback.append(displayName);
+        }
+        if (!TextUtils.isEmpty(company)) {
+            if (talkback.length() != 0) {
+                talkback.append(", ");
+            }
+            talkback.append(company);
+        }
+
+        if (talkback.length() != 0) {
             AccessibilityManager accessibilityManager =
                     (AccessibilityManager) this.getSystemService(Context.ACCESSIBILITY_SERVICE);
             if (accessibilityManager.isEnabled()) {
                 View decorView = getWindow().getDecorView();
-                decorView.setContentDescription(displayName);
+                decorView.setContentDescription(talkback);
                 decorView.sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED);
             }
         }

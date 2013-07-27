@@ -30,8 +30,8 @@ import com.android.contacts.R;
 import com.android.contacts.editor.Editor.EditorListener;
 import com.android.contacts.model.RawContactModifier;
 import com.android.contacts.model.RawContactDelta;
-import com.android.contacts.model.RawContactDelta.ValuesDelta;
-import com.android.contacts.model.dataitem.DataKind;
+import com.android.contacts.common.model.ValuesDelta;
+import com.android.contacts.common.model.dataitem.DataKind;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -186,12 +186,13 @@ public class KindSectionView extends LinearLayout implements EditorListener {
      */
     private View createEditorView(ValuesDelta entry) {
         final View view;
+        final int layoutResId = EditorUiUtils.getLayoutResourceId(mKind.mimeType);
         try {
-            view = mInflater.inflate(mKind.editorLayoutResourceId, mEditors, false);
+            view = mInflater.inflate(layoutResId, mEditors, false);
         } catch (Exception e) {
             throw new RuntimeException(
                     "Cannot allocate editor with layout resource ID " +
-                    mKind.editorLayoutResourceId + " for MIME type " + mKind.mimeType +
+                    layoutResId + " for MIME type " + mKind.mimeType +
                     " with error " + e.toString());
         }
 

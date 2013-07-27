@@ -41,10 +41,11 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.LongSparseArray;
 
-import com.android.contacts.ContactsUtils;
 import com.android.contacts.GroupMetaData;
-import com.android.contacts.model.account.AccountType;
-import com.android.contacts.model.account.AccountTypeWithDataSet;
+import com.android.contacts.common.GeoUtil;
+import com.android.contacts.common.model.AccountTypeManager;
+import com.android.contacts.common.model.account.AccountType;
+import com.android.contacts.common.model.account.AccountTypeWithDataSet;
 import com.android.contacts.model.dataitem.DataItem;
 import com.android.contacts.model.dataitem.PhoneDataItem;
 import com.android.contacts.model.dataitem.PhotoDataItem;
@@ -52,7 +53,7 @@ import com.android.contacts.util.ContactLoaderUtils;
 import com.android.contacts.util.DataStatus;
 import com.android.contacts.util.StreamItemEntry;
 import com.android.contacts.util.StreamItemPhotoEntry;
-import com.android.contacts.util.UriUtils;
+import com.android.contacts.common.util.UriUtils;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
@@ -382,12 +383,12 @@ public class ContactLoader extends AsyncTaskLoader<Contact> {
                     // First time to see this raw contact id, so create a new entity, and
                     // add it to the result's entities.
                     currentRawContactId = rawContactId;
-                    rawContact = new RawContact(getContext(), loadRawContactValues(cursor));
+                    rawContact = new RawContact(loadRawContactValues(cursor));
                     rawContactsBuilder.add(rawContact);
                 }
                 if (!cursor.isNull(ContactQuery.DATA_ID)) {
                     ContentValues data = loadDataValues(cursor);
-                    final DataItem item = rawContact.addDataItemValues(data);
+                    rawContact.addDataItemValues(data);
 
                     if (!cursor.isNull(ContactQuery.PRESENCE)
                             || !cursor.isNull(ContactQuery.STATUS)) {
@@ -804,7 +805,7 @@ public class ContactLoader extends AsyncTaskLoader<Contact> {
      * overwritten
      */
     private void computeFormattedPhoneNumbers(Contact contactData) {
-        final String countryIso = ContactsUtils.getCurrentCountryIso(getContext());
+        final String countryIso = GeoUtil.getCurrentCountryIso(getContext());
         final ImmutableList<RawContact> rawContacts = contactData.getRawContacts();
         final int rawContactCount = rawContacts.size();
         for (int rawContactIndex = 0; rawContactIndex < rawContactCount; rawContactIndex++) {
@@ -865,7 +866,7 @@ public class ContactLoader extends AsyncTaskLoader<Contact> {
                 continue; // Already notified for this raw contact.
             }
             mNotifiedRawContactIds.add(rawContactId);
-            final AccountType accountType = rawContact.getAccountType();
+            final AccountType accountType = rawContact.getAccountType(context);
             final String serviceName = accountType.getViewContactNotifyServiceClassName();
             final String servicePackageName = accountType.getViewContactNotifyServicePackageName();
             if (!TextUtils.isEmpty(serviceName) && !TextUtils.isEmpty(servicePackageName)) {

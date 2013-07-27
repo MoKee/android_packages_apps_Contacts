@@ -46,11 +46,12 @@ import android.provider.ContactsContract.RawContactsEntity;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.android.contacts.model.AccountTypeManager;
-import com.android.contacts.model.RawContactModifier;
+import com.android.contacts.common.database.ContactUpdateUtils;
+import com.android.contacts.common.model.AccountTypeManager;
 import com.android.contacts.model.RawContactDelta;
 import com.android.contacts.model.RawContactDeltaList;
-import com.android.contacts.model.account.AccountWithDataSet;
+import com.android.contacts.model.RawContactModifier;
+import com.android.contacts.common.model.account.AccountWithDataSet;
 import com.android.contacts.util.CallerInfoCacheUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -903,13 +904,7 @@ public class ContactSaveService extends IntentService {
             return;
         }
 
-        // Update the primary values in the data record.
-        ContentValues values = new ContentValues(1);
-        values.put(Data.IS_SUPER_PRIMARY, 1);
-        values.put(Data.IS_PRIMARY, 1);
-
-        getContentResolver().update(ContentUris.withAppendedId(Data.CONTENT_URI, dataId),
-                values, null, null);
+        ContactUpdateUtils.setSuperPrimary(this, dataId);
     }
 
     /**
@@ -1018,6 +1013,9 @@ public class ContactSaveService extends IntentService {
         long rawContactIds[];
         long verifiedNameRawContactId = -1;
         try {
+            if (c.getCount() == 0) {
+                return;
+            }
             int maxDisplayNameSource = -1;
             rawContactIds = new long[c.getCount()];
             for (int i = 0; i < rawContactIds.length; i++) {

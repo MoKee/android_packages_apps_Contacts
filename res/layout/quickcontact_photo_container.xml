@@ -29,7 +29,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dip"
             android:layout_alignParentTop="true"
-            android:background="@color/photo_container" />
+            android:background="#4CFFFFFF" />
         <View
             android:id="@+id/photo_text_bar"
             android:layout_width="0dip"
@@ -37,7 +37,9 @@
             android:layout_alignBottom="@id/photo"
             android:layout_alignLeft="@id/photo"
             android:layout_alignRight="@id/photo"
-            android:background="@color/call_detail_photo_bg" />
+            android:layout_alignStart="@id/photo"
+            android:layout_alignEnd="@id/photo"
+            android:background="#7F000000" />
         <ImageView
             android:id="@+id/contact_details_image"
             android:src="@drawable/ic_contacts_holo_dark"
@@ -45,21 +47,26 @@
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             android:layout_marginRight="16dip"
+            android:layout_marginEnd="16dip"
             android:layout_marginBottom="5dip"
             android:layout_alignBottom="@id/photo_text_bar"
-            android:layout_alignRight="@id/photo_text_bar" />
+            android:layout_alignRight="@id/photo_text_bar"
+            android:layout_alignEnd="@id/photo_text_bar" />
         <TextView
             android:id="@+id/name"
             android:layout_width="wrap_content"
             android:layout_height="42dip"
             android:layout_alignBottom="@id/photo"
             android:layout_alignLeft="@id/photo"
+            android:layout_alignStart="@id/photo"
             android:layout_toLeftOf="@id/open_details_button"
+            android:layout_toStartOf="@id/open_details_button"
             android:gravity="center_vertical"
             android:paddingLeft="8dip"
+            android:paddingStart="8dip"
             android:singleLine="true"
             android:ellipsize="end"
-            android:textColor="@color/white_text"
+            android:textColor="@android:color/white"
             android:textAppearance="?android:attr/textAppearanceMedium" />
         <ImageButton
             android:id="@+id/open_details_push_layer"

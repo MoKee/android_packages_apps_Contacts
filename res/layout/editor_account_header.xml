@@ -20,13 +20,15 @@
     android:layout_height="wrap_content"
     android:layout_width="match_parent"
     android:minHeight="48dip"
-    android:background="@color/account_container"
+    android:background="#EEEEEE"
     android:orientation="horizontal"
     android:paddingTop="8dip"
     android:paddingBottom="8dip"
     android:gravity="center_vertical"
     android:paddingLeft="@dimen/account_container_left_padding"
-    android:paddingRight="28dip">
+    android:paddingRight="28dip"
+    android:paddingStart="@dimen/account_container_left_padding"
+    android:paddingEnd="28dip">
 
     <LinearLayout
         android:id="@+id/account"

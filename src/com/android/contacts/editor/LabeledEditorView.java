@@ -47,10 +47,10 @@ import android.widget.TextView;
 import com.android.contacts.ContactsUtils;
 import com.android.contacts.R;
 import com.android.contacts.model.RawContactDelta;
-import com.android.contacts.model.RawContactDelta.ValuesDelta;
+import com.android.contacts.common.model.ValuesDelta;
 import com.android.contacts.model.RawContactModifier;
-import com.android.contacts.model.account.AccountType.EditType;
-import com.android.contacts.model.dataitem.DataKind;
+import com.android.contacts.common.model.account.AccountType.EditType;
+import com.android.contacts.common.model.dataitem.DataKind;
 import com.android.contacts.util.DialogManager;
 import com.android.contacts.util.DialogManager.DialogShowingView;
 
@@ -559,7 +559,7 @@ public abstract class LabeledEditorView extends LinearLayout implements Editor, 
             if (convertView == null) {
                 textView = (TextView) mInflater.inflate(resource, parent, false);
                 textView.setAllCaps(true);
-                textView.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
+                textView.setGravity(Gravity.END | Gravity.CENTER_VERTICAL);
                 textView.setTextAppearance(mContext, android.R.style.TextAppearance_Small);
                 textView.setTextColor(mTextColor);
                 textView.setEllipsize(TruncateAt.MIDDLE);

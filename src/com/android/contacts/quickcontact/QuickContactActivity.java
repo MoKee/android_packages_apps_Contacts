@@ -40,6 +40,7 @@ import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.QuickContact;
 import android.provider.ContactsContract.RawContacts;
 import android.support.v13.app.FragmentPagerAdapter;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.SimpleOnPageChangeListener;
 import android.text.TextUtils;
@@ -56,20 +57,22 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.contacts.Collapser;
+import com.android.contacts.common.Collapser;
 import com.android.contacts.R;
+import com.android.contacts.common.model.AccountTypeManager;
 import com.android.contacts.model.Contact;
 import com.android.contacts.model.ContactLoader;
 import com.android.contacts.model.RawContact;
+import com.android.contacts.common.model.account.AccountType;
 import com.android.contacts.model.dataitem.DataItem;
-import com.android.contacts.model.dataitem.DataKind;
+import com.android.contacts.common.model.dataitem.DataKind;
 import com.android.contacts.model.dataitem.EmailDataItem;
 import com.android.contacts.model.dataitem.ImDataItem;
-import com.android.contacts.util.Constants;
+import com.android.contacts.common.util.Constants;
 import com.android.contacts.util.DataStatus;
 import com.android.contacts.util.ImageViewDrawableSetter;
 import com.android.contacts.util.SchedulingUtils;
-import com.android.contacts.util.StopWatch;
+import com.android.contacts.common.util.StopWatch;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
@@ -112,6 +115,7 @@ public class QuickContactActivity extends Activity {
     private ImageView mOpenDetailsImage;
     private ImageButton mOpenDetailsPushLayerButton;
     private ViewPager mListPager;
+    private ViewPagerAdapter mPagerAdapter;
 
     private ContactLoader mContactLoader;
 
@@ -221,7 +225,8 @@ public class QuickContactActivity extends Activity {
             }
         };
         mOpenDetailsPushLayerButton.setOnClickListener(openDetailsClickHandler);
-        mListPager.setAdapter(new ViewPagerAdapter(getFragmentManager()));
+        mPagerAdapter = new ViewPagerAdapter(getFragmentManager());
+        mListPager.setAdapter(mPagerAdapter);
         mListPager.setOnPageChangeListener(new PageChangeListener());
 
         final Rect sourceBounds = intent.getSourceBounds();
@@ -347,6 +352,9 @@ public class QuickContactActivity extends Activity {
         for (RawContact rawContact : data.getRawContacts()) {
             for (DataItem dataItem : rawContact.getDataItems()) {
                 final String mimeType = dataItem.getMimeType();
+                final AccountType accountType = rawContact.getAccountType(this);
+                final DataKind dataKind = AccountTypeManager.getInstance(this)
+                        .getKindOrFallback(accountType, mimeType);
 
                 // Skip this data item if MIME-type excluded
                 if (isMimeExcluded(mimeType)) continue;
@@ -355,11 +363,11 @@ public class QuickContactActivity extends Activity {
                 final boolean isPrimary = dataItem.isPrimary();
                 final boolean isSuperPrimary = dataItem.isSuperPrimary();
 
-                if (dataItem.getDataKind() != null) {
+                if (dataKind != null) {
                     // Build an action for this data entry, find a mapping to a UI
                     // element, build its summary from the cursor, and collect it
                     // along with all others of this MIME-type.
-                    final Action action = new DataAction(context, dataItem);
+                    final Action action = new DataAction(context, dataItem, dataKind);
                     final boolean wasAdded = considerAdd(action, cache, isSuperPrimary);
                     if (wasAdded) {
                         // Remember the default
@@ -374,8 +382,8 @@ public class QuickContactActivity extends Activity {
                 if (status != null && dataItem instanceof EmailDataItem) {
                     final EmailDataItem email = (EmailDataItem) dataItem;
                     final ImDataItem im = ImDataItem.createFromEmail(email);
-                    if (im.getDataKind() != null) {
-                        final DataAction action = new DataAction(context, im);
+                    if (dataKind != null) {
+                        final DataAction action = new DataAction(context, im, dataKind);
                         action.setPresence(status.getPresence());
                         considerAdd(action, cache, isSuperPrimary);
                     }
@@ -420,13 +428,14 @@ public class QuickContactActivity extends Activity {
                 mSortedActionMimeTypes.add(mimeType);
             }
         }
+        mPagerAdapter.notifyDataSetChanged();
 
         mStopWatch.lap("mt"); // Mime types initialized
 
         // Add buttons for each mimetype
         mTrack.removeAllViews();
         for (String mimeType : mSortedActionMimeTypes) {
-            final View actionView = inflateAction(mimeType, cache, mTrack);
+            final View actionView = inflateAction(mimeType, cache, mTrack, data.getDisplayName());
             mTrack.addView(actionView);
         }
 
@@ -460,7 +469,8 @@ public class QuickContactActivity extends Activity {
      * Inflate the in-track view for the action of the given MIME-type, collapsing duplicate values.
      * Will use the icon provided by the {@link DataKind}.
      */
-    private View inflateAction(String mimeType, ResolveCache resolveCache, ViewGroup root) {
+    private View inflateAction(String mimeType, ResolveCache resolveCache,
+                               ViewGroup root, String name) {
         final CheckableImageView typeView = (CheckableImageView) getLayoutInflater().inflate(
                 R.layout.quickcontact_track_button, root, false);
 
@@ -469,7 +479,7 @@ public class QuickContactActivity extends Activity {
         final Action firstInfo = children.get(0);
 
         // Set icon and listen for clicks
-        final CharSequence descrip = resolveCache.getDescription(firstInfo);
+        final CharSequence descrip = resolveCache.getDescription(firstInfo, name);
         final Drawable icon = resolveCache.getIcon(firstInfo);
         typeView.setChecked(false);
         typeView.setContentDescription(descrip);
@@ -571,8 +581,8 @@ public class QuickContactActivity extends Activity {
 
         @Override
         public Fragment getItem(int position) {
-            QuickContactListFragment fragment = new QuickContactListFragment();
             final String mimeType = mSortedActionMimeTypes.get(position);
+            QuickContactListFragment fragment = new QuickContactListFragment(mimeType);
             final List<Action> actions = mActions.get(mimeType);
             fragment.setActions(actions);
             return fragment;
@@ -582,15 +592,38 @@ public class QuickContactActivity extends Activity {
         public int getCount() {
             return mSortedActionMimeTypes.size();
         }
+
+        @Override
+        public int getItemPosition(Object object) {
+            final QuickContactListFragment fragment = (QuickContactListFragment) object;
+            final String mimeType = fragment.getMimeType();
+            for (int i = 0; i < mSortedActionMimeTypes.size(); i++) {
+                if (mimeType.equals(mSortedActionMimeTypes.get(i))) {
+                    return i;
+                }
+            }
+            return PagerAdapter.POSITION_NONE;
+        }
     }
 
     private class PageChangeListener extends SimpleOnPageChangeListener {
+        private int mScrollingState = ViewPager.SCROLL_STATE_IDLE;
+
         @Override
         public void onPageSelected(int position) {
             final CheckableImageView actionView = getActionViewAt(position);
             mTrackScroller.requestChildRectangleOnScreen(actionView,
                     new Rect(0, 0, actionView.getWidth(), actionView.getHeight()), false);
-            renderSelectedRectangle(position, 0);
+            // Don't render rectangle if we are currently scrolling to prevent it from flickering
+            if (mScrollingState == ViewPager.SCROLL_STATE_IDLE) {
+                renderSelectedRectangle(position, 0);
+            }
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int state) {
+            super.onPageScrollStateChanged(state);
+            mScrollingState = state;
         }
 
         @Override
@@ -602,7 +635,7 @@ public class QuickContactActivity extends Activity {
             final RelativeLayout.LayoutParams layoutParams =
                     (RelativeLayout.LayoutParams) mSelectedTabRectangle.getLayoutParams();
             final int width = layoutParams.width;
-            layoutParams.leftMargin = (int) ((position + positionOffset) * width);
+            layoutParams.setMarginStart((int) ((position + positionOffset) * width));
             mSelectedTabRectangle.setLayoutParams(layoutParams);
         }
     }

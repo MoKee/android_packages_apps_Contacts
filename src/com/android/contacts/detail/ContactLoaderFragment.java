@@ -42,12 +42,12 @@ import android.widget.Toast;
 import com.android.contacts.ContactSaveService;
 import com.android.contacts.R;
 import com.android.contacts.activities.ContactDetailActivity.FragmentKeyListener;
-import com.android.contacts.list.ShortcutIntentBuilder;
-import com.android.contacts.list.ShortcutIntentBuilder.OnShortcutIntentCreatedListener;
+import com.android.contacts.common.list.ShortcutIntentBuilder;
+import com.android.contacts.common.list.ShortcutIntentBuilder.OnShortcutIntentCreatedListener;
 import com.android.contacts.model.Contact;
 import com.android.contacts.model.ContactLoader;
 import com.android.contacts.util.PhoneCapabilityTester;
-import com.android.internal.util.Objects;
+import com.google.common.base.Objects;
 
 /**
  * This is an invisible worker {@link Fragment} that loads the contact details for the contact card.
@@ -416,8 +416,8 @@ public class ContactLoaderFragment extends Fragment implements FragmentKeyListen
         intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true);
         // Show only ringtones
         intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_RINGTONE);
-        // Don't show 'Silent'
-        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false);
+        // Allow the user to pick a silent ringtone
+        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, true);
 
         Uri ringtoneUri;
         if (mCustomRingtone != null) {

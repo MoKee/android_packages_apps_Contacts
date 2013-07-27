@@ -15,7 +15,7 @@
 -->
 <view
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:ex="http://schemas.android.com/apk/res/com.android.contacts"
+    xmlns:ex="http://schemas.android.com/apk/res-auto"
     class="com.android.contacts.quickcontact.FloatingChildLayout"
     android:id="@+id/floating_layout"
     android:layout_width="match_parent"
@@ -42,7 +42,7 @@
             android:background="@color/quickcontact_tab_indicator" />
         <android.support.v4.view.ViewPager
             android:id="@+id/item_list_pager"
-            android:background="@color/quickcontact_list_background"
+            android:background="@drawable/quickcontact_track_background"
             android:layout_width="match_parent"
             android:layout_height="160dip" />
     </LinearLayout>

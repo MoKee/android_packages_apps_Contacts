@@ -38,10 +38,10 @@ import android.widget.LinearLayout;
 import com.android.contacts.ContactsUtils;
 import com.android.contacts.R;
 import com.android.contacts.model.RawContactDelta;
-import com.android.contacts.model.RawContactDelta.ValuesDelta;
-import com.android.contacts.model.account.AccountType.EditField;
-import com.android.contacts.model.dataitem.DataKind;
-import com.android.contacts.util.PhoneNumberFormatter;
+import com.android.contacts.common.model.ValuesDelta;
+import com.android.contacts.common.model.account.AccountType.EditField;
+import com.android.contacts.common.model.dataitem.DataKind;
+import com.android.contacts.common.util.PhoneNumberFormatter;
 
 /**
  * Simple editor that handles labels and any {@link EditField} defined for the
@@ -58,6 +58,7 @@ public class TextFieldsEditorView extends LabeledEditorView {
     private boolean mHideOptional = true;
     private boolean mHasShortAndLongForms;
     private int mMinFieldHeight;
+    private int mPreviousViewHeight;
 
     public TextFieldsEditorView(Context context) {
         super(context);
@@ -87,6 +88,8 @@ public class TextFieldsEditorView extends LabeledEditorView {
         mExpansionViewContainer.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                mPreviousViewHeight = mFields.getHeight();
+
                 // Save focus
                 final View focusedChild = getFocusedChild();
                 final int focusedViewId = focusedChild == null ? -1 : focusedChild.getId();
@@ -103,6 +106,8 @@ public class TextFieldsEditorView extends LabeledEditorView {
                     newFocusView = TextFieldsEditorView.this;
                 }
                 newFocusView.requestFocus();
+
+                EditorAnimator.getInstance().slideAndFadeIn(mFields, mPreviousViewHeight);
             }
         });
     }
@@ -169,6 +174,10 @@ public class TextFieldsEditorView extends LabeledEditorView {
         }
     }
 
+    public void setValue(int field, String value) {
+        mFieldEditTexts[field].setText(value);
+    }
+
     @Override
     public void setValues(DataKind kind, ValuesDelta entry, RawContactDelta state, boolean readOnly,
             ViewIdGenerator vig) {
@@ -206,6 +215,7 @@ public class TextFieldsEditorView extends LabeledEditorView {
             fieldView.setInputType(inputType);
             if (inputType == InputType.TYPE_CLASS_PHONE) {
                 PhoneNumberFormatter.setPhoneNumberFormattingTextWatcher(mContext, fieldView);
+                fieldView.setTextDirection(View.TEXT_DIRECTION_LTR);
             }
 
             // Show the "next" button in IME to navigate between text fields

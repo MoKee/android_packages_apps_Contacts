@@ -16,13 +16,6 @@
 
 package com.android.contacts;
 
-import com.android.contacts.dialpad.T9SearchCache;
-import com.android.contacts.list.ContactListFilterController;
-import com.android.contacts.model.AccountTypeManager;
-import com.android.contacts.test.InjectedServices;
-import com.android.contacts.util.Constants;
-import com.google.common.annotations.VisibleForTesting;
-
 import android.app.Application;
 import android.app.FragmentManager;
 import android.app.LoaderManager;
@@ -36,10 +29,11 @@ import android.preference.PreferenceManager;
 import android.provider.ContactsContract.Contacts;
 import android.util.Log;
 
-import com.android.contacts.list.ContactListFilterController;
-import com.android.contacts.model.AccountTypeManager;
+import com.android.contacts.common.ContactPhotoManager;
+import com.android.contacts.common.list.ContactListFilterController;
+import com.android.contacts.common.model.AccountTypeManager;
 import com.android.contacts.test.InjectedServices;
-import com.android.contacts.util.Constants;
+import com.android.contacts.common.util.Constants;
 import com.google.common.annotations.VisibleForTesting;
 
 public final class ContactsApplication extends Application {
@@ -47,10 +41,13 @@ public final class ContactsApplication extends Application {
     private static final boolean ENABLE_FRAGMENT_LOG = false; // Don't submit with true
 
     private static InjectedServices sInjectedServices;
-    private AccountTypeManager mAccountTypeManager;
+    /**
+     * Log tag for enabling/disabling StrictMode violation log.
+     * To enable: adb shell setprop log.tag.ContactsStrictMode DEBUG
+     */
+    public static final String STRICT_MODE_TAG = "ContactsStrictMode";
     private ContactPhotoManager mContactPhotoManager;
     private ContactListFilterController mContactListFilterController;
-    private T9SearchCache mT9Cache;
 
     /**
      * Overrides the system services with mocks for testing.
@@ -96,13 +93,6 @@ public final class ContactsApplication extends Application {
             }
         }
 
-        if (AccountTypeManager.ACCOUNT_TYPE_SERVICE.equals(name)) {
-            if (mAccountTypeManager == null) {
-                mAccountTypeManager = AccountTypeManager.createAccountTypeManager(this);
-            }
-            return mAccountTypeManager;
-        }
-
         if (ContactPhotoManager.CONTACT_PHOTO_SERVICE.equals(name)) {
             if (mContactPhotoManager == null) {
                 mContactPhotoManager = ContactPhotoManager.createContactPhotoManager(this);
@@ -110,21 +100,6 @@ public final class ContactsApplication extends Application {
                 mContactPhotoManager.preloadPhotosInBackground();
             }
             return mContactPhotoManager;
-        }
-
-        if (ContactListFilterController.CONTACT_LIST_FILTER_SERVICE.equals(name)) {
-            if (mContactListFilterController == null) {
-                mContactListFilterController =
-                        ContactListFilterController.createContactListFilterController(this);
-            }
-            return mContactListFilterController;
-        }
-
-        if (T9SearchCache.T9_CACHE_SERVICE.equals(name)) {
-            if (mT9Cache == null) {
-                mT9Cache = T9SearchCache.createT9Cache(this);
-            }
-            return mT9Cache;
         }
 
         return super.getSystemService(name);
@@ -141,7 +116,7 @@ public final class ContactsApplication extends Application {
         if (ENABLE_FRAGMENT_LOG) FragmentManager.enableDebugLogging(true);
         if (ENABLE_LOADER_LOG) LoaderManager.enableDebugLogging(true);
 
-        if (Log.isLoggable(Constants.STRICT_MODE_TAG, Log.DEBUG)) {
+        if (Log.isLoggable(STRICT_MODE_TAG, Log.DEBUG)) {
             StrictMode.setThreadPolicy(
                     new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
         }

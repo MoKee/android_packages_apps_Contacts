@@ -22,8 +22,8 @@ import android.text.TextUtils;
 import android.util.AttributeSet;
 
 import com.android.contacts.model.RawContactDelta;
-import com.android.contacts.model.RawContactDelta.ValuesDelta;
-import com.android.contacts.model.dataitem.DataKind;
+import com.android.contacts.common.model.ValuesDelta;
+import com.android.contacts.common.model.dataitem.DataKind;
 import com.android.contacts.model.dataitem.StructuredNameDataItem;
 
 /**

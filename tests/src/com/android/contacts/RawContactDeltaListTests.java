@@ -37,14 +37,15 @@ import android.test.suitebuilder.annotation.LargeTest;
 import com.android.contacts.RawContactModifierTests.MockContactsSource;
 import com.android.contacts.model.RawContact;
 import com.android.contacts.model.RawContactDelta;
-import com.android.contacts.model.RawContactDelta.ValuesDelta;
+import com.android.contacts.common.model.ValuesDelta;
 import com.android.contacts.model.RawContactDeltaList;
 import com.android.contacts.model.RawContactModifier;
-import com.android.contacts.model.account.AccountType;
+import com.android.contacts.common.model.account.AccountType;
 import com.google.common.collect.Lists;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * Tests for {@link RawContactDeltaList} which focus on "diff" operations that should
@@ -112,10 +113,8 @@ public class RawContactDeltaListTests extends AndroidTestCase {
     }
 
     static RawContactDeltaList buildSet(RawContactDelta... deltas) {
-        final RawContactDeltaList set = RawContactDeltaList.fromSingle(deltas[0]);
-        for (int i = 1; i < deltas.length; i++) {
-            set.add(deltas[i]);
-        }
+        final RawContactDeltaList set = new RawContactDeltaList();
+        Collections.addAll(set, deltas);
         return set;
     }
 
@@ -125,7 +124,7 @@ public class RawContactDeltaListTests extends AndroidTestCase {
         final ContentValues contact = new ContentValues();
         contact.put(RawContacts.VERSION, version);
         contact.put(RawContacts._ID, rawContactId);
-        final RawContact before = new RawContact(context, contact);
+        final RawContact before = new RawContact(contact);
         for (ContentValues entry : entries) {
             before.addDataItemValues(entry);
         }
