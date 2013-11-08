@@ -216,6 +216,8 @@ public class ContactEditorFragment extends Fragment implements
      */
     private PhotoHandler mCurrentPhotoHandler;
 
+    private PhotoHandler mBindPhotoHandler;
+
     private final EntityDeltaComparator mComparator = new EntityDeltaComparator();
 
     private Cursor mGroupMetaData;
@@ -507,6 +509,15 @@ public class ContactEditorFragment extends Fragment implements
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (Intent.ACTION_EDIT.equals(mAction)) {
+            mHasNewContact = false;
+        }
+    }
+
     public void setData(Contact contact) {
 
         // If we have already loaded data, we do not want to change it here to not confuse the user
@@ -781,6 +792,14 @@ public class ContactEditorFragment extends Fragment implements
         // Remove any existing editors and rebuild any visible
         mContent.removeAllViews();
 
+        // If photoActionPopup shown, the popup will leak when contact editor
+        // fragment bind editors. The popup need dismiss with content view
+        // remove all views.
+        if (mBindPhotoHandler != null) {
+            mBindPhotoHandler.destroy();
+            mBindPhotoHandler = null;
+        }
+
         final LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(
                 Context.LAYOUT_INFLATER_SERVICE);
         final AccountTypeManager accountTypes = AccountTypeManager.getInstance(mContext);
@@ -842,6 +861,11 @@ public class ContactEditorFragment extends Fragment implements
                         if (request == EditorListener.FIELD_CHANGED && !isEditingUserProfile()) {
                             acquireAggregationSuggestions(activity, rawContactEditor);
                         }
+                    }
+
+                    @Override
+                    public void onDismissPopup() {
+                        // Nothing to do.
                     }
 
                     @Override
@@ -925,6 +949,8 @@ public class ContactEditorFragment extends Fragment implements
         if (mRawContactIdRequestingPhoto == editor.getRawContactId()) {
             mCurrentPhotoHandler = photoHandler;
         }
+
+        mBindPhotoHandler = photoHandler;
     }
 
     private void bindGroupMetaData() {
@@ -1904,6 +1930,12 @@ public class ContactEditorFragment extends Fragment implements
                 if (request == EditorListener.REQUEST_PICK_PHOTO) {
                     onClick(mEditor.getPhotoEditor());
                 }
+            }
+
+            @Override
+            public void onDismissPopup() {
+                // Dismiss the popup menu.
+                destroy();
             }
 
             @Override
