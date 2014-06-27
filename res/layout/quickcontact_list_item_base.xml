@@ -15,6 +15,17 @@
 -->
 
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
+    <ImageView
+        android:id="@+id/thirdly_action_button"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:paddingLeft="14dip"
+        android:paddingRight="8dip"
+        android:paddingStart="14dip"
+        android:paddingEnd="8dip"
+        android:background="?android:attr/selectableItemBackground"
+        android:duplicateParentState="false"
+        android:nextFocusLeft="@id/actions_view_container"/>
     <View
         android:id="@+id/vertical_divider"
         android:layout_width="1dip"

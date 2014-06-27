@@ -126,6 +126,8 @@ public class QuickContactListFragment extends Fragment {
                         R.id.actions_view_container);
                 final ImageView alternateActionButton = (ImageView) resultView.findViewById(
                         R.id.secondary_action_button);
+                final ImageView alternateThirdlyActionButton = (ImageView) resultView.findViewById(
+                        R.id.thirdly_action_button);
                 final View alternateActionDivider = resultView.findViewById(R.id.vertical_divider);
                 final ImageView presenceIconView =
                         (ImageView) resultView.findViewById(R.id.presence_icon);
@@ -135,12 +137,18 @@ public class QuickContactListFragment extends Fragment {
                 actionsContainer.setTag(action);
                 alternateActionButton.setOnClickListener(mSecondaryActionClickListener);
                 alternateActionButton.setTag(action);
+                alternateThirdlyActionButton.setOnClickListener(mThirdlyActionClickListener);
+                alternateThirdlyActionButton.setTag(action);
 
                 final boolean hasAlternateAction = action.getAlternateIntent() != null;
+                final boolean hasAlternateThirdlyAction = action.getAlternateThirdlyIntent() != null;
                 alternateActionDivider.setVisibility(hasAlternateAction ? View.VISIBLE : View.GONE);
                 alternateActionButton.setImageDrawable(action.getAlternateIcon());
                 alternateActionButton.setContentDescription(action.getAlternateIconDescription());
                 alternateActionButton.setVisibility(hasAlternateAction ? View.VISIBLE : View.GONE);
+                alternateThirdlyActionButton.setImageDrawable(action.getAlternateThirdlyIcon());
+                alternateThirdlyActionButton.setContentDescription(action.getAlternateThirdlyIconDescription());
+                alternateThirdlyActionButton.setVisibility(hasAlternateThirdlyAction ? View.VISIBLE : View.GONE);
 
                 if (mimeType.equals(Phone.CONTENT_ITEM_TYPE)) {
                     // Force LTR text direction for phone numbers
@@ -152,6 +160,8 @@ public class QuickContactListFragment extends Fragment {
                     if (hasAlternateAction) {
                         alternateActionButton.setContentDescription(getActivity()
                                 .getString(R.string.description_send_message, action.getBody()));
+                        alternateThirdlyActionButton.setContentDescription(getActivity()
+                                .getString(R.string.description_ip_call, action.getBody()));
                     }
                 }
 
@@ -208,6 +218,15 @@ public class QuickContactListFragment extends Fragment {
         }
     };
 
+    /** A thirdly action (IPCall) was clicked */
+    protected final OnClickListener mThirdlyActionClickListener = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            final Action action = (Action) v.getTag();
+            if (mListener != null) mListener.onThirdlyItemClicked(action, true);
+        }
+    };
+
     private final OnClickListener mOutsideClickListener = new OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -218,5 +237,6 @@ public class QuickContactListFragment extends Fragment {
     public interface Listener {
         void onOutsideClick();
         void onItemClicked(Action action, boolean alternate);
+        void onThirdlyItemClicked(Action action, boolean alternate);
     }
 }

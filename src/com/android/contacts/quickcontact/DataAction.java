@@ -60,8 +60,11 @@ public class DataAction implements Action {
     private CharSequence mSubtitle;
     private Intent mIntent;
     private Intent mAlternateIntent;
+    private Intent mAlternateThirdlyIntent;
     private int mAlternateIconDescriptionRes;
     private int mAlternateIconRes;
+    private int mAlternateIconThirdlyDescriptionRes;
+    private int mAlternateIconThirdlyRes;
     private int mPresence = -1;
 
     private Uri mDataUri;
@@ -122,12 +125,24 @@ public class DataAction implements Action {
                         smsIntent.setComponent(smsComponent);
                     }
 
+                    // IPCall
+                    Intent ipcallIntent = null;
+                    if (hasPhone) {
+                        ipcallIntent = new Intent();
+                        ComponentName ipcallComponent = new ComponentName("com.android.dialer", "com.android.dialer.IPCallActivity");
+                        ipcallIntent.putExtra("number", number);
+                        ipcallIntent.setComponent(ipcallComponent);
+                    }
+
                     // Configure Icons and Intents. Notice actionIcon is already set to the phone
                     if (hasPhone && hasSms) {
                         mIntent = phoneIntent;
                         mAlternateIntent = smsIntent;
+                        mAlternateThirdlyIntent = ipcallIntent;
                         mAlternateIconRes = kind.iconAltRes;
                         mAlternateIconDescriptionRes = kind.iconAltDescriptionRes;
+                        mAlternateIconThirdlyRes = kind.iconAltThirdlyRes;
+                        mAlternateIconThirdlyDescriptionRes = kind.iconAltThirdlyDescriptionRes;
                     } else if (hasPhone) {
                         mIntent = phoneIntent;
                     } else if (hasSms) {
@@ -291,6 +306,29 @@ public class DataAction implements Action {
         return mContext.getResources().getString(mAlternateIconDescriptionRes);
     }
 
+    // IPCall
+    @Override
+    public Drawable getAlternateThirdlyIcon() {
+        if (mAlternateIconThirdlyRes == 0) return null;
+
+        final String resourcePackageName = mKind.resourcePackageName;
+        if (resourcePackageName != null) {
+            final PackageManager pm = mContext.getPackageManager();
+            Drawable dw = pm.getDrawable(resourcePackageName, mAlternateIconThirdlyRes, null);
+            if (dw != null) {
+                return dw;
+            }
+        }
+
+        return mContext.getResources().getDrawable(mAlternateIconThirdlyRes);
+    }
+
+    @Override
+    public String getAlternateThirdlyIconDescription() {
+        if (mAlternateIconThirdlyDescriptionRes == 0) return null;
+        return mContext.getResources().getString(mAlternateIconThirdlyDescriptionRes);
+    }
+
     @Override
     public Intent getIntent() {
         return mIntent;
@@ -299,6 +337,11 @@ public class DataAction implements Action {
     @Override
     public Intent getAlternateIntent() {
         return mAlternateIntent;
+    }
+
+    @Override
+    public Intent getAlternateThirdlyIntent() {
+        return mAlternateThirdlyIntent;
     }
 
     @Override

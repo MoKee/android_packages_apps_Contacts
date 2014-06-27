@@ -38,6 +38,17 @@ public interface Action extends Collapser.Collapsible<Action> {
     /** Returns the content description of the icon for the alternate action. */
     public String getAlternateIconDescription();
 
+    // IPCall Start
+    /** Returns an icon that can be clicked for the alternate thirdly action. */
+    public Drawable getAlternateThirdlyIcon();
+
+    /** Returns the content description of the icon for the alternate thirdly action. */
+    public String getAlternateThirdlyIconDescription();
+
+    /** Build an {@link Intent} that will perform the alternate thirdly action. */
+    public Intent getAlternateThirdlyIntent();
+    // IPCall End
+
     /** Build an {@link Intent} that will perform this action. */
     public Intent getIntent();
 
