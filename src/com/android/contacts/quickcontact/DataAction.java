@@ -63,9 +63,9 @@ public class DataAction implements Action {
     private Intent m2AlternateIntent;
     private Intent mAlternateThirdlyIntent;
     private int mAlternateIconDescriptionRes;
-    private int mAlternateIconRes;
     private int mAlternateIconThirdlyDescriptionRes;
     private int m2AlternateIconDescriptionRes;
+    private int mAlternateIconRes;
     private int mAlternateIconThirdlyRes;
     private int mPresence = -1;
     private int m2AlternateIconRes;
