@@ -136,7 +136,7 @@ public class QuickContactListFragment extends Fragment {
                 final ImageView presenceIconView =
                         (ImageView) resultView.findViewById(R.id.presence_icon);
 
-                if(QuickContactActivity.VTCALL_ITEM_TYPE.equals(mimeType)){
+                if (QuickContactActivity.VTCALL_ITEM_TYPE.equals(mimeType)){
                     actionsContainer.setOnClickListener(mThirdActionClickListener);
                     actionsContainer.setTag(action);
                 } else {
@@ -151,7 +151,6 @@ public class QuickContactListFragment extends Fragment {
                 alternateActionButton1.setOnClickListener(mThirdActionClickListener);//add for cavt
                 alternateActionButton1.setTag(action);
 
-                final boolean hasAlternateAction = action.getAlternateIntent() != null;
                 final boolean hasAlternateThirdlyAction = action.getAlternateThirdlyIntent() != null;
                 final boolean isVTTab = QuickContactActivity.VTCALL_ITEM_TYPE.equals(mimeType);
                 final boolean hasAlternateAction = isVTTab ? false

@@ -816,7 +816,6 @@ public class QuickContactActivity extends Activity {
             // Defer the action to make the window properly repaint
             new Handler().post(startAppRunnable);
         }
-    };
 
         @Override
         public void on2ItemClicked(final Action action, final boolean alternate) {
