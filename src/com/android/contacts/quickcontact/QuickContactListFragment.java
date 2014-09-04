@@ -42,6 +42,8 @@ import com.android.contacts.R;
 
 import java.util.List;
 
+import android.os.SystemProperties;
+
 /** A fragment that shows the list of resolve items below a tab */
 public class QuickContactListFragment extends Fragment {
     private ListView mListView;
@@ -128,24 +130,45 @@ public class QuickContactListFragment extends Fragment {
                         R.id.secondary_action_button);
                 final ImageView alternateThirdlyActionButton = (ImageView) resultView.findViewById(
                         R.id.thirdly_action_button);
+                final ImageView alternateActionButton1 = (ImageView) resultView.findViewById(
+                        R.id.third_action_button);
                 final View alternateActionDivider = resultView.findViewById(R.id.vertical_divider);
                 final ImageView presenceIconView =
                         (ImageView) resultView.findViewById(R.id.presence_icon);
 
-                actionsContainer.setOnClickListener(mPrimaryActionClickListener);
-                actionsContainer.setOnLongClickListener(mPrimaryActionLongClickListener);
-                actionsContainer.setTag(action);
+                if(QuickContactActivity.VTCALL_ITEM_TYPE.equals(mimeType)){
+                    actionsContainer.setOnClickListener(mThirdActionClickListener);
+                    actionsContainer.setTag(action);
+                } else {
+                    actionsContainer.setOnClickListener(mPrimaryActionClickListener);
+                    actionsContainer.setOnLongClickListener(mPrimaryActionLongClickListener);
+                    actionsContainer.setTag(action);
+                }
                 alternateActionButton.setOnClickListener(mSecondaryActionClickListener);
                 alternateActionButton.setTag(action);
                 alternateThirdlyActionButton.setOnClickListener(mThirdlyActionClickListener);
                 alternateThirdlyActionButton.setTag(action);
+                alternateActionButton1.setOnClickListener(mThirdActionClickListener);//add for cavt
+                alternateActionButton1.setTag(action);
 
                 final boolean hasAlternateAction = action.getAlternateIntent() != null;
                 final boolean hasAlternateThirdlyAction = action.getAlternateThirdlyIntent() != null;
-                alternateActionDivider.setVisibility(hasAlternateAction ? View.VISIBLE : View.GONE);
+                final boolean isVTTab = QuickContactActivity.VTCALL_ITEM_TYPE.equals(mimeType);
+                final boolean hasAlternateAction = isVTTab ? false
+                        : action.getAlternateIntent() != null;
+                final boolean hasAlternateAction1 = !isVTTab ? false
+                        : action.get2AlternateIntent() != null;
+
+                alternateActionDivider.setVisibility(hasAlternateAction
+                                || hasAlternateAction1 ? View.VISIBLE : View.GONE);
                 alternateActionButton.setImageDrawable(action.getAlternateIcon());
                 alternateActionButton.setContentDescription(action.getAlternateIconDescription());
                 alternateActionButton.setVisibility(hasAlternateAction ? View.VISIBLE : View.GONE);
+
+                alternateActionButton1.setImageDrawable(action.get2AlternateIcon());//csvt
+                alternateActionButton1.setContentDescription(action.get2AlternateIconDescription());
+                alternateActionButton1.setVisibility(hasAlternateAction1
+                                && isVTSupported() ? View.VISIBLE : View.GONE);
                 alternateThirdlyActionButton.setImageDrawable(action.getAlternateThirdlyIcon());
                 alternateThirdlyActionButton.setContentDescription(action.getAlternateThirdlyIconDescription());
                 alternateThirdlyActionButton.setVisibility(hasAlternateThirdlyAction ? View.VISIBLE : View.GONE);
@@ -162,6 +185,10 @@ public class QuickContactListFragment extends Fragment {
                                 .getString(R.string.description_send_message, action.getBody()));
                         alternateThirdlyActionButton.setContentDescription(getActivity()
                                 .getString(R.string.description_ip_call, action.getBody()));
+                    }
+                    if (hasAlternateAction1) {
+                        alternateActionButton1.setContentDescription(getActivity()
+                                .getString(R.string.description_dial_vt, action.getBody()));
                     }
                 }
 
@@ -227,6 +254,15 @@ public class QuickContactListFragment extends Fragment {
         }
     };
 
+    /** A third action (VT) was clicked */
+    protected final OnClickListener mThirdActionClickListener = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            final Action action = (Action) v.getTag();
+            if (mListener != null) mListener.on2ItemClicked(action, true);
+        }
+    };
+
     private final OnClickListener mOutsideClickListener = new OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -234,9 +270,16 @@ public class QuickContactListFragment extends Fragment {
         }
     };
 
+    private boolean isVTSupported(){
+            return SystemProperties.getBoolean(
+                    "persist.radio.csvt.enabled"
+           /* TelephonyProperties.PROPERTY_CSVT_ENABLED*/, false);
+    }
+
     public interface Listener {
         void onOutsideClick();
         void onItemClicked(Action action, boolean alternate);
         void onThirdlyItemClicked(Action action, boolean alternate);
+        void on2ItemClicked(Action action, boolean alternate);
     }
 }
