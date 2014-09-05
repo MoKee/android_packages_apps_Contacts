@@ -44,6 +44,8 @@ import com.android.contacts.common.model.dataitem.StructuredPostalDataItem;
 import com.android.contacts.common.model.dataitem.WebsiteDataItem;
 import com.android.contacts.util.PhoneCapabilityTester;
 import com.android.contacts.util.StructuredPostalUtils;
+import com.android.internal.telephony.MSimConstants;
+import com.android.internal.telephony.PhoneConstants;
 
 /**
  * Description of a specific {@link Data#_ID} item, with style information
@@ -129,12 +131,11 @@ public class DataAction implements Action {
                     }
 
                     // IPCall
-                    Intent ipcallIntent = null;
+                    Intent callIntent = null;
                     if (hasPhone) {
-                        ipcallIntent = new Intent();
-                        ComponentName ipcallComponent = new ComponentName("com.android.dialer", "com.android.dialer.IPCallActivity");
-                        ipcallIntent.putExtra("number", number);
-                        ipcallIntent.setComponent(ipcallComponent);
+                        callIntent = new Intent(CallUtil.getCallIntent(number));
+                        callIntent.putExtra(PhoneConstants.IP_CALL, true);
+                        callIntent.putExtra(MSimConstants.SUBSCRIPTION_KEY, MSimConstants.SUB1);
                     }
                     final Intent videocallIntent = getVTCallIntent(number);
 
@@ -142,7 +143,7 @@ public class DataAction implements Action {
                     if (hasPhone && hasSms) {
                         mIntent = phoneIntent;
                         mAlternateIntent = smsIntent;
-                        mAlternateThirdlyIntent = ipcallIntent;
+                        mAlternateThirdlyIntent = callIntent;
                         mAlternateIconRes = kind.iconAltRes;
                         mAlternateIconDescriptionRes = kind.iconAltDescriptionRes;
                         mAlternateIconThirdlyRes = kind.iconAltThirdlyRes;
