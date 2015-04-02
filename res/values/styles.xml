@@ -74,6 +74,7 @@
         <item name="android:colorPrimaryDark">@color/primary_color_dark</item>
         <item name="android:colorPrimary">@color/primary_color</item>
         <item name="android:colorAccent">@color/primary_color</item>
+        <item name="android:navigationBarColor">@color/primary_color_dark</item>
         <item name="android:alertDialogTheme">@style/ContactsAlertDialogTheme</item>
         <item name="list_item_height">?android:attr/listPreferredItemHeight</item>
         <item name="activated_background">@drawable/list_item_activated_background</item>
