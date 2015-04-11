@@ -47,6 +47,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
+import android.mokee.utils.MoKeeUtils;
 import android.net.Uri;
 import android.net.Uri.Builder;
 import android.os.AsyncTask;
@@ -1378,8 +1379,10 @@ public class MultiPickContactActivity extends ListActivity implements
 
                 CharSequence numberLabel = null;
                 if (callerNumberType != 0 && !PhoneNumberUtils.isUriNumber(cache.number)) {
-                    numberLabel = Phone.getDisplayLabel(context, callerNumberType,
-                            callerNumberLabel);
+                    numberLabel = MoKeeUtils.isSupportLanguage(true) ? TextUtils.isEmpty(geocodedLocation) ? Phone.getDisplayLabel(context, callerNumberType,
+                            callerNumberLabel) : Phone.getDisplayLabel(context, callerNumberType,
+                                    callerNumberLabel) + " " + geocodedLocation : Phone.getDisplayLabel(context, callerNumberType,
+                                            callerNumberLabel) ;
                 } else {
                     numberLabel = geocodedLocation;
                 }
