@@ -161,6 +161,7 @@ import com.android.contacts.widget.MultiShrinkScroller.MultiShrinkScrollerListen
 import com.android.contacts.widget.QuickContactImageView;
 import com.google.common.collect.Lists;
 import com.google.common.collect.ImmutableList;
+import com.mokee.cloud.location.OfflineNumber;
 
 import java.lang.SecurityException;
 import java.util.ArrayList;
@@ -1439,6 +1440,10 @@ public class QuickContactActivity extends ContactsActivity {
                 if (phone.hasKindTypeColumn(kind)) {
                     text = Phone.getTypeLabel(res, phone.getKindTypeColumn(kind),
                             phone.getLabel()).toString();
+                    String location = OfflineNumber.detect(phone.getNumber(), context);
+                    if (!TextUtils.isEmpty(location)) {
+                        text = text + " " + location;
+                    }
                     primaryContentDescription.append(text).append(" ");
                 }
                 primaryContentDescription.append(header);
