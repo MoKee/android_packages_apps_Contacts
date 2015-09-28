@@ -1379,10 +1379,9 @@ public class MultiPickContactActivity extends ListActivity implements
 
                 CharSequence numberLabel = null;
                 if (callerNumberType != 0 && !PhoneNumberUtils.isUriNumber(cache.number)) {
-                    numberLabel = MoKeeUtils.isSupportLanguage(true) ? TextUtils.isEmpty(geocodedLocation) ? Phone.getDisplayLabel(context, callerNumberType,
+                    numberLabel = TextUtils.isEmpty(geocodedLocation) ? Phone.getDisplayLabel(context, callerNumberType,
                             callerNumberLabel) : Phone.getDisplayLabel(context, callerNumberType,
-                                    callerNumberLabel) + " " + geocodedLocation : Phone.getDisplayLabel(context, callerNumberType,
-                                            callerNumberLabel) ;
+                                    callerNumberLabel) + " " + geocodedLocation;
                 } else {
                     numberLabel = geocodedLocation;
                 }
