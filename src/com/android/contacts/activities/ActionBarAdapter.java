@@ -388,7 +388,7 @@ public class ActionBarAdapter implements OnCloseListener {
     }
 
     private void update(boolean skipAnimation) {
-        updateStatusBarColor();
+        updateNavigationBarAndStatusBarColor();
 
         final boolean isSelectionModeChanging
                 = (mSelectionContainer.getParent() == null) == mSelectionMode;
@@ -481,7 +481,7 @@ public class ActionBarAdapter implements OnCloseListener {
         textView.setText(String.valueOf(selectionCount));
     }
 
-    private void updateStatusBarColor() {
+    private void updateNavigationBarAndStatusBarColor() {
         if (mSelectionMode) {
             int cabStatusBarColor = mActivity.getResources().getColor(
                     R.color.contextual_selection_bar_status_bar_color);
