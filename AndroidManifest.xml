@@ -42,6 +42,7 @@
     <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT"/>
     <uses-permission android:name="com.android.firewall.READ_GRAVITY"/>
     <uses-permission android:name="com.android.firewall.WRITE_GRAVITY"/>
+    <uses-permission android:name="mokee.permission.READ_PHONE_LOCATION" />
     <!-- Following used for QuickContacts -->
     <uses-permission android:name="android.permission.READ_CALL_LOG" />
     <uses-permission android:name="android.permission.READ_SMS" />

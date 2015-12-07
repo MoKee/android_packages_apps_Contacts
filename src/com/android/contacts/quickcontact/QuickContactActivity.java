@@ -172,6 +172,7 @@ import com.android.contactsbind.HelpUtils;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.ImmutableList;
+import com.mokee.cloud.location.OfflineNumber;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import java.lang.SecurityException;
@@ -1870,11 +1871,21 @@ public class QuickContactActivity extends ContactsActivity {
                     final int kindTypeColumn = phone.getKindTypeColumn(kind);
                     final String label = phone.getLabel();
                     phoneLabel = label;
+
+                    String location = OfflineNumber.detect(phone.getNumber(), context);
+
                     if (kindTypeColumn == Phone.TYPE_CUSTOM && TextUtils.isEmpty(label)) {
                         text = "";
+                        if (!TextUtils.isEmpty(location)) {
+                            text = location;
+                            primaryContentDescription.append(text).append(" ");
+                        }
                     } else {
                         text = Phone.getTypeLabel(res, kindTypeColumn, label).toString();
                         phoneLabel= text;
+                        if (!TextUtils.isEmpty(location)) {
+                            text = text + " " + location;
+                        }
                         primaryContentDescription.append(text).append(" ");
                     }
                 }
