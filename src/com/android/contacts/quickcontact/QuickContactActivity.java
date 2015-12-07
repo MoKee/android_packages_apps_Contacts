@@ -951,7 +951,7 @@ public class QuickContactActivity extends ContactsActivity {
         }
 
         getWindow().setStatusBarColor(Color.TRANSPARENT);
-
+        getWindow().setNavigationBarColor(Color.TRANSPARENT);
 
         // Show QuickContact in front of soft input
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM,
