@@ -184,6 +184,7 @@ public class MultiPickContactActivity extends ListActivity implements
     private static final int CALL_LOG_CALLER_NUMBERTYPE_COLUMN_INDEX = 6;
     private static final int CALL_LOG_CALLER_NUMBERLABEL_COLUMN_INDEX = 7;
     private static final int CALL_LOG_ACCOUNT_ID_COLUMN_INDEX = 8;
+    private static final int CALL_LOG_CALLER_LOCATION_COLUMN_INDEX = 9;
     //phone column
     private static final int PHONE_COLUMN_ID = 0;
     private static final int PHONE_COLUMN_TYPE = 1;
@@ -1349,6 +1350,7 @@ public class MultiPickContactActivity extends ListActivity implements
                 int callerNumberType = cursor.getInt(CALL_LOG_CALLER_NUMBERTYPE_COLUMN_INDEX);
                 String callerNumberLabel = cursor
                         .getString(CALL_LOG_CALLER_NUMBERLABEL_COLUMN_INDEX);
+                String geocodedLocation = cursor.getString(CALL_LOG_CALLER_LOCATION_COLUMN_INDEX);
                 String subscriptionId = cursor.getString(CALL_LOG_ACCOUNT_ID_COLUMN_INDEX);
                 long date = cursor.getLong(CALL_LOG_DATE_COLUMN_INDEX);
                 long duration = cursor.getLong(CALL_LOG_DURATION_COLUMN_INDEX);
@@ -1402,6 +1404,9 @@ public class MultiPickContactActivity extends ListActivity implements
                 if (!PhoneNumberUtils.isUriNumber(number)) {
                     numberLabel = Phone.getTypeLabel(context.getResources(),
                             callerNumberType, callerNumberLabel);
+                    if (!TextUtils.isEmpty(geocodedLocation)) {
+                        numberLabel = numberLabel + " " + geocodedLocation;
+                    }
                 }
                 if (!TextUtils.isEmpty(numberLabel)) {
                     numberLableText.setText(numberLabel);
