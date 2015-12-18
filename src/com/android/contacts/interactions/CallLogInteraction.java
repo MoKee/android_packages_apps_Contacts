@@ -31,6 +31,7 @@ import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.text.BidiFormatter;
 import android.text.Spannable;
 import android.text.TextDirectionHeuristics;
+import android.text.TextUtils;
 
 /**
  * Represents a call log event interaction, wrapping the columns in
@@ -77,12 +78,17 @@ public class CallLogInteraction implements ContactInteraction {
 
     @Override
     public String getViewBody(Context context) {
+        String location = getGeocodedLocation();
         Integer numberType = getCachedNumberType();
-        if (numberType == null) {
+        if (numberType == null && TextUtils.isEmpty(location)) {
             return null;
-        }
-        return Phone.getTypeLabel(context.getResources(), getCachedNumberType(),
+        } else if (numberType == null) {
+            return location;
+        } else {
+            String label = Phone.getTypeLabel(context.getResources(), getCachedNumberType(),
                 getCachedNumberLabel()).toString();
+            return TextUtils.isEmpty(location) ? label : label + " " + location;
+        }
     }
 
     @Override
@@ -136,6 +142,10 @@ public class CallLogInteraction implements ContactInteraction {
 
     public String getCachedNumberLabel() {
         return mValues.getAsString(Calls.CACHED_NUMBER_LABEL);
+    }
+
+    public String getGeocodedLocation() {
+        return mValues.getAsString(Calls.GEOCODED_LOCATION);
     }
 
     public Integer getCachedNumberType() {
