@@ -1948,6 +1948,12 @@ public class QuickContactActivity extends ContactsActivity {
         if (dataItems.get(0).getMimeType().equals(MIMETYPE_GPLUS_PROFILE) ||
                 dataItems.get(0).getMimeType().equals(MIMETYPE_HANGOUTS)) {
             return gPlusOrHangoutsDataItemsToEntries(dataItems);
+        } else if (dataItems.get(0).getMimeType().equals(GroupMembership.CONTENT_ITEM_TYPE)) {
+            final Entry entry = groupDataItemsToEntry(dataItems);
+            if (entry != null) {
+                return Lists.newArrayList(entry);
+            }
+            return null;
         } else {
             final List<Entry> entries = new ArrayList<>();
             for (DataItem dataItem : dataItems) {
@@ -1959,6 +1965,48 @@ public class QuickContactActivity extends ContactsActivity {
             }
             return entries;
         }
+    }
+
+    private Entry groupDataItemsToEntry(List<DataItem> dataItems) {
+        final List<String> titles = new ArrayList<>();
+        for (DataItem dataItem : dataItems) {
+            if (!(dataItem instanceof GroupMembershipDataItem)) {
+                continue;
+            }
+
+            final GroupMembershipDataItem groupItem = (GroupMembershipDataItem) dataItem;
+            if (groupItem.isDefaultGroup() || groupItem.isFavoritesGroup()) {
+                continue;
+            }
+            final String title = groupItem.getGroupTitle();
+            if (title != null) {
+                titles.add(title);
+            }
+        }
+        if (titles.isEmpty()) {
+            return null;
+        }
+
+        return new Entry(/* viewId = */ -1, /* icon = */ null,
+                /* header */ getResources().getString(R.string.contacts_groups_label),
+                /* subHeader */ null,
+                /* subHeaderIcon = */ null,
+                /* text = */ TextUtils.join(", ", titles),
+                /* textIcon = */ null,
+                /* primaryContentDescription = */ null,
+                /* intent = */ null,
+                /* alternateIcon = */ null,
+                /* alternateIntent = */ null,
+                /* alternateContentDescription = */ null,
+                /* shouldApplyColor = */ true,
+                /* isEditable = */ false,
+                /* EntryContextMenuInfo = */ null,
+                /* thirdIcon = */ null,
+                /* thirdIntent = */ null,
+                /* thirdContentDescription = */ null,
+                /* thirdAction = */ Entry.ACTION_NONE,
+                /* thirdExtras = */ null,
+                /* iconResourceId = */ 0);
     }
 
     /**
