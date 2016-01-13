@@ -20,6 +20,7 @@ import android.accounts.Account;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
+import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.app.SearchManager;
@@ -109,6 +110,7 @@ import com.android.contacts.common.GroupMetaData;
 import com.android.contacts.common.activity.RequestPermissionsActivity;
 import com.android.contacts.common.dialog.CallSubjectDialog;
 import com.android.contacts.common.editor.SelectAccountDialogFragment;
+import com.android.contacts.common.activity.fragment.BlockContactDialogFragment;
 import com.android.contacts.common.interactions.TouchPointManager;
 import com.android.contacts.common.lettertiles.LetterTileDrawable;
 import com.android.contacts.common.list.ShortcutIntentBuilder;
@@ -135,6 +137,7 @@ import com.android.contacts.common.model.dataitem.SipAddressDataItem;
 import com.android.contacts.common.model.dataitem.StructuredNameDataItem;
 import com.android.contacts.common.model.dataitem.StructuredPostalDataItem;
 import com.android.contacts.common.model.dataitem.WebsiteDataItem;
+import com.android.contacts.common.util.BlockContactHelper;
 import com.android.contacts.common.util.ImplicitIntentsUtil;
 import com.android.contacts.common.MoreContactUtils;
 import com.android.contacts.common.SimContactsConstants;
@@ -167,6 +170,7 @@ import com.android.contacts.widget.MultiShrinkScroller.MultiShrinkScrollerListen
 import com.android.contacts.widget.QuickContactImageView;
 import com.android.contactsbind.HelpUtils;
 
+import com.cyanogen.lookup.phonenumber.provider.LookupProviderImpl;
 import com.google.common.collect.Lists;
 import com.google.common.collect.ImmutableList;
 import com.mokee.cloud.location.OfflineNumber;
@@ -189,7 +193,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * data asynchronously, and then shows a popup with details centered around
  * {@link Intent#getSourceBounds()}.
  */
-public class QuickContactActivity extends ContactsActivity {
+public class QuickContactActivity extends ContactsActivity implements
+        BlockContactDialogFragment.BlockContactCallbacks {
 
     /**
      * QuickContacts immediately takes up the full screen. All possible information is shown.
@@ -280,6 +285,7 @@ public class QuickContactActivity extends ContactsActivity {
     private final ImageViewDrawableSetter mPhotoSetter = new ImageViewDrawableSetter();
 
     private Target mContactBitmapTarget;
+    private BlockContactHelper mBlockContactHelper;
 
     /**
      * {@link #LEADING_MIMETYPES} is used to sort MIME-types.
@@ -466,6 +472,16 @@ public class QuickContactActivity extends ContactsActivity {
             mScroller.setDisableTouchesForSuppressLayout(/* areTouchesDisabled = */ false);
         }
     };
+
+    @Override
+    public void onBlockContact(boolean notifyLookupProvider) {
+        mBlockContactHelper.blockContactAsync(notifyLookupProvider);
+    }
+
+    @Override
+    public void onUnblockContact(boolean notifyLookupProvider) {
+        mBlockContactHelper.unblockContactAsync(notifyLookupProvider);
+    }
 
     private interface ContextMenuIds {
         static final int COPY_TEXT = 0;
@@ -887,6 +903,11 @@ public class QuickContactActivity extends ContactsActivity {
                     });
         }
         processIntent(getIntent());
+        mBlockContactHelper = new BlockContactHelper(this, new LookupProviderImpl(this));
+        if (mContactData != null) {
+            mBlockContactHelper.setContactInfo(mContactData);
+            mBlockContactHelper.gatherDataInBackground();
+        }
         Trace.endSection();
     }
 
@@ -2317,7 +2338,8 @@ public class QuickContactActivity extends ContactsActivity {
                     finish();
                     return;
                 }
-
+                mBlockContactHelper.setContactInfo(data);
+                mBlockContactHelper.gatherDataInBackground();
                 bindContactData(data);
 
             } finally {
@@ -2826,6 +2848,14 @@ public class QuickContactActivity extends ContactsActivity {
                 }
             }
 
+            // set block or un-block menu titles accordingly
+            final MenuItem blockMenuItem = menu.findItem(R.id.menu_block_contact);
+            if (mBlockContactHelper.isContactBlacklisted()) {
+                blockMenuItem.setTitle(R.string.menu_unblock_contact);
+            } else {
+                blockMenuItem.setTitle(R.string.menu_block_contact);
+            }
+
             return true;
         }
         return false;
@@ -2936,6 +2966,16 @@ public class QuickContactActivity extends ContactsActivity {
             case R.id.menu_copy_to_sim2: {
                 if (mContactData == null) return false;
                 copyToCard(PhoneConstants.SUB2);
+                return true;
+            }
+            case R.id.menu_block_contact: {
+                // block contact dialog fragment
+                DialogFragment f = mBlockContactHelper.getBlockContactDialog(
+                        mBlockContactHelper.isContactBlacklisted() ?
+                                BlockContactHelper.BlockMode.UNBLOCK :
+                                BlockContactHelper.BlockMode.BLOCK
+                );
+                f.show(getFragmentManager(), "block_contact");
                 return true;
             }
             default:
