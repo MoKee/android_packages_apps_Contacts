@@ -960,17 +960,16 @@ public class QuickContactActivity extends ContactsActivity implements
         mLookupUri = lookupUri;
         mExcludeMimes = intent.getStringArrayExtra(QuickContact.EXTRA_EXCLUDE_MIMES);
 
-        Contact contact = null;
-        if (mLookupUri == null) {
-            // See if a URI has been attached as an extra
-            mLookupUri = intent.getParcelableExtra(Contact.CONTACT_URI_EXTRA);
-            contact = ContactLoader.parseEncodedContactEntity(mLookupUri,
-                    ContactLoader.EncodedContactEntitySchemaVersion.ENHANCED_CALLER_META_DATA);
-        }
-
         if (mLookupUri == null) {
             finish();
             return;
+        }
+
+        Contact contact = null;
+        if (UriUtils.isEncodedContactUri(mLookupUri)) {
+            // try to parse it as an ENHANCED_CALLER_META_DATA uri
+            contact = ContactLoader.parseEncodedContactEntity(mLookupUri,
+                    ContactLoader.EncodedContactEntitySchemaVersion.ENHANCED_CALLER_META_DATA);
         }
 
         if (contact != null) {
@@ -2972,8 +2971,8 @@ public class QuickContactActivity extends ContactsActivity implements
                 // block contact dialog fragment
                 DialogFragment f = mBlockContactHelper.getBlockContactDialog(
                         mBlockContactHelper.isContactBlacklisted() ?
-                                BlockContactHelper.BlockMode.UNBLOCK :
-                                BlockContactHelper.BlockMode.BLOCK
+                                BlockContactHelper.BlockOperation.UNBLOCK :
+                                BlockContactHelper.BlockOperation.BLOCK
                 );
                 f.show(getFragmentManager(), "block_contact");
                 return true;
