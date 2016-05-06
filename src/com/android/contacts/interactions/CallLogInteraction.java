@@ -105,13 +105,19 @@ public class CallLogInteraction implements ContactInteraction {
     public String getViewBody(Context context) {
         String location = getGeocodedLocation();
         Integer numberType = getCachedNumberType();
-        if (numberType == null && TextUtils.isEmpty(location)) {
+        if (numberType == null) {
+            numberType = Phone.TYPE_CUSTOM;
+        }
+
+        final String cachedNumberLabel = getCachedNumberLabel();
+        final String label = ContactDisplayUtils.getLabelForCall(context, getNumber(), numberType,
+                cachedNumberLabel, mPluginName);
+
+        if (TextUtils.isEmpty(label) && TextUtils.isEmpty(location)) {
             return null;
-        } else if (numberType == null) {
+        } else if (TextUtils.isEmpty(label)) {
             return location;
         } else {
-            String label = Phone.getTypeLabel(context.getResources(), getCachedNumberType(),
-                getCachedNumberLabel()).toString();
             return TextUtils.isEmpty(location) ? label : label + " " + location;
         }
     }

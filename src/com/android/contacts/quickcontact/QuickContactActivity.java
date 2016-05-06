@@ -283,7 +283,6 @@ public class QuickContactActivity extends ContactsActivity implements
     private AsyncTask<Contact, Void, Cp2DataCardModel> mEntriesAndActionsTask;
     private AsyncTask<Void, Void, Void> mRecentDataTask;
     private AtomicBoolean mIsUpdating;
-    private boolean mNeedPluginUpdate = false;
     private static final String CALL_METHOD_SUBSCRIBER_ID = TAG;
     /**
      * The last copy of Cp2DataCardModel that was passed to {@link #populateContactAndAboutCard}.
@@ -1198,10 +1197,6 @@ public class QuickContactActivity extends ContactsActivity implements
                 bindDataToCards(cardDataModel);
                 showActivity();
                 mIsUpdating.set(false);
-            }
-            if (mNeedPluginUpdate) {
-                mNeedPluginUpdate = false;
-                updatePlugins(null);
             }
             if (DEBUG) Log.d(TAG, "---onPostExecute");
         }
@@ -3527,6 +3522,7 @@ public class QuickContactActivity extends ContactsActivity implements
                         null,
                         null,
                         null,
+                        Entry.ACTION_INTENT,
                         cmi.mBrandIconId,
                         cmi,
                         containerList, parentList);
@@ -3553,6 +3549,7 @@ public class QuickContactActivity extends ContactsActivity implements
                             res.getString(R.string.incall_plugin_invite),
                             null,
                             new Intent(ACTION_INCALL_PLUGIN_INVITE),
+                            Entry.ACTION_INTENT,
                             cmi.mBrandIconId,
                             cmi,
                             containerList, parentList);
@@ -3582,6 +3579,7 @@ public class QuickContactActivity extends ContactsActivity implements
                                 null,
                                 null,
                                 null,
+                                Entry.ACTION_INTENT,
                                 cmi.mBrandIconId,
                                 cmi,
                                 containerList, parentList);
@@ -3626,6 +3624,7 @@ public class QuickContactActivity extends ContactsActivity implements
                         null,
                         cmi.mVoiceIcon,
                         callIntent,
+                        Entry.ACTION_INTENT,
                         cmi.mBrandIconId,
                         cmi,
                         entries, parentList);
@@ -3638,11 +3637,19 @@ public class QuickContactActivity extends ContactsActivity implements
                         cmi.mBrandIcon,
                         contactAccountHandle,
                         res.getString(R.string.incall_plugin_account_subheader, cmi.mName),
-                        null, null,
+                        null,
+                        null,
                         new Intent(ACTION_INCALL_PLUGIN_LOGIN),
-                        null, null, null, null,
-                        null, cmi.mBrandIconId,
-                        cmi, entries, parentList);
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        Entry.ACTION_INTENT,
+                        cmi.mBrandIconId,
+                        cmi,
+                        entries,
+                        parentList);
                 if (DEBUG) Log.d(TAG, "Adding ACCOUNT ENTRY");
             }
             entries.add(entry);
@@ -3734,7 +3741,8 @@ public class QuickContactActivity extends ContactsActivity implements
                     InCallPluginUtils.displayPendingIntentError(mScroller,
                             getResources().getString(R.string.incall_plugin_intent_error));
                 }
-                InCallMetricsHelper.increaseInviteCount(this, cmi.mComponent.flattenToString());
+                InCallMetricsHelper.increaseCount(this, InCallMetricsHelper.Events.INVITES_SENT,
+                        cmi.mComponent.flattenToString());
             } else if (intent.getAction().equals(ACTION_INCALL_PLUGIN_DIRECTORY_SEARCH)) {
                 if (cpi != null && cpi.mDirectorySearchIntent != null) {
                     cpi.mDirectorySearchIntent.send();
@@ -3742,6 +3750,8 @@ public class QuickContactActivity extends ContactsActivity implements
                     InCallPluginUtils.displayPendingIntentError(mScroller,
                             getResources().getString(R.string.incall_plugin_intent_error));
                 }
+                InCallMetricsHelper.increaseCount(this, InCallMetricsHelper.Events.DIRECTORY_SEARCH,
+                        cmi.mComponent.flattenToString());
             }
         } catch (PendingIntent.CanceledException e) {
             if (DEBUG) Log.d(TAG, "handleInCallPluginAction ", e);
