@@ -245,7 +245,7 @@ public class InCallMetricsHelper {
                         map.put(Parameters.COUNT, cv.getAsInteger(Parameters.COUNT.toCol()));
                         map.put(Parameters.NUDGE_ID, cv.getAsString(Parameters.NUDGE_ID.toCol()));
                         map.put(Parameters.EVENT_ACCEPTANCE_TIME,
-                                cv.getAsInteger(Parameters.EVENT_ACCEPTANCE_TIME.toCol()));
+                                cv.getAsLong(Parameters.EVENT_ACCEPTANCE_TIME.toCol()));
                         map.put(Parameters.EVENT_ACCEPTANCE,
                                 cv.getAsInteger(Parameters.EVENT_ACCEPTANCE.toCol()) == 0 ?
                                         Boolean.FALSE : Boolean.TRUE);
@@ -259,6 +259,7 @@ public class InCallMetricsHelper {
                     case CONTACTS_AUTO_MERGED:
                     case CONTACTS_MANUAL_MERGED:
                     case INVITES_SENT:
+                    case DIRECTORY_SEARCH:
                         map.put(Parameters.COUNT, cv.getAsInteger(Parameters.COUNT.toCol()));
                         break;
                     default:
@@ -267,6 +268,9 @@ public class InCallMetricsHelper {
                 break;
             default:
                 break;
+        }
+        if (DEBUG) {
+            Log.d(TAG, event.value() + ": " + map.toString());
         }
         return map;
     }
