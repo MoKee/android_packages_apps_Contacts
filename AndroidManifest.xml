@@ -52,6 +52,9 @@
     <!-- Following used for Contact metadata syncing -->
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
 
+    <!-- Following used for phone location data -->
+    <uses-permission android:name="mokee.permission.READ_PHONE_LOCATION" />
+
     <application
         android:name="com.android.contacts.ContactsApplication"
         android:label="@string/applicationLabel"
