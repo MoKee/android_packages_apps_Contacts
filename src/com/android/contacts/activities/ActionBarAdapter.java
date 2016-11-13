@@ -408,7 +408,7 @@ public class ActionBarAdapter implements OnCloseListener {
     }
 
     private void update(boolean skipAnimation) {
-        updateStatusBarColor();
+        updateNavigationBarAndStatusBarColor();
 
         final boolean isSelectionModeChanging
                 = (mSelectionContainer.getParent() == null) == mSelectionMode;
@@ -585,7 +585,7 @@ public class ActionBarAdapter implements OnCloseListener {
         }
     }
 
-    private void updateStatusBarColor() {
+    private void updateNavigationBarAndStatusBarColor() {
         if (!CompatUtils.isLollipopCompatible()) {
             return; // we can't change the status bar color prior to Lollipop
         }
@@ -593,10 +593,12 @@ public class ActionBarAdapter implements OnCloseListener {
             final int cabStatusBarColor = mActivity.getResources().getColor(
                     R.color.contextual_selection_bar_status_bar_color);
             mActivity.getWindow().setStatusBarColor(cabStatusBarColor);
+            mActivity.getWindow().setNavigationBarColor(cabStatusBarColor);
         } else {
             final int normalStatusBarColor = ContextCompat.getColor(
                     mActivity, R.color.primary_color_dark);
             mActivity.getWindow().setStatusBarColor(normalStatusBarColor);
+            mActivity.getWindow().setNavigationBarColor(normalStatusBarColor);
         }
     }
 
