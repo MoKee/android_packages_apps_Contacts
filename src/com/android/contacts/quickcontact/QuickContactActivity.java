@@ -233,6 +233,7 @@ public class QuickContactActivity extends ContactsActivity
     private static final String KEY_SUGGESTIONS_AUTO_SELECTED = "suggestions_auto_seleted";
 
     private static final int ANIMATION_STATUS_BAR_COLOR_CHANGE_DURATION = 150;
+    private static final int ANIMATION_NAVIGATION_BAR_COLOR_CHANGE_DURATION = 150;
     private static final int REQUEST_CODE_CONTACT_EDITOR_ACTIVITY = 1;
     private static final int SCRIM_COLOR = Color.argb(0xC8, 0, 0, 0);
     private static final int REQUEST_CODE_CONTACT_SELECTION_ACTIVITY = 2;
@@ -265,6 +266,7 @@ public class QuickContactActivity extends ContactsActivity
     private int mExtraMode;
     private String mExtraPrioritizedMimeType;
     private int mStatusBarColor;
+    private int mNavigationBarColor;
     private boolean mHasAlreadyBeenOpened;
     private boolean mOnlyOnePhoneNumber;
     private boolean mOnlyOneEmail;
@@ -807,11 +809,13 @@ public class QuickContactActivity extends ContactsActivity
         @Override
         public void onEnterFullscreen() {
             updateStatusBarColor();
+            updateNavigationBarColor();
         }
 
         @Override
         public void onExitFullscreen() {
             updateStatusBarColor();
+            updateNavigationBarColor();
         }
 
         @Override
@@ -952,6 +956,7 @@ public class QuickContactActivity extends ContactsActivity
 
         if (CompatUtils.isLollipopCompatible()) {
             getWindow().setStatusBarColor(Color.TRANSPARENT);
+            getWindow().setNavigationBarColor(Color.TRANSPARENT);
         }
 
         tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
@@ -2424,7 +2429,9 @@ public class QuickContactActivity extends ContactsActivity
         mColorFilterColor = palette.mPrimaryColor;
         mScroller.setHeaderTintColor(mColorFilterColor);
         mStatusBarColor = palette.mSecondaryColor;
+        mNavigationBarColor = palette.mSecondaryColor;
         updateStatusBarColor();
+        updateNavigationBarColor();
 
         mColorFilter =
                 new PorterDuffColorFilter(mColorFilterColor, PorterDuff.Mode.SRC_ATOP);
@@ -2449,6 +2456,25 @@ public class QuickContactActivity extends ContactsActivity
         final ObjectAnimator animation = ObjectAnimator.ofInt(getWindow(), "statusBarColor",
                 getWindow().getStatusBarColor(), desiredStatusBarColor);
         animation.setDuration(ANIMATION_STATUS_BAR_COLOR_CHANGE_DURATION);
+        animation.setEvaluator(new ArgbEvaluator());
+        animation.start();
+    }
+
+    private void updateNavigationBarColor() {
+        if (mScroller == null || !CompatUtils.isLollipopCompatible()) {
+            return;
+        }
+        final int desiredNavigationBarColor;
+        // Only use a custom navigation bar color if QuickContacts touches the top of the viewport.
+        if (mScroller.getScrollNeededToBeFullScreen() <= 0) {
+            desiredNavigationBarColor = mNavigationBarColor;
+        } else {
+            desiredNavigationBarColor = Color.TRANSPARENT;
+        }
+        // Animate to the new color.
+        final ObjectAnimator animation = ObjectAnimator.ofInt(getWindow(), "navigationBarColor",
+                getWindow().getNavigationBarColor(), desiredNavigationBarColor);
+        animation.setDuration(ANIMATION_NAVIGATION_BAR_COLOR_CHANGE_DURATION);
         animation.setEvaluator(new ArgbEvaluator());
         animation.start();
     }
