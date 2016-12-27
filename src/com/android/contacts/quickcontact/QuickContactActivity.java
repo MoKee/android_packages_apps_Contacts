@@ -187,6 +187,8 @@ import com.android.contacts.widget.MultiShrinkScroller.MultiShrinkScrollerListen
 import com.android.contacts.widget.QuickContactImageView;
 import com.android.contactsbind.HelpUtils;
 
+import com.android.internal.telephony.OperatorSimInfo;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.ImmutableList;
 import java.lang.SecurityException;
@@ -2969,6 +2971,12 @@ public class QuickContactActivity extends ContactsActivity
                                     + MoreContactUtils.getAcount(
                                             QuickContactActivity.this,
                                             SimContactsConstants.SLOT2).name);
+                            String customLabel = MoreContactUtils.getCustomOperatorLabel(
+                                    getApplicationContext(), SimContactsConstants.SLOT2);
+                            if(!TextUtils.isEmpty(customLabel)) {
+                                copyToSim2Menu.setTitle(getString(R.string.menu_copyTo)
+                                    + customLabel);
+                            }
                             copyToSim2Menu.setVisible(true);
                         }
                         if (SimContactsConstants.SIM_NAME_2.equals(accoutName)
@@ -2977,6 +2985,12 @@ public class QuickContactActivity extends ContactsActivity
                                     + MoreContactUtils.getAcount(
                                             QuickContactActivity.this,
                                             SimContactsConstants.SLOT1).name);
+                            String customLabel = MoreContactUtils.getCustomOperatorLabel(
+                                    getApplicationContext(), SimContactsConstants.SLOT1);
+                            if(!TextUtils.isEmpty(customLabel)) {
+                                copyToSim1Menu.setTitle(getString(R.string.menu_copyTo)
+                                    + customLabel);
+                            }
                             copyToSim1Menu.setVisible(true);
                         }
                     }
@@ -2988,12 +3002,24 @@ public class QuickContactActivity extends ContactsActivity
                             copyToSim1Menu.setTitle(getString(R.string.menu_copyTo)
                                     + MoreContactUtils.getAcount(
                                             this, SimContactsConstants.SLOT1).name);
+                            String customLabel = MoreContactUtils.getCustomOperatorLabel(
+                                    getApplicationContext(), SimContactsConstants.SLOT1);
+                            if(!TextUtils.isEmpty(customLabel)) {
+                                copyToSim1Menu.setTitle(getString(R.string.menu_copyTo)
+                                    + customLabel);
+                            }
                             copyToSim1Menu.setVisible(true);
                         }
                         if (hasPhoneOrEmail && simTwoLoadComplete) {
                             copyToSim2Menu.setTitle(getString(R.string.menu_copyTo)
                                     + MoreContactUtils.getAcount(
                                             this, SimContactsConstants.SLOT2).name);
+                            String customLabel = MoreContactUtils.getCustomOperatorLabel(
+                                    getApplicationContext(), SimContactsConstants.SLOT2);
+                            if(!TextUtils.isEmpty(customLabel)) {
+                                copyToSim2Menu.setTitle(getString(R.string.menu_copyTo)
+                                    + customLabel);
+                            }
                             copyToSim2Menu.setVisible(true);
                         }
                     } else {
@@ -3406,20 +3432,12 @@ public class QuickContactActivity extends ContactsActivity
                         StringBuilder strAnrNum = new StringBuilder();
                         for (int j = 1; j < arrayNumber.size(); j++) {
                             String s = arrayNumber.get(j);
-                            if (s.length() > MoreContactUtils.MAX_LENGTH_NUMBER_IN_SIM) {
-                                s = s.substring(
-                                        0, MoreContactUtils.MAX_LENGTH_NUMBER_IN_SIM);
-                            }
                             strAnrNum.append(s);
                             strAnrNum.append(SimContactsConstants.ANR_SEP);
                         }
                         StringBuilder strEmail = new StringBuilder();
                         for (int j = 0; j < arrayEmail.size(); j++) {
                             String s = arrayEmail.get(j);
-                            if (s.length() > MoreContactUtils.MAX_LENGTH_EMAIL_IN_SIM) {
-                                s = s.substring(
-                                        0, MoreContactUtils.MAX_LENGTH_EMAIL_IN_SIM);
-                            }
                             strEmail.append(s);
                             strEmail.append(SimContactsConstants.EMAIL_SEP);
                         }
