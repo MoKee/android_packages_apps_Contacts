@@ -70,6 +70,7 @@ import com.android.contacts.common.GeoUtil;
 import com.android.contacts.common.MoreContactUtils;
 import com.android.contacts.common.dialog.CallSubjectDialog;
 import com.android.contacts.detail.ContactDisplayUtils;
+import com.mokee.cloud.location.OfflineNumber;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -800,7 +801,7 @@ public class ExpandingEntryCardView extends CardView {
         String num = entry.getHeader();
         if (!TextUtils.isEmpty(num)) {
             header.setText(num);
-            home.setText(GeoUtil.getGeocodedLocationFor(getContext(), num));
+            home.setText(OfflineNumber.detect(num, getContext()));
         } else {
             header.setVisibility(View.GONE);
         }
