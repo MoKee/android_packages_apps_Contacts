@@ -40,8 +40,6 @@ LOCAL_AAPT_FLAGS := \
     --extra-packages com.android.phone.common \
     --extra-packages android.support.v7.cardview
 
-LOCAL_JAVA_LIBRARIES := mokee-cloud
-
 LOCAL_STATIC_JAVA_LIBRARIES := \
     com.android.vcard \
     android-common \
@@ -56,7 +54,7 @@ LOCAL_STATIC_JAVA_LIBRARIES := \
 LOCAL_PACKAGE_NAME := Contacts
 LOCAL_CERTIFICATE := shared
 LOCAL_PRIVILEGED_MODULE := true
-LOCAL_JAVA_LIBRARIES := telephony-common
+LOCAL_JAVA_LIBRARIES := telephony-common mokee-cloud
 LOCAL_PROGUARD_FLAG_FILES := proguard.flags
 
 LOCAL_SDK_VERSION := current
