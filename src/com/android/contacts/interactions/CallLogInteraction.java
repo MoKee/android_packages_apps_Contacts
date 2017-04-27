@@ -113,7 +113,7 @@ public class CallLogInteraction implements ContactInteraction {
         switch (type) {
             case Calls.INCOMING_TYPE:
                 callArrow = res.getDrawable(CALL_ARROW_ICON_RES);
-                callArrow.setColorFilter(res.getColor(R.color.call_arrow_green),
+                callArrow.setColorFilter(res.getColor(R.color.call_arrow_blue),
                         PorterDuff.Mode.MULTIPLY);
                 break;
             case Calls.MISSED_TYPE:

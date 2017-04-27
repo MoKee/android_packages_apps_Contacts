@@ -54,7 +54,8 @@
     <!-- Color of the margin for cards -->
     <color name="card_margin_color">#f4f4f4</color>
 
-    <color name="call_arrow_green">#2aad6f</color>
+    <color name="call_arrow_green">#00c853</color>
+    <color name="call_arrow_blue">#00a8ff</color>
     <color name="call_arrow_red">#ff2e58</color>
 
     <color name="contact_all_list_background_color">#FFFFFF</color>
