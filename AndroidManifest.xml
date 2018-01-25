@@ -70,6 +70,7 @@
         android:icon="@mipmap/ic_contacts_launcher"
         android:roundIcon="@mipmap/ic_contacts_launcher_round"
         android:label="@string/applicationLabel"
+        android:appCategory="social"
         android:supportsRtl="true"
         android:taskAffinity="android.task.contacts"
         android:usesCleartextTraffic="false">
