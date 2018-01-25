@@ -57,6 +57,9 @@
     <uses-permission android:name="android.permission.READ_SYNC_STATS"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
+    <!-- Following used for phone location data -->
+    <uses-permission android:name="mokee.permission.READ_PHONE_LOCATION" />
+
     <uses-feature
         android:name="android.hardware.telephony"
         android:required="false"/>

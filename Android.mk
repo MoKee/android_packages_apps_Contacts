@@ -50,6 +50,8 @@ LOCAL_STATIC_JAVA_LIBRARIES := \
     legacy-android-test \
     junit
 
+LOCAL_JAVA_LIBRARIES := mokee-cloud
+
 LOCAL_PACKAGE_NAME := Contacts
 LOCAL_CERTIFICATE := shared
 LOCAL_PRIVILEGED_MODULE := true
