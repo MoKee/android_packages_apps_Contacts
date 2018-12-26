@@ -29,6 +29,8 @@ LOCAL_STATIC_JAVA_LIBRARIES := \
     guava \
     libphonenumber
 
+LOCAL_JAVA_LIBRARIES := mokee-cloud
+
 LOCAL_USE_AAPT2 := true
 
 LOCAL_AAPT_FLAGS := \

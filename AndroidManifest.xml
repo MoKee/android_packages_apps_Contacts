@@ -59,6 +59,9 @@
     <!-- Required in P to run Service.startForeground() -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
 
+    <!-- Following used for phone location data -->
+    <uses-permission android:name="mokee.permission.READ_PHONE_LOCATION" />
+
     <uses-feature
         android:name="android.hardware.telephony"
         android:required="false"/>
