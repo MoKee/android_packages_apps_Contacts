@@ -75,7 +75,7 @@ public class LetterTileDrawable extends Drawable {
 
     private int mColor;
     private Character mLetter = null;
-    private boolean mIsChineseLetter = false;
+    private boolean mIsCJKLetter = false;
 
     public LetterTileDrawable(final Resources res) {
         if (sColors == null) {
@@ -158,7 +158,7 @@ public class LetterTileDrawable extends Drawable {
             sFirstChar[0] = mLetter;
 
             // Scale text by canvas bounds and user selected scaling factor
-            sPaint.setTextSize(mScale * sLetterToTileRatio * minDimension * (mIsChineseLetter ? 0.75f : 1f));
+            sPaint.setTextSize(mScale * sLetterToTileRatio * minDimension * (mIsCJKLetter ? 0.75f : 1f));
             sPaint.getTextBounds(sFirstChar, 0, 1, sRect);
             sPaint.setTypeface(Typeface.create("sans-serif", Typeface.NORMAL));
             sPaint.setColor(sTileFontColor);
@@ -272,9 +272,9 @@ public class LetterTileDrawable extends Drawable {
                 && isEnglishLetter(displayName.charAt(0))) {
             mLetter = Character.toUpperCase(displayName.charAt(0));
         } else if (!TextUtils.isEmpty(displayName)
-                && com.mokee.utils.TextUtils.isChineseLetter(displayName.charAt(0))) {
+                && com.mokee.utils.TextUtils.isCJKLetter(displayName.charAt(0))) {
             mLetter = Character.toUpperCase(displayName.charAt(0));
-            mIsChineseLetter = true;
+            mIsCJKLetter = true;
         } else {
             mLetter = null;
         }
