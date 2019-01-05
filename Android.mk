@@ -13,6 +13,8 @@ LOCAL_SRC_FILES := $(call all-java-files-under, $(src_dirs))
 LOCAL_RESOURCE_DIR := $(addprefix $(LOCAL_PATH)/, $(res_dirs))
 LOCAL_ASSET_DIR := $(addprefix $(LOCAL_PATH)/, $(asset_dirs))
 
+LOCAL_JAVA_LIBRARIES := mokee-cloud
+
 LOCAL_STATIC_ANDROID_LIBRARIES := \
     com.google.android.material_material \
     androidx.transition_transition \
