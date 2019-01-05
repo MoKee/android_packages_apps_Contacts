@@ -23,6 +23,10 @@ android_app {
         "libphonenumber",
     ],
 
+    libs: [
+        "mokee-cloud",
+    ],
+
     certificate: "shared",
     product_specific: true,
     privileged: true,
