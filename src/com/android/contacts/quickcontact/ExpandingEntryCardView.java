@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2014 The Android Open Source Project
- * Copyright (C) 2014-2018 The MoKee Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +52,6 @@ import android.widget.TextView;
 
 import com.android.contacts.R;
 import com.android.contacts.dialog.CallSubjectDialog;
-import com.mokee.cloud.location.OfflineNumber;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -666,15 +664,10 @@ public class ExpandingEntryCardView extends CardView {
         }
 
         final TextView text = (TextView) view.findViewById(R.id.text);
-        String location = OfflineNumber.detect(entry.getHeader(), getContext());
         if (!TextUtils.isEmpty(entry.getText())) {
-            text.setText(TextUtils.isEmpty(location) ? entry.getText() : entry.getText() + " " + location);
+            text.setText(entry.getText());
         } else {
-            if (TextUtils.isEmpty(location)) {
-                text.setVisibility(View.GONE);
-            } else {
-                text.setText(location);
-            }
+            text.setVisibility(View.GONE);
         }
 
         final ImageView textIcon = (ImageView) view.findViewById(R.id.icon_text);
