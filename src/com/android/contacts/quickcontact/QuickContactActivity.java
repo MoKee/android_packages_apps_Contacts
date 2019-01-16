@@ -1,6 +1,7 @@
 /*
 
  * Copyright (C) 2009 The Android Open Source Project
+ * Copyright (C) 2019 The MoKee Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -168,6 +169,7 @@ import com.android.contacts.widget.MultiShrinkScroller.MultiShrinkScrollerListen
 import com.android.contacts.widget.QuickContactImageView;
 import com.android.contactsbind.HelpUtils;
 import com.google.common.collect.Lists;
+import com.mokee.cloud.location.OfflineNumber;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -1536,6 +1538,14 @@ public class QuickContactActivity extends ContactsActivity {
                         text = Phone.getTypeLabel(res, kindTypeColumn, label).toString();
                         phoneLabel= text;
                         primaryContentDescription.append(text).append(" ");
+                    }
+                }
+                String location = OfflineNumber.detect(phone.getNumber(), context);
+                if (!TextUtils.isEmpty(location) && !TextUtils.equals(contactData.getDisplayName(), location)) {
+                    if (TextUtils.isEmpty(text)) {
+                        text = location;
+                    } else {
+                        text = text + " " + location;
                     }
                 }
                 primaryContentDescription.append(header);
