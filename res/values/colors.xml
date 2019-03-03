@@ -63,8 +63,9 @@
     <!-- Color of the margin for cards -->
     <color name="card_margin_color">#f4f4f4</color>
 
-    <color name="call_arrow_green">#2aad6f</color>
-    <color name="call_arrow_red">#ff2e58</color>
+    <color name="call_arrow_red">#C53929</color>
+    <color name="call_arrow_blue">#00a8ff</color>
+    <color name="call_arrow_green">#00c853</color>
 
     <!-- Background color of pinned header items. -->
     <color name="list_item_pinned_header_color">@color/background_primary</color>
