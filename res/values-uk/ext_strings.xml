@@ -17,6 +17,5 @@
      limitations under the License.
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="menu_emergency_information_txt">Informação de emergência</string>
-    <string name="call_via_template">Chamar via <xliff:g id="account">%1$s</xliff:g></string>
+    <string name="call_via_template">Зателефонувати через <xliff:g id="account">%1$s</xliff:g></string>
 </resources>
